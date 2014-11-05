@@ -12,7 +12,7 @@ apply plugin: 'application'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-mainClassName = 'net.rpools.tokentool.TokenTool'
+mainClassName = 'net.rptools.tokentool.TokenTool'
 
 version = getVersionName()
 
@@ -39,9 +39,12 @@ configurations {
 
 dependencies {
     osxTools 'com.oracle.appbundler:AppBundlerTask:1.0'
-    compile 'net.rptools.rplib:rplib:1.0.b134'
+    compile 'net.rptools.rplib:rplib:1.0.b87'
     compile 'de.muntjak.tinylookandfeel:tinylaf-nocp:1.4.0'
     compile 'net.java.abeille:abeille-formsrt:2.0'
+    compile 'commons-logging:commons-logging:1.1.1'
+    compile 'log4j:log4j:1.2.16'
+    compile 'commons-io:commons-io:2.0'
 }
 
 ext.compileDate = new Date();
