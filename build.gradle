@@ -114,10 +114,19 @@ jar {
 assemble.dependsOn += copyLibs;
 
 
-task zipRelease(type: Zip) {
+task copyProjectFiles(type: Sync) {
+    from jar.destinationDir.getPath()
+    into 'build/tmp/dist'
+    outputs.upToDateWhen {
+        false
+    }
+}
+copyProjectFiles.mustRunAfter('jar')
+
+task zipRelease(dependsOn: copyProjectFiles, type: Zip) {
     from 'build/tmp/dist/'
     into  ''
-    baseName = 'maptool-' + getVersionName()
+    baseName = 'tokentool-' + getVersionName()
     destinationDir new File(projectDir, 'build')
     outputs.upToDateWhen {
         false
@@ -126,10 +135,10 @@ task zipRelease(type: Zip) {
 
 
 
-task osxApp() << {
+task osxApp(dependsOn: copyProjectFiles) << {
     def baseDir = '.'
     def buildVersion = rootProject.getVersionName()
-    def mainClassName = project(":maptool").mainClassName
+    def mainClassName = mainClassName
     def sourceDir = 'build/tmp/dist'
     ant {
         taskdef(
@@ -139,12 +148,12 @@ task osxApp() << {
         )
         bundleapp(
             outputdirectory: 'build/tmp/',
-            name: 'MapTool-' + buildVersion,
-            displayname: 'MapTool-' + buildVersion,
-            identifier: 'net.rptools.maptool',
+            name: 'TokenTool-' + buildVersion,
+            displayname: 'TokenTool-' + buildVersion,
+            identifier: 'net.rptools.tokentool',
             mainclassname: mainClassName,
             signature: 'RPTM',
-            icon: 'build-resources/maptool-icon.icns'
+            icon: 'build-resources/tokentool-icon.icns'
         ) {
             classpath(dir: sourceDir) {
                 include(name: '*.jar')
@@ -162,9 +171,9 @@ task osxApp() << {
 }
 
 task zipOSXApp(dependsOn: osxApp, type: Zip) {
-    from 'build/tmp/MapTool-' + getVersionName() + '.app'
-    into  'MapTool-' + getVersionName() + '.app'
-    baseName = 'maptool-' + getVersionName() + '-osx'
+    from 'build/tmp/TokenTool-' + getVersionName() + '.app'
+    into  'TokenTool-' + getVersionName() + '.app'
+    baseName = 'tokentool-' + getVersionName() + '-osx'
     destinationDir new File(projectDir, 'build')
     outputs.upToDateWhen {
         false
@@ -173,7 +182,7 @@ task zipOSXApp(dependsOn: osxApp, type: Zip) {
 
 
 
-task release() {
+task release(dependsOn: assemble) {
     println 'Creating Release'
 }
 release.dependsOn += zipRelease
