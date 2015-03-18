@@ -121,10 +121,11 @@ public class OverlayPanel extends ImagePanel implements SelectionListener, DropT
             }
             
             new Thread(){
-            	public void run() {
+            	@Override
+				public void run() {
                     List<Object> selectedIds = getSelectedIds();
                     
-                    OverlayPanelModel model = (OverlayPanelModel) getModel();
+                    OverlayPanelModel model = getModel();
                     for (Object id : selectedIds) {
                         
                         File file = model.getFile((Integer) id);

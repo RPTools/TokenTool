@@ -30,6 +30,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
@@ -46,15 +47,23 @@ import java.awt.event.MouseWheelListener;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JPanel;
 
+import org.apache.commons.io.FilenameUtils;
+
 import net.rptools.lib.image.ImageUtil;
 import net.rptools.lib.swing.PositionalLayout;
 import net.rptools.lib.swing.SwingUtil;
+import net.rptools.lib.transferable.FileTransferableHandler;
 import net.rptools.lib.transferable.ImageTransferableHandler;
 import net.rptools.tokentool.AppState;
 import net.rptools.tokentool.TokenCompositor;
@@ -172,7 +181,6 @@ public class TokenCompositionPanel extends JPanel implements
 			g.drawImage(tokenImage, tokenOffsetX, tokenOffsetY, width, height,
 					this);
 		} else {
-
 			g.setColor(Color.white);
 			g.drawString("Drag an image onto this pane", messageX, messageY);
 			messageY += 15;
@@ -181,9 +189,6 @@ public class TokenCompositionPanel extends JPanel implements
 		if ( ! AppState.compositionProperties.isBase() ) {
 			paintOverlay(g,size);
 		}
-
-		
-		// OVERLAY
 	}
 
 	public void setToken(BufferedImage tokenImage) {
@@ -195,6 +200,10 @@ public class TokenCompositionPanel extends JPanel implements
 
 		repaint();
 		fireCompositionChanged();
+	}
+	
+	public BufferedImage getBaseImage() {
+		return tokenImage;
 	}
 
 	public void setOverlay(BufferedImage overlayImage) {
@@ -231,7 +240,7 @@ public class TokenCompositionPanel extends JPanel implements
 		repaint();
 		fireCompositionChanged();
 	}
-
+	
 	public void fireCompositionChanged() {
 		changeObservers.fireChangeEvent();
 	}
@@ -285,6 +294,26 @@ public class TokenCompositionPanel extends JPanel implements
 
 		Transferable transferable = dtde.getTransferable();
 		dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+		
+		try
+		{
+			if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
+			{
+				List<URL> urls = new FileTransferableHandler().getTransferObject(transferable);
+				
+				for (URL url : urls)
+				{
+					String baseName = java.net.URLDecoder.decode(FilenameUtils.getBaseName(url.getFile()), "UTF-8");
+			        TokenTool.getFrame().getControlPanel().setNamePrefixField(baseName);
+				}
+			}
+		}
+		catch (UnsupportedFlavorException | IOException e1)
+		{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		try {
 			Image image = new ImageTransferableHandler()
 					.getTransferObject(transferable);

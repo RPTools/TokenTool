@@ -25,7 +25,6 @@
 package net.rptools.tokentool.ui;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 
 import javax.swing.DefaultListCellRenderer;

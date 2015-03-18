@@ -21,6 +21,7 @@ import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
 import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
@@ -154,6 +155,7 @@ public class RegionSelector  {
 				
 			};
 			panel.addMouseListener(new MouseAdapter() {
+				@Override
 				public void mousePressed(java.awt.event.MouseEvent e) {
 					if (!bounds.contains(e.getPoint())) {
 						close();
@@ -245,7 +247,7 @@ public class RegionSelector  {
 					}
 				}
 			});
-			panel.getInputMap(panel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ENTER"), "close");
+			panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ENTER"), "close");
 			panel.getActionMap().put("close", new AbstractAction() {
 				public void actionPerformed(ActionEvent e) {
 					close();

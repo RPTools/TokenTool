@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.datatransfer.Transferable;
@@ -73,7 +74,14 @@ public class OverlayPanelModel implements ImagePanelModel {
 	}
 
 	public Image getImage(final int index) {
-		BufferedImage image = imageMap.get(imageFiles[index]);
+		if( index >= imageFiles.length || index < 0) {
+			// index is out of bounds
+			// how should i handle that?
+			// why does it happens??
+			throw new IndexOutOfBoundsException();
+		}
+		BufferedImage image =  imageMap.get(imageFiles[index]);
+		
 		if (image == null) {
 			image = tempImage;
 			imageMap.put(imageFiles[index], image);
@@ -96,8 +104,12 @@ public class OverlayPanelModel implements ImagePanelModel {
 	}
 
     public String getCaption(int index) {
+    	if( index >= 0 && index < imageFiles.length) {
     	Image image = getImage(index);
         return image.getWidth(null) + "x" + image.getHeight(null);
+    	} else {
+    		return "n/a";
+    	}
     }
     
     public File getFile(int index) {
@@ -109,6 +121,22 @@ public class OverlayPanelModel implements ImagePanelModel {
     }
     public void removeChangeListener(PropertyChangeListener listener) {
     	changeSupport.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * @see net.rptools.lib.swing.ImagePanelModel#getBackground(int)
+     */
+    public Paint getBackground(int index) {
+     //throw new UnsupportedOperationException("Added by newer version of RPLIB, but not used here.");
+    	return null;
+    }
+
+    /**
+     * @see net.rptools.lib.swing.ImagePanelModel#getDecorations(int)
+     */
+    public Image[] getDecorations(int index) {
+      //throw new UnsupportedOperationException("Added by newer version of RPLIB, but not used here.");
+    	return null;
     }
     
 }
