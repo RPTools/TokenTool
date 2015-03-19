@@ -27,7 +27,6 @@ package net.rptools.tokentool;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
@@ -103,7 +102,7 @@ public class TokenCompositor {
         
         Graphics2D g = composedImage.createGraphics();
         if (props.isSolidBackground()) {
-        	g.setColor(Color.white);
+        	g.setColor(props.getBackgroundColor());
         	g.fillRect(0, 0, width, height);
         }
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);

@@ -54,7 +54,7 @@ public class OverlayListModel extends AbstractListModel implements ComboBoxModel
 	}
 	
 	public Object getSelectedItem() {
-		return selectedIndex >= 0 ? thumbList.get(selectedIndex) : null;
+		return (selectedIndex >= 0 && selectedIndex < thumbList.size()) ? thumbList.get(selectedIndex) : null;
 	}
 	public void setSelectedItem(Object anItem) {
 		selectedIndex = thumbList.indexOf(anItem);
@@ -71,7 +71,7 @@ public class OverlayListModel extends AbstractListModel implements ComboBoxModel
 	}
 	
 	public BufferedImage getSelectedOverlay() {
-		return selectedIndex >= 0 ? overlayList.get(selectedIndex) : null;
+		return (selectedIndex >= 0 && selectedIndex < overlayList.size()) ? overlayList.get(selectedIndex) : null;
 	}
 	
 	public void refresh() {

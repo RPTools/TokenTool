@@ -8,6 +8,7 @@ apply plugin: 'java'
 apply plugin: 'findbugs'
 apply plugin: 'pmd'
 apply plugin: 'application'
+apply plugin: 'eclipse'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -17,7 +18,6 @@ mainClassName = 'net.rptools.tokentool.TokenTool'
 version = getVersionName()
 
 ext.repo = Grgit.open(project.file('.'))
-
 
 task wrapper(type: Wrapper) {
     gradleVersion='2.1'
@@ -39,7 +39,10 @@ configurations {
 
 dependencies {
     osxTools 'com.oracle.appbundler:AppBundlerTask:1.0'
-    compile 'net.rptools.rplib:rplib:1.0.b87'
+    compile 'net.rptools.rplib:rplib:1.0.b136'
+    compile 'net.rptools.parser:parser:1.1.b24'
+    compile 'com.withay:withay-util:1.0'
+    compile 'com.thoughtworks.xstream:xstream:1.4.8'
     compile 'de.muntjak.tinylookandfeel:tinylaf-nocp:1.4.0'
     compile 'net.java.abeille:abeille-formsrt:2.0'
     compile 'commons-logging:commons-logging:1.1.1'
@@ -55,6 +58,9 @@ repositories {
     mavenCentral()
     maven {
         url = 'http://maptool.craigs-stuff.net/repo/'
+    }
+    maven {
+        url = 'http://www.nerps.net/repo/'
     }
 }
 

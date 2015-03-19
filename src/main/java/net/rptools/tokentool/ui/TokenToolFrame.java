@@ -37,30 +37,31 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.BevelBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.rptools.lib.FileUtil;
 import net.rptools.lib.image.ImageUtil;
 import net.rptools.lib.swing.AboutDialog;
 import net.rptools.lib.swing.SwingUtil;
-import net.rptools.lib.swing.preference.FramePreferences;
+import net.rptools.lib.swing.preference.WindowPreferences;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.AppMenuBar;
 import net.rptools.tokentool.TokenTool;
 
-public class TokenToolFrame extends JFrame {
+public class TokenToolFrame extends JFrame
+{
 
 	private TokenCompositionPanel compositionPanel;
-
 	private TokenPreviewPanel previewPanel;
-
 	private ControlPanel controlPanel;
-
 	private JFileChooser saveChooser;
-
 	private AboutDialog aboutDialog;
+	public static String VERSION = "";
 
-	public TokenToolFrame() {
+	public TokenToolFrame()
+	{
 
 		super("TokenTool");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -69,38 +70,53 @@ public class TokenToolFrame extends JFrame {
 		init();
 	}
 
-	private void init() {
+	private void init()
+	{
 		setLayout(new BorderLayout());
 
-		try {
+		try
+		{
 			setIconImage(ImageUtil.getImage("net/rptools/tokentool/image/minilogo.png"));
-		} catch (IOException ioe) {
-			System.err.println ("Could not load icon image");
+		}
+		catch (IOException ioe)
+		{
+			System.err.println("Could not load icon image");
 		}
 
 		// ABOUT
-		try {
+		try
+		{
 			String credits = null;
-			try {
+			try
+			{
 				credits = new String(FileUtil.loadResource("net/rptools/tokentool/credits.html"));
-			} catch (IllegalArgumentException iae) {
+			}
+			catch (IllegalArgumentException iae)
+			{
 				credits = "Could not be loaded";
 			}
-			
+
 			String version = "DEVELOPMENT";
-			try {
-				if (getClass().getClassLoader().getResource("net/rptools/tokentool/version.txt") != null) {
+			try
+			{
+				if (getClass().getClassLoader().getResource("net/rptools/tokentool/version.txt") != null)
+				{
 					version = new String(FileUtil.loadResource("net/rptools/tokentool/version.txt"));
 				}
-			} catch (IllegalArgumentException iae) {
+			}
+			catch (IllegalArgumentException iae)
+			{
 				version = "Could not load version";
 			}
-			
+
+			VERSION = version;
 			credits = credits.replace("%VERSION%", version);
 			Image logo = ImageUtil.getImage("net/rptools/lib/image/rptools-logo.png");
 
 			aboutDialog = new AboutDialog(this, logo, credits);
-		} catch (IOException ioe) {
+		}
+		catch (IOException ioe)
+		{
 			// This won't happen
 		}
 
@@ -114,16 +130,16 @@ public class TokenToolFrame extends JFrame {
 
 		setSize(400, 300);
 		SwingUtil.centerOnScreen(this);
-		new FramePreferences(AppConstants.APP_NAME, "mainFrame", this);
+		new WindowPreferences(AppConstants.APP_NAME, "mainFrame", this);
 	}
 
-	private JPanel createCenterPanel() {
+	private JPanel createCenterPanel()
+	{
 		JPanel panel = new JPanel(new BorderLayout());
 
 		JPanel wrapperPanel = new JPanel(new GridLayout());
-		wrapperPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createEmptyBorder(3, 3, 3, 3), BorderFactory
-				.createBevelBorder(BevelBorder.LOWERED)));
+		wrapperPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3),
+				BorderFactory.createBevelBorder(BevelBorder.LOWERED)));
 
 		wrapperPanel.add(getTokenCompositionPanel());
 
@@ -132,7 +148,8 @@ public class TokenToolFrame extends JFrame {
 		return panel;
 	}
 
-	private JPanel createEastPanel() {
+	private JPanel createEastPanel()
+	{
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
@@ -141,24 +158,27 @@ public class TokenToolFrame extends JFrame {
 		previewWrapper.add(getPreviewPanel());
 
 		panel.add(BorderLayout.NORTH, previewWrapper);
-		panel.add(BorderLayout.CENTER, new JScrollPane(getControlPanel(),
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+		panel.add(BorderLayout.CENTER, new JScrollPane(getControlPanel(), ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER));
 
 		return panel;
 	}
 
-	public ControlPanel getControlPanel() {
+	public ControlPanel getControlPanel()
+	{
 
-		if (controlPanel == null) {
+		if (controlPanel == null)
+		{
 			controlPanel = new ControlPanel();
 		}
 
 		return controlPanel;
 	}
 
-	public TokenPreviewPanel getPreviewPanel() {
-		if (previewPanel == null) {
+	public TokenPreviewPanel getPreviewPanel()
+	{
+		if (previewPanel == null)
+		{
 			previewPanel = new TokenPreviewPanel();
 			getTokenCompositionPanel().addChangeObserver(previewPanel);
 		}
@@ -166,23 +186,43 @@ public class TokenToolFrame extends JFrame {
 		return previewPanel;
 	}
 
-	public TokenCompositionPanel getTokenCompositionPanel() {
-		if (compositionPanel == null) {
+	public TokenCompositionPanel getTokenCompositionPanel()
+	{
+		if (compositionPanel == null)
+		{
 			compositionPanel = new TokenCompositionPanel();
 		}
 
 		return compositionPanel;
 	}
 
-	public void showAboutDialog() {
+	public void showAboutDialog()
+	{
 		aboutDialog.setVisible(true);
 	}
 
-	public BufferedImage getComposedToken() {
+	public BufferedImage getComposedToken()
+	{
 		return compositionPanel.getComposedToken();
 	}
 
-	public File showSaveDialog() {
+	public File showSaveDialog(boolean isToken)
+	{
+		saveChooser.resetChoosableFileFilters();
+		String tokenName = TokenTool.getFrame().getControlPanel().getNamePrefix();
+		
+		if (isToken)
+		{
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("MapTool Tokens (*.rptok)", "rptok");
+			saveChooser.setSelectedFile(new File(tokenName));
+			saveChooser.setFileFilter(filter);
+		}
+		else
+		{
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Images (*.png)", "png");
+			saveChooser.setSelectedFile(new File(tokenName));
+			saveChooser.setFileFilter(filter);
+		}
 
 		int action = saveChooser.showSaveDialog(TokenTool.getFrame());
 		return action == JFileChooser.APPROVE_OPTION ? saveChooser.getSelectedFile() : null;

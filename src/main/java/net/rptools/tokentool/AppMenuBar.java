@@ -28,43 +28,46 @@ package net.rptools.tokentool;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JSeparator;
 
 public class AppMenuBar extends JMenuBar {
 
-    public AppMenuBar() {
-        
-        add(createFileMenu());
-        add(createToolMenu());
-        add(createHelpMenu());
-    }
+	public AppMenuBar() {
 
-    protected JMenu createToolMenu() {
-    	JMenu menu = new JMenu("Tool");
-    	
-    	menu.add(new JMenuItem(AppActions.SCREEN_CAP));
-    	
-    	return menu;
-    }
-    
-    protected JMenu createHelpMenu() {
-    	
-    	JMenu menu = new JMenu("Help");
+		add(createFileMenu());
+		add(createToolMenu());
+		add(createHelpMenu());
+	}
 
-    	menu.add(new JMenuItem(AppActions.SHOW_ABOUT));
-    	
-    	return menu;
-    }
-    
-    protected JMenu createFileMenu() {
-        
-        JMenu menu = new JMenu("File");
-        
-        menu.add(new JMenuItem(AppActions.SHOW_OVERLAY_MANAGEMENT_DIALOG));
+	protected JMenu createToolMenu() {
+		JMenu menu = new JMenu("Tool");
+
+		menu.add(new JMenuItem(AppActions.SCREEN_CAP));
+		menu.addSeparator();
+		menu.add(new JMenuItem(AppActions.COPY_CLIPBOARD));
+		menu.add(new JMenuItem(AppActions.PASTE_CLIPBOARD));
+
+		return menu;
+	}
+
+	protected JMenu createHelpMenu() {
+
+		JMenu menu = new JMenu("Help");
+
+		menu.add(new JMenuItem(AppActions.SHOW_ABOUT));
+
+		return menu;
+	}
+
+	protected JMenu createFileMenu() {
+
+		JMenu menu = new JMenu("File");
+
+		menu.add(new JMenuItem(AppActions.SHOW_OVERLAY_MANAGEMENT_DIALOG));
         menu.add(new JMenuItem(AppActions.SAVE_TOKEN));
-        menu.addSeparator();
-        menu.add(new JMenuItem(AppActions.EXIT_APP));
-        
-        return menu;
-    }
+        menu.add(new JMenuItem(AppActions.SAVE_TOKEN_IMAGE));
+		menu.addSeparator();
+		menu.add(new JMenuItem(AppActions.EXIT_APP));
+
+		return menu;
+	}
 }
