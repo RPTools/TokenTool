@@ -51,6 +51,7 @@ import javax.swing.KeyStroke;
 import org.apache.commons.io.FilenameUtils;
 
 import net.rptools.lib.MD5Key;
+import net.rptools.lib.image.ImageUtil;
 import net.rptools.lib.io.PackedFile;
 import net.rptools.maptool.model.Asset;
 import net.rptools.maptool.model.AssetManager;
@@ -66,6 +67,8 @@ public class AppActions
 {
 	private static final String PROP_VERSION = "version";
 	private static final String ASSET_DIR = "assets/";
+	private static final int THUMB_SIZE = 100;
+	public static final String FILE_THUMBNAIL = "thumbnail";
 	
 	public static final Action EXIT_APP = new AbstractAction()
 	{
@@ -306,6 +309,10 @@ public class AppActions
 				Image image = ImageIO.read(tokenImageFile);
 				_token.setShape(TokenUtil.guessTokenType(image));
 
+				// set the height/width, fixes dragging to stamp layer issue
+				_token.setHeight(tokenImg.getHeight());
+				_token.setWidth(tokenImg.getWidth());
+				
 				// set the portrait image asset
 				Asset portrait = AssetManager.createAsset(portraitImageFile); // Change for portrait
 				AssetManager.putAsset(portrait);
@@ -318,6 +325,8 @@ public class AppActions
 					pakFile = new PackedFile(rptok_file);
 					saveAssets(_token.getAllImageAssets(), pakFile);
 					pakFile.setContent(_token);
+					BufferedImage thumb = ImageUtil.createCompatibleImage(image, THUMB_SIZE, THUMB_SIZE, null);
+					pakFile.putFile(FILE_THUMBNAIL, ImageUtil.imageToBytes(thumb, "png"));
 					pakFile.setProperty(PROP_VERSION, TokenToolFrame.VERSION);
 					pakFile.save();
 				}
