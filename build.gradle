@@ -3,21 +3,24 @@ import java.text.SimpleDateFormat
 import org.ajoberstar.grgit.*
 
 
-
 apply plugin: 'java'
 apply plugin: 'findbugs'
 apply plugin: 'pmd'
 apply plugin: 'application'
 apply plugin: 'eclipse'
+apply plugin: 'launch4gradle'
+
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 mainClassName = 'net.rptools.tokentool.TokenTool'
-
 version = getVersionName()
 
 ext.repo = Grgit.open(project.file('.'))
+ext.finalName = 'TokenTool'
+ext.finalWinVersion = '1.0.33.0'
+ext.finalVersion = '1.0b33'
 
 task wrapper(type: Wrapper) {
     gradleVersion='2.1'
@@ -25,10 +28,12 @@ task wrapper(type: Wrapper) {
 
 buildscript {
     repositories {
-        mavenCentral()
+		mavenCentral()
+		mavenLocal()
     }
     dependencies {
         classpath 'org.ajoberstar:gradle-git:0.11.2'
+        classpath 'cc.cu.netvl.gradle:launch4gradle:1'
     }
 }
 
@@ -119,6 +124,84 @@ jar {
 }
 assemble.dependsOn += copyLibs;
 
+
+task fatJar(type: Jar) {
+	//create a single Jar with all dependencies
+	
+	manifest {
+        attributes 'Implementation-Title': 'TokenTool',  
+        	'Implementation-Version': version,
+        	'Main-Class': mainClassName
+    }
+    baseName = 'TokenTool'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+
+launch4j {
+	//create windows executable using launch4j (must have it installed first)
+    //launch4jProgram = 'D:/programs/launch4j/launch4jc.exe'
+
+    executable {
+		
+		headerType = 'GUI'
+		outputFileName = finalName + '-' + finalVersion + '.exe'
+		dontWrapJar = false
+		//errTitle
+		downloadUrl = 'http://java.com/download'
+		supportUrl  = 'http://forums.rptools.net/'
+		//cmdLine
+		//chdir
+		stayAlive = false
+		icon = file('other-resources/tokenTool-512px.ico')	
+
+		classPath {
+			mainClass = mainClassName
+		}
+   
+   		jre {
+   			//path
+   			bundledJre64Bit = false
+   			minVersion = '1.6.0'
+   			//maxVersion
+   			jdkPreference = 'PREFER_JRE'
+   			runtimeBits = 'BITS_64_OR_32'
+   			//initialHeapSize
+   			//initialHeapPercent
+   			//maxHeapSize
+   			//maxHeapPercent
+   		}
+   		splash {
+			file = file('/other-resources/TokenTool_splash.bmp')
+			waitForWindow  = true
+			timeout = 60
+			timeoutErr = true
+		}
+
+		versionInfo {
+			fileVersion = finalWinVersion
+			txtFileVersion = finalVersion
+			fileDescription = 'TokenTool powered by RPTools'
+			copyright = '2015'
+			productVersion = finalWinVersion
+			txtProductVersion = finalVersion
+			productName = finalName
+			companyName = 'RPTools'
+			internalName = finalName
+			originalFilename  = finalName + '.exe'
+		}
+
+		/*	
+		messages {
+			startupErr = 'some text'
+			bundledJreErr = 'some text'
+			jreVersionErr = 'some text'
+			launcherErr = 'some text'
+		}
+		*/
+	}
+}
 
 task copyProjectFiles(type: Sync) {
     from jar.destinationDir.getPath()
