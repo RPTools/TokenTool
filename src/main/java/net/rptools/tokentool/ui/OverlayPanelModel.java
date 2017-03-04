@@ -111,8 +111,13 @@ public class OverlayPanelModel implements ImagePanelModel {
     		return "n/a";
     	}
     }
-    
-    public File getFile(int index) {
+
+	@Override
+	public String getCaption(int i, boolean b) {
+		return null;
+	}
+
+	public File getFile(int index) {
         return imageFiles[index];
     }
     
