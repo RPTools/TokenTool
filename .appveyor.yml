@@ -1,0 +1,18 @@
+version: '{branch}'
+skip_non_tags: true
+image: Visual Studio 2017
+platform: x64
+shallow_clone: true
+build_script:
+- gradlew.bat deploy
+artifacts:
+- path: releases\release-*\bundles\TokenTool-*.exe
+  name: tokentool
+deploy:
+- provider: GitHub
+  description: Draft release from AppVeyor
+  auth_token:
+    secure: HXIHe/F7K2yGOZ0I56DW5PevrQDe+zjyunjORGKYaUGxFtvPYPcmOdjZT69tzHcS
+  artifact: tokentool
+  draft: true
+  force_update: true

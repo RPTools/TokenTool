@@ -1,5 +1,9 @@
+# Gradle
+################################################################################
 .gradle
-build/
+/gradle.properties
+/gradlew.bat
+/gradlew
 
 # OS generated files
 ################################################################################
@@ -12,24 +16,28 @@ Icon?
 ehthumbs.db
 Thumbs.db
 
+# IDEs
+################################################################################
+*.iml
+.idea/*
+.*.sw[p0-9]
+.sw[p0-9]
+.project
+.settings/*
+.classpath
+.history
+workbench.xmi
+
+# Keystore
+build-resources/rptools-keystore
 
 # Others
 ################################################################################
 *.log
 *~
-target/
-build/
-out/
-
-
-# IDEs
-################################################################################
-*.iml
-.idea/
-.*.sw[p0-9]
-.sw[p0-9]
-.project
-.settings/
-.classpath
-.history
-/bin/
+target/*
+build/*
+out/*
+releases/*
+bin/*
+sentry-events/*

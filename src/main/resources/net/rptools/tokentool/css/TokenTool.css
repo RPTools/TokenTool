@@ -1,0 +1,117 @@
+/* leaf is a PsuedoClass added via the controller to child-only nodes, e.g. overlays... */
+.tree-cell:leaf {
+	-fx-content-display: graphic-only;
+	-fx-indent: 0.0;
+}
+
+.token-view {
+	-fx-background-image: url("../image/grid.png");
+	-fx-background-size: 20.0, 20.0;
+	-fx-border-color: black;
+	-fx-border-width: 2.0;
+}
+
+.composite-view-checkered {
+	-fx-background-image: url("../image/grid.png");
+	-fx-background-size: 20.0, 20.0;
+	-fx-border-color: black;
+	-fx-border-width: 2.0;
+}
+
+.composite-view-black {
+	-fx-background-color: black;
+	-fx-background: black;
+	-fx-border-color: black;
+	-fx-border-width: 2.0;
+}
+
+.composite-transparent {
+	-fx-background-color: transparent;
+	-fx-background: transparent;
+	-fx-border-color: black;
+	-fx-border-width: 2.0;
+}
+
+.selection-region-pane {
+	-fx-background-color: #00ff0926;
+}
+
+.manage-overlay-selected {
+	-fx-background-color: #cce8ffaa;
+	-fx-border-color: #cce8ff;
+	-fx-border-width: 2.0;
+}
+
+.manage-overlay-not-selected {
+	-fx-background-color: transparent;
+	-fx-border-color: transparent;
+	-fx-border-width: 2.0;
+}
+
+.stack-pane > .viewport {
+	-fx-background-color: transparent;
+}
+
+.stack-pane {
+   -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+	-fx-background-color: transparent;
+}
+
+.scroll-pane {
+   -fx-background-color: transparent;
+}
+
+.overlay-toggle-button {
+  -fx-base: transparent;
+}
+
+.overlay-toggle-button:selected {
+  -fx-base: #cce8ffaa;
+}
+
+.overlay-toggle-button:focused {
+  -fx-base: #cce8ffaa;
+}
+
+.aspect-lock-toggle-button {
+  -fx-graphic: url("../image/unlocked.png");
+}
+
+.aspect-lock-toggle-button:selected {
+  -fx-graphic: url("../image/locked.png");
+}
+
+.add-folder-button {
+	-fx-min-width: 26px;
+	-fx-min-height: 24px;
+	-fx-background-image: url("../image/folder.png");
+	-fx-background-size: 20px 20px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+.add-overlay-button {
+	-fx-min-width: 26px;
+	-fx-min-height: 24px;
+	-fx-background-image: url("../image/add.png");
+	-fx-background-size: 20px 20px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+.delete-button {
+	-fx-min-width: 26px;
+	-fx-min-height: 24px;
+	-fx-background-image: url("../image/trash.png");
+	-fx-background-size: 20px 20px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+/* CSS For Credits window */
+.text-area, .text-area .viewport, .text-area .content {
+    -fx-background-color: transparent ;
+}
