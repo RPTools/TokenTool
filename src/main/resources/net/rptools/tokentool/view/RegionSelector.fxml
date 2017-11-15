@@ -64,7 +64,7 @@
 						<Image url="@../image/side-drag-35px.png" />
 					</image>
 				</ImageView>
-				<Button fx:id="captureButton" defaultButton="true" mnemonicParsing="false" onAction="#captureButton_onAction" text="%RegionSelector.button.Capture" GridPane.columnIndex="1" GridPane.rowIndex="2">
+				<Button fx:id="captureButton" defaultButton="true" mnemonicParsing="false" onAction="#captureButton_onAction" styleClass="hortaFont" text="%RegionSelector.button.Capture" GridPane.columnIndex="1" GridPane.rowIndex="2">
 					<GridPane.margin>
 						<Insets bottom="20.0" />
 					</GridPane.margin>

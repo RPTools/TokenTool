@@ -22,13 +22,10 @@
 					<children>
 						<AnchorPane>
 							<children>
-								<Label alignment="CENTER" style="&#10;" text="%ManageOverlays.label.Directory" textAlignment="CENTER" wrapText="false">
+								<Label alignment="CENTER" styleClass="hortaFont" text="%ManageOverlays.label.Directory" textAlignment="CENTER" wrapText="false">
 									<opaqueInsets>
 										<Insets />
 									</opaqueInsets>
-									<font>
-										<Font size="18.0" fx:id="x11" />
-									</font>
 									<textFill>
 										<Color blue="0.624" green="0.624" red="0.624" fx:id="x21" />
 									</textFill>
@@ -59,7 +56,7 @@
 						</ScrollPane>
 						<AnchorPane>
 							<children>
-								<Button fx:id="restoreButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#restoreButton_onAction" text="%ManageOverlays.button.Restore_Default_Overlays" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+								<Button fx:id="restoreButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#restoreButton_onAction" style="-fx-font-size: 15;" styleClass="hortaFont" text="%ManageOverlays.button.Restore_Default_Overlays" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 									<font>
 										<Font size="10.0" />
 									</font>
@@ -72,13 +69,10 @@
 					<children>
 						<AnchorPane>
 							<children>
-								<Label alignment="CENTER" layoutX="5.0" style="&#10;" text="%ManageOverlays.label.Overlays" textAlignment="CENTER" wrapText="false">
+								<Label alignment="CENTER" layoutX="5.0" styleClass="hortaFont" text="%ManageOverlays.label.Overlays" textAlignment="CENTER" wrapText="false">
 									<opaqueInsets>
 										<Insets />
 									</opaqueInsets>
-									<font>
-										<Font size="18.0" fx:id="x111" />
-									</font>
 									<textFill>
 										<Color blue="0.624" green="0.624" red="0.624" fx:id="x211" />
 									</textFill>
@@ -115,14 +109,11 @@
 				</VBox>
 				<VBox>
 					<children>
-						<Label alignment="CENTER" style="&#10;" text="%ManageOverlays.label.Details" textAlignment="CENTER" wrapText="false">
+						<Label alignment="CENTER" style="&#10;" styleClass="hortaFont" text="%ManageOverlays.label.Details" textAlignment="CENTER" wrapText="false">
 							<opaqueInsets>
 								<Insets />
 							</opaqueInsets>
-							<font>
-								<Font size="18.0" fx:id="x1" />
-							</font>
-							<textFill>
+									<textFill>
 								<Color blue="0.624" green="0.624" red="0.624" fx:id="x2" />
 							</textFill>
 							<padding>

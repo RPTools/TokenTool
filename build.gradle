@@ -47,7 +47,7 @@ ext {
 // Default parameters for gradle run command
 run {
 	args = [ '-v='+version, '-vendor='+vendor ]
-	applicationDefaultJvmArgs = [ "-Djavafx.preloader=net.rptools.tokentool.view.SplashScreenLoader", "-Dsentry.environment=Development" ]
+	applicationDefaultJvmArgs = [ "-Djavafx.preloader=" + preloaderClassName, "-Dsentry.environment=Development" ]
 
 	if(System.getProperty("exec.args") != null) {
 		args System.getProperty("exec.args").split()
@@ -139,7 +139,8 @@ task uberJar(type: Jar) {
 		'Built-JDK': System.getProperty('java.version'),
 		'Source-Compatibility': project.sourceCompatibility,
 		'Target-Compatibility': project.targetCompatibility,
-		'Main-Class': project.mainClassName
+		'Main-Class': project.mainClassName,
+		'JavaFX-Preloader-Class' : preloaderClassName
 	}
 
 	from {
@@ -151,9 +152,17 @@ task uberJar(type: Jar) {
 	exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
 }
 
-task deploy(dependsOn: uberJar) {
+task copyLicense(type: Copy) {
+	from('/license')
+	into('/build/libs/')
+	include('*')
+}
+
+task deploy(dependsOn: [uberJar, copyLicense]) {
 	group = 'distribution'
 	description = 'Create native installers'
+
+	tasks.findByName('copyLicense').mustRunAfter 'uberJar'
 
 	doLast {
 		// Using the -deploy Command with Bundler Arguments
@@ -170,7 +179,8 @@ task deploy(dependsOn: uberJar) {
 				"-appclass", mainClassName,
 				"-preloader", preloaderClassName,
 				"-srcdir", "build/libs",
-				"-srcfiles", "tokentool-"+version+".jar",	// leave lowercase for linux, windows does not care
+				"-srcfiles", "*.jar",
+				"-srcfiles", "COPYING.AFFERO",
 				"-outdir", "releases/release-"+version,
 				"-outfile", project.name,
 				"-name", project.name,
@@ -182,7 +192,11 @@ task deploy(dependsOn: uberJar) {
 				"-Bwin.menuGroup=" + vendor,
 				"-BshortcutHint=true",
 				"-BappVersion=" + version,
-				"-Bwin.msi.productVersion=" + msiVersion
+				"-Bwin.msi.productVersion=" + msiVersion,
+				"-BlicenseFile=COPYING.AFFERO",
+				"-BlicenseType=GNU AFFERO GENERAL PUBLIC LICENSE",
+				"-Bcategory=Graphics",
+				"-Bemail=tokentool@nerps.net"
 		}
 	}
 }

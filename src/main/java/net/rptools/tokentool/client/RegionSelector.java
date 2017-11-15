@@ -17,6 +17,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import net.rptools.tokentool.AppConstants;
@@ -40,8 +41,10 @@ public class RegionSelector {
 			stage = new Stage();
 			Scene scene = new Scene(root);
 
-			scene.setFill(Color.TRANSPARENT);
+			// scene.setFill(Color.TRANSPARENT);
+			scene.setFill(new Color(0, 0, 0, 0.25));
 			stage.initStyle(StageStyle.TRANSPARENT);
+			stage.initModality(Modality.APPLICATION_MODAL);
 			stage.getIcons().add(new Image(getClass().getResourceAsStream(AppConstants.REGION_SELECTOR_ICON)));
 			stage.setScene(scene);
 

@@ -1,3 +1,14 @@
+/* Add custom font */
+@font-face {
+    font-family: Horta;
+    src: url('../fonts/Horta.ttf');
+}
+
+.hortaFont {
+	-fx-font-family: "Horta";
+	-fx-font-size: 20;
+}
+
 /* leaf is a PsuedoClass added via the controller to child-only nodes, e.g. overlays... */
 .tree-cell:leaf {
 	-fx-content-display: graphic-only;

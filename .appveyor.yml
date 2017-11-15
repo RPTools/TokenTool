@@ -13,6 +13,6 @@ deploy:
   description: Draft release from AppVeyor
   auth_token:
     secure: HXIHe/F7K2yGOZ0I56DW5PevrQDe+zjyunjORGKYaUGxFtvPYPcmOdjZT69tzHcS
-  artifact: tokentool
+  artifact: TokenTool
   draft: true
   force_update: true

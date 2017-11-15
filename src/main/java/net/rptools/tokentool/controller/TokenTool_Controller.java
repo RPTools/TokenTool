@@ -42,6 +42,8 @@ import javafx.concurrent.Task;
 import javafx.css.PseudoClass;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
@@ -70,8 +72,10 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.RotateEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -452,8 +456,17 @@ public class TokenTool_Controller {
 
 	@FXML
 	void compositeTokenPane_OnScroll(ScrollEvent event) {
+		// if event is touch enabled, skip this as it will be handled by onZoom & onRotate handlers
+		if (event.isDirect())
+			return;
+
 		if (event.isShiftDown()) {
-			Double r = portraitImageView.getRotate() + event.getDeltaX() / 20;
+			// Note: OK, this is stupid but on Windows shift + mousewheel returns X delta but on Ubuntu it returns Y delta...
+			double delta = event.getDeltaY();
+			if (delta == 0)
+				delta = event.getDeltaX();
+
+			Double r = portraitImageView.getRotate() + delta / 20;
 
 			if (r < -360d || r > 360d)
 				r = 0d;
@@ -461,11 +474,34 @@ public class TokenTool_Controller {
 			portraitImageView.setRotate(r);
 		} else {
 			Double scale = portraitImageView.getScaleY() * Math.pow(1.001, event.getDeltaY());
+
 			portraitImageView.setScaleX(scale);
 			portraitImageView.setScaleY(scale);
 		}
 
+		event.consume();
 		updateTokenPreviewImageView();
+	}
+
+	@FXML
+	void compositeTokenPane_OnZoom(ZoomEvent event) {
+		Double scale = portraitImageView.getScaleY() * event.getZoomFactor();
+
+		portraitImageView.setScaleX(scale);
+		portraitImageView.setScaleY(scale);
+	}
+
+	@FXML
+	void compositeTokenPane_OnRotate(RotateEvent event) {
+		log.info("isDirect(): " + event.isDirect());
+		log.info("getTotalAngle" + event.getTotalAngle());
+
+		double r = portraitImageView.getRotate() + (event.getAngle() * 0.75);
+		if (r < -360d || r > 360d)
+			r = 0d;
+
+		portraitImageView.setRotate(r);
+		event.consume();
 	}
 
 	@FXML
@@ -847,6 +883,7 @@ public class TokenTool_Controller {
 		TreeItem<Path> root = new TreeItem<>(dir.toPath());
 		root.setExpanded(false);
 		File[] files = dir.listFiles();
+		final String I18N_CACHE_TEXT = I18N.getString("TokenTool.treeview.caching");
 
 		final Task<Void> task = new Task<Void>() {
 			@Override
@@ -862,7 +899,7 @@ public class TokenTool_Controller {
 						TreeItem<Path> imageNode = new TreeItem<>(filePath, ImageUtil.getOverlayThumb(new ImageView(), filePath));
 						root.getChildren().add(imageNode);
 						loadCount.getAndIncrement();
-						updateProgress(loadCount.doubleValue(), overlayCount);
+						overlayTreeProgressBar.progressProperty().set(loadCount.doubleValue() / overlayCount);
 					}
 				}
 
@@ -905,16 +942,17 @@ public class TokenTool_Controller {
 			}
 		};
 
-		overlayTreeProgressBar.progressProperty().bind(task.progressProperty());
 		overlayTreeProgressBar.progressProperty().addListener(observable -> {
-			Platform.runLater(() -> progressBarLabel.setText(I18N.getString("TokenTool.treeview.caching") + Math.round(overlayCount - loadCount.doubleValue()) + "..."));
+			Platform.runLater(() -> progressBarLabel.setText(I18N_CACHE_TEXT + Math.round(overlayCount - loadCount.doubleValue()) + "..."));
 		});
 
 		// Only add this listener to the parent task so it's only called once
 		if (parent == null) {
 			overlayTreeProgressBar.progressProperty().addListener(observable -> {
-				if (overlayTreeProgressBar.getProgress() >= 1)
-					treeViewFinish();
+				Platform.runLater(() -> {
+					if (overlayTreeProgressBar.getProgress() >= 1)
+						treeViewFinish();
+				});
 			});
 		}
 

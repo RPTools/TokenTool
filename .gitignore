@@ -23,7 +23,6 @@ Thumbs.db
 .*.sw[p0-9]
 .sw[p0-9]
 .project
-.settings/*
 .classpath
 .history
 workbench.xmi
@@ -41,3 +40,5 @@ out/*
 releases/*
 bin/*
 sentry-events/*
+/bin/
+/build/

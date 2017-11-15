@@ -49,7 +49,7 @@ import net.rptools.tokentool.util.ImageUtil;
  * 
  * @author Jamz
  * 
- *         To see splashscreen during testing, use JVM arg: -Djavafx.preloader=net.rptools.tokentool.fx.view.SplashScreenLoader Otherwise splashscreen will only show when defined as
+ *         To see splashscreen during testing, use JVM arg: -Djavafx.preloader=net.rptools.tokentool.client.SplashScreenLoader Otherwise splashscreen will only show when defined as
  *         JavaFX-Preloader-Class in the JAR manifest.
  * 
  */

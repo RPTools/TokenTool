@@ -140,6 +140,9 @@ public class AppSetup {
 	 * @return true if valid version format
 	 */
 	private static boolean isNewerVersion(String version, String installedVersion) {
+		if (version.equals("DEVELOPMENT") || installedVersion.equals("DEVELOPMENT"))
+			return false;
+
 		String[] versions = version.indexOf(".") > 0 ? version.split("\\.") : new String[] { version };
 		String[] installedVersions = installedVersion.indexOf(".") > 0 ? installedVersion.split("\\.") : new String[] { installedVersion };
 

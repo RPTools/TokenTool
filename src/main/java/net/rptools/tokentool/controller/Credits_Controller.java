@@ -14,17 +14,23 @@ import org.apache.logging.log4j.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import net.rptools.tokentool.AppConstants;
+import net.rptools.tokentool.AppSetup;
 import net.rptools.tokentool.client.TokenTool;
 
 public class Credits_Controller {
 	private static final Logger log = LogManager.getLogger(Credits_Controller.class);
 
 	@FXML private Hyperlink rptoolsHyperlink;
+	@FXML private Label versionLabel;
 
 	@FXML
 	void initialize() {
 		assert rptoolsHyperlink != null : "fx:id=\"rptoolsHyperlink\" was not injected: check your FXML file 'Credits.fxml'.";
+		assert versionLabel != null : "fx:id=\"versionLabel\" was not injected: check your FXML file 'Credits.fxml'.";
+
+		versionLabel.setText(versionLabel.getText() + " " + TokenTool.getVersion());
 	}
 
 	@FXML

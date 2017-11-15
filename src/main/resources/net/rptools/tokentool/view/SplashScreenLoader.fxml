@@ -9,7 +9,8 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="splashLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.rptools.tokentool.controller.SplashScreen_Controller">
+<StackPane fx:id="splashLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@../css/TokenTool.css" xmlns="http://javafx.com/javafx/8.0.141"
+	xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.rptools.tokentool.controller.SplashScreen_Controller">
 	<ImageView pickOnBounds="true" preserveRatio="true">
 		<image>
 			<Image url="@../image/token_tool_splash.jpg" />
@@ -20,7 +21,8 @@
 			<Insets />
 		</StackPane.margin>
 	</ProgressBar>
-	<Rectangle arcHeight="5.0" arcWidth="5.0" blendMode="MULTIPLY" fill="#c7c8c9" height="17.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="420.0" StackPane.alignment="BOTTOM_CENTER">
+	<Rectangle arcHeight="5.0" arcWidth="5.0" blendMode="MULTIPLY" fill="#c7c8c9" height="17.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="420.0"
+		StackPane.alignment="BOTTOM_CENTER">
 		<StackPane.margin>
 			<Insets bottom="18.0" />
 		</StackPane.margin>
@@ -33,27 +35,30 @@
 			<Insets bottom="18.0" left="3.0" />
 		</StackPane.margin>
 	</Label>
-   <Label fx:id="versionLabel" layoutX="13.0" layoutY="225.0" prefWidth="415.0" text="%splash.version.label" textFill="#fcc53b" StackPane.alignment="TOP_LEFT">
-      <font>
-         <Font name="Horta" size="20.0" />
-      </font>
-      <StackPane.margin>
-         <Insets left="5.0" top="3.0" />
-      </StackPane.margin>
-   </Label>
-   <ImageView fx:id="nerpsLogoImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" scaleX="0.4" scaleY="0.4" translateX="-175.0" translateY="55.0">
-      <image>
-         <Image url="@../image/nerps_logo.png" />
-      </image>
-   </ImageView>
-   <ImageView fx:id="infusedWithNerpsImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" scaleX="1.4" scaleY="1.4" translateX="-20.0" translateY="72.0">
-      <image>
-         <Image url="@../image/infused_with_nerps.png" />
-      </image>
-   </ImageView>
-   <ImageView fx:id="byRP_ToolsImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" scaleX="0.7" scaleY="0.7" translateX="130.0" translateY="35.0">
-      <image>
-         <Image url="@../image/by_rp_tools.png" />
-      </image>
-   </ImageView>
+	<Label fx:id="versionLabel" layoutX="13.0" layoutY="225.0" prefWidth="415.0" styleClass="hortaFont" text="%splash.version.label" textFill="#fcc53b" StackPane.alignment="TOP_LEFT">
+		<font>
+			<Font name="Horta" size="20.0" />
+		</font>
+		<StackPane.margin>
+			<Insets left="5.0" top="3.0" />
+		</StackPane.margin>
+	</Label>
+	<ImageView fx:id="nerpsLogoImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" scaleX="0.4" scaleY="0.4" translateX="-175.0"
+		translateY="55.0">
+		<image>
+			<Image url="@../image/nerps_logo.png" />
+		</image>
+	</ImageView>
+	<ImageView fx:id="infusedWithNerpsImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" scaleX="1.4" scaleY="1.4" translateX="-20.0"
+		translateY="72.0">
+		<image>
+			<Image url="@../image/infused_with_nerps.png" />
+		</image>
+	</ImageView>
+	<ImageView fx:id="byRP_ToolsImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" scaleX="0.7" scaleY="0.7" translateX="130.0"
+		translateY="35.0">
+		<image>
+			<Image url="@../image/by_rp_tools.png" />
+		</image>
+	</ImageView>
 </StackPane>
