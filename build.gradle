@@ -153,8 +153,8 @@ task uberJar(type: Jar) {
 }
 
 task copyLicense(type: Copy) {
-	from('/license')
-	into('/build/libs/')
+	from('license')
+	into('build/libs/')
 	include('*')
 }
 
