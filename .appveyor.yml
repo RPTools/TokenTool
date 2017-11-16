@@ -14,13 +14,15 @@ after_test:
 - ps: ls $env:appveyor_build_folder\releases\release-*\bundles\
 artifacts:
 - path: releases\release-*\bundles\TokenTool-*.exe
-  name: TokenTool
+  name: TokenTool-Install
+- path: releases\release-*\TokenTool-*.jar
+  name: TokenTool-Jar
 deploy:
 - provider: GitHub
   description: Windows release from AppVeyor
   auth_token:
     secure: HXIHe/F7K2yGOZ0I56DW5PevrQDe+zjyunjORGKYaUGxFtvPYPcmOdjZT69tzHcS
-  artifact: TokenTool
+  artifact: TokenTool-Install, TokenTool-Jar
   draft: true
   force_update: true
 notifications:
