@@ -22,6 +22,7 @@ deploy:
     secure: HXIHe/F7K2yGOZ0I56DW5PevrQDe+zjyunjORGKYaUGxFtvPYPcmOdjZT69tzHcS
   artifact: TokenTool-Install, TokenTool-Jar
   draft: true
+  prerelease: true
   force_update: true
   on:
     appveyor_repo_tag: true
