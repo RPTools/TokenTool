@@ -1,4 +1,4 @@
-version: '{branch}.{build}'
+version: '{branch}'
 pull_requests:
   do_not_increment_build_number: true
 skip_non_tags: true
@@ -8,7 +8,7 @@ platform: x64
 build_script:
 - gradlew.bat deploy
 before_test:
-- ps: echo my build folder is [$env:appveyor_build_folder]
+- ps: echo my build folder is $env:appveyor_build_folder
 after_test:
 - ps: ls $env:appveyor_build_folder\releases\release-*\bundles\
 artifacts:
