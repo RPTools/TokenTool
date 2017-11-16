@@ -179,7 +179,7 @@ task deploy(dependsOn: [uberJar, copyLicense]) {
 				"-appclass", mainClassName,
 				"-preloader", preloaderClassName,
 				"-srcdir", "build/libs",
-				"-srcfiles", "*.jar",
+				"-srcfiles", jar.archiveName,
 				"-srcfiles", "COPYING.AFFERO",
 				"-outdir", "releases/release-"+version,
 				"-outfile", project.name,

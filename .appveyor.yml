@@ -1,18 +1,32 @@
-version: '{branch}'
+version: '{branch}.{build}'
+pull_requests:
+  do_not_increment_build_number: true
 skip_non_tags: true
 image: Visual Studio 2017
+shallow_clone: true
 platform: x64
 shallow_clone: true
 build_script:
 - gradlew.bat deploy
+before_test:
+- ps: echo my build folder is [$env:appveyor_build_folder]
+after_test:
+- ps: ls $env:appveyor_build_folder\releases\release-*\bundles\
 artifacts:
 - path: releases\release-*\bundles\TokenTool-*.exe
-  name: tokentool
+  name: TokenTool
 deploy:
 - provider: GitHub
-  description: Draft release from AppVeyor
+  description: Windows release from AppVeyor
   auth_token:
     secure: HXIHe/F7K2yGOZ0I56DW5PevrQDe+zjyunjORGKYaUGxFtvPYPcmOdjZT69tzHcS
   artifact: TokenTool
   draft: true
   force_update: true
+notifications:
+- provider: Slack
+  incoming_webhook: https://hooks.slack.com/services/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
+  channel: '#development'
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
