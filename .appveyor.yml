@@ -5,7 +5,6 @@ skip_non_tags: true
 image: Visual Studio 2017
 shallow_clone: true
 platform: x64
-shallow_clone: true
 build_script:
 - gradlew.bat deploy
 before_test:
