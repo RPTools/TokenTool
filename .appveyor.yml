@@ -17,7 +17,7 @@ artifacts:
 deploy:
 - provider: GitHub
   description: Windows release from AppVeyor
-  tag: '{appveyor_repo_tag_name}'
+  tag: $(APPVEYOR_REPO_TAG_NAME)
   auth_token:
     secure: HXIHe/F7K2yGOZ0I56DW5PevrQDe+zjyunjORGKYaUGxFtvPYPcmOdjZT69tzHcS
   artifact: TokenTool-Install, TokenTool-Jar
