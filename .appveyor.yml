@@ -1,12 +1,10 @@
 version: '{branch}.{build}'
 pull_requests:
   do_not_increment_build_number: true
-skip_non_tags: false
 image: Visual Studio 2017
-shallow_clone: true
 platform: x64
 build_script:
-- gradlew.bat deploy
+- gradlew.bat build
 after_test:
 - ps: ls $env:appveyor_build_folder\releases\release-*\bundles\
 artifacts:
@@ -14,6 +12,8 @@ artifacts:
   name: TokenTool-Install
 - path: releases\release-*\TokenTool-*.jar
   name: TokenTool-Jar
+before_deploy:
+- gradlew.bat deploy
 deploy:
 - provider: GitHub
   description: Windows release from AppVeyor
@@ -22,8 +22,8 @@ deploy:
     secure: HXIHe/F7K2yGOZ0I56DW5PevrQDe+zjyunjORGKYaUGxFtvPYPcmOdjZT69tzHcS
   artifact: TokenTool-Install, TokenTool-Jar
   draft: true
-  prerelease: true
-  force_update: true
+  prerelease: false
+  force_update: false
   on:
     appveyor_repo_tag: true
 notifications:
