@@ -7,7 +7,7 @@ import org.gradle.plugins.ide.eclipse.model.AccessRule
 
 buildscript {
 	dependencies {
-		classpath "com.diffplug.spotless:spotless-plugin-gradle:3.4.1"
+		classpath "com.diffplug.spotless:spotless-plugin-gradle:3.7.0"
 	}
 
 	repositories {
@@ -58,6 +58,7 @@ spotless {
 	java {
 		licenseHeaderFile	'spotless.license.java'
 		eclipse().configFile('build-resources/eclipse.prefs.formatter.xml')
+		removeUnusedImports()
 	}
 
 	format 'misc', {
