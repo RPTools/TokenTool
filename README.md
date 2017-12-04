@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/JamzTheMan/tokentool.svg?branch=2.0)](https://travis-ci.org/JamzTheMan/TokenTool)
+[![Build Status](https://travis-ci.org/JamzTheMan/TokenTool.svg?branch=2.0)](https://travis-ci.org/JamzTheMan/TokenTool)
 [![Build status](https://ci.appveyor.com/api/projects/status/jxic7g0ph02fqkic?svg=true)](https://ci.appveyor.com/project/JamzTheMan/TokenTool)
 
 # TokenTool 2.0
