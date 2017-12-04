@@ -252,19 +252,15 @@ public class ImageUtil {
 		return croppedImageView.snapshot(parameter, null);
 	}
 
-	public static Image composePreview(StackPane compositeTokenPane, Color bgColor, ImageView portraitImageView, ImageView maskImageView, ImageView overlayImageView, boolean useAsBase) {
+	public static Image composePreview(StackPane compositeTokenPane, Color bgColor, ImageView portraitImageView, ImageView maskImageView, ImageView overlayImageView, boolean useAsBase,
+			boolean clipImage) {
 		// Process layout as maskImage may have changed size if the overlay was changed
 		compositeTokenPane.layout();
-
 		SnapshotParameters parameter = new SnapshotParameters();
 		Image finalImage = null;
+		Group blend;
 
-		if (useAsBase) {
-			// Snapshot the whole compositeTokenpane to capture portrait and overlay and then crop the image to it's smallest size.
-			// The layers have already been blended together so no other work needed.
-			parameter.setFill(Color.TRANSPARENT);
-			finalImage = autoCropImage(compositeTokenPane.snapshot(parameter, null));
-		} else {
+		if (clipImage) {
 			// We need to clip the portrait image first then blend the overlay image over it
 			// We will first get a snapshot of the portrait equal to the mask overlay image width/height
 			double x, y, width, height;
@@ -281,7 +277,6 @@ public class ImageUtil {
 
 			ImageView overlayCopyImageView = new ImageView();
 			ImageView clippedImageView = new ImageView();
-			Group blend;
 
 			parameter.setViewport(viewPort);
 			parameter.setFill(bgColor);
@@ -304,10 +299,17 @@ public class ImageUtil {
 			overlayCopyImageView.setFitHeight(overlayImageView.getFitHeight());
 			overlayCopyImageView.setOpacity(overlayImageView.getOpacity());
 
-			blend = new Group(clippedImageView, overlayCopyImageView);
+			if (useAsBase) {
+				blend = new Group(overlayCopyImageView, clippedImageView);
+			} else {
+				blend = new Group(clippedImageView, overlayCopyImageView);
+			}
 
 			// Last, we'll clean up any excess transparent edges by cropping it
 			finalImage = autoCropImage(blend.snapshot(parameter, null));
+		} else {
+			parameter.setFill(Color.TRANSPARENT);
+			finalImage = autoCropImage(compositeTokenPane.snapshot(parameter, null));
 		}
 
 		return finalImage;
@@ -377,7 +379,8 @@ public class ImageUtil {
 	/*
 	 * These are the file types supported by TokenTool
 	 */
-	public static final IOFileFilter SUPPORTED_FILE_FILTER = new SuffixFileFilter(new String[] { ".psd", ".png", ".gif", ".jpg", ".jpeg", ".bmp" });
+	public static final String[] SUPPORTED_FILE_FILTER_ARRAY = new String[] { ".psd", ".png", ".gif", ".jpg", ".jpeg", ".bmp" };
+	public static final IOFileFilter SUPPORTED_FILE_FILTER = new SuffixFileFilter(SUPPORTED_FILE_FILTER_ARRAY);
 
 	public static final List<ExtensionFilter> GET_EXTENSION_FILTERS() {
 		List<ExtensionFilter> extensionFilters = new ArrayList<ExtensionFilter>();

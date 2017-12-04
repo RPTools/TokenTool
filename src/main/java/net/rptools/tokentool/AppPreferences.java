@@ -25,6 +25,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
 import net.rptools.tokentool.client.TokenTool;
 import net.rptools.tokentool.controller.TokenTool_Controller;
 import net.rptools.tokentool.util.FileSaveUtil;
@@ -37,6 +38,11 @@ public class AppPreferences {
 	private static final String OVERLAY_WIDTH = "overlayWidthSpinner";
 	private static final String OVERLAY_HEIGHT = "overlayHeightSpinner";
 	private static final String OVERLAY_USE_BASE = "overlayUseAsBaseCheckbox";
+	private static final String OVERLAY_CLIP_PORTRAIT = "clipPortraitCheckbox";
+	private static final String BACKGROUND_COLOR_RED = "backgroundColor_RED";
+	private static final String BACKGROUND_COLOR_BLUE = "backgroundColor_BLUE";
+	private static final String BACKGROUND_COLOR_GREEN = "backgroundColor_GREEN";
+	private static final String BACKGROUND_COLOR_ALPHA = "backgroundColor_ALPHA";
 	private static final String LAST_FILE = "lastFileSaved";
 	private static final String LAST_PORTRAIT_FILE = "lastPortrait";
 	private static final String FILE_NAME_TEXT_FIELD = "fileNameTextField";
@@ -61,6 +67,13 @@ public class AppPreferences {
 		prefs.putDouble(OVERLAY_WIDTH, tokentool_Controller.getOverlayWidth());
 		prefs.putDouble(OVERLAY_HEIGHT, tokentool_Controller.getOverlayHeight());
 		prefs.putBoolean(OVERLAY_USE_BASE, tokentool_Controller.getOverlayUseAsBase());
+		prefs.putBoolean(OVERLAY_CLIP_PORTRAIT, tokentool_Controller.getClipPortraitCheckbox());
+
+		// Save Portrait background color
+		prefs.putDouble(BACKGROUND_COLOR_RED, tokentool_Controller.getBackgroundColor().getRed());
+		prefs.putDouble(BACKGROUND_COLOR_GREEN, tokentool_Controller.getBackgroundColor().getGreen());
+		prefs.putDouble(BACKGROUND_COLOR_BLUE, tokentool_Controller.getBackgroundColor().getBlue());
+		prefs.putDouble(BACKGROUND_COLOR_ALPHA, tokentool_Controller.getBackgroundColor().getOpacity());
 
 		// Save naming details
 		prefs.putBoolean(USE_FILE_NUMBERING, tokentool_Controller.getUseFileNumberingCheckbox());
@@ -118,6 +131,16 @@ public class AppPreferences {
 		tokentool_Controller.setOverlayWidth(prefs.getDouble(OVERLAY_WIDTH, AppConstants.DEFAULT_OVERLAY_SIZE));
 		tokentool_Controller.setOverlayHeight(prefs.getDouble(OVERLAY_HEIGHT, AppConstants.DEFAULT_OVERLAY_SIZE));
 		tokentool_Controller.setOverlayUseAsBase(prefs.getBoolean(OVERLAY_USE_BASE, AppConstants.DEFAULT_OVERLAY_USE_BASE));
+		tokentool_Controller.setClipPortraitCheckbox(prefs.getBoolean(OVERLAY_CLIP_PORTRAIT, AppConstants.DEFAULT_OVERLAY_CLIP_PORTRAIT));
+
+		// Save Portrait background color
+		double red = prefs.getDouble(BACKGROUND_COLOR_RED, 0);
+		double grn = prefs.getDouble(BACKGROUND_COLOR_GREEN, 0);
+		double blu = prefs.getDouble(BACKGROUND_COLOR_BLUE, 0);
+		double alpha = prefs.getDouble(BACKGROUND_COLOR_ALPHA, 0);
+
+		if (red + grn + blu + alpha > 0)
+			tokentool_Controller.setBackgroundColor(new Color(red, grn, blu, alpha));
 
 		// Restore naming details
 		tokentool_Controller.setUseFileNumberingCheckbox(prefs.getBoolean(USE_FILE_NUMBERING, AppConstants.DEFAULT_USE_FILE_NUMBERING));

@@ -26,6 +26,7 @@
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
@@ -137,7 +138,10 @@
 																			</VBox.margin>
 																		</Label>
 																		<ColorPicker fx:id="backgroundColorPicker" editable="true" maxWidth="1.7976931348623157E308" minWidth="180.0" onAction="#backgroundColorPicker_onAction" promptText="%options.pane.portrait.color.prompt" VBox.vgrow="ALWAYS" />
-																		<Button fx:id="removeBackgroundButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeBackgroundButton_onAction" text="Remove Background Color" />
+																		<Button fx:id="removeBackgroundButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeBackgroundButton_onAction" text="Remove Background Color">
+                                                         <font>
+                                                            <Font size="11.0" />
+                                                         </font></Button>
                                                       <Label text="%options.pane.portrait.label.Opacity">
                                                          <VBox.margin>
                                                             <Insets top="10.0" />
@@ -221,11 +225,20 @@
 																					</children>
 																				</StackPane>
 																				<TreeView fx:id="overlayTreeView" prefWidth="50.0" showRoot="false" VBox.vgrow="ALWAYS" />
-																				<CheckBox fx:id="overlayUseAsBaseCheckbox" mnemonicParsing="false" onAction="#overlayUseAsBaseCheckbox_onAction" styleClass="controls-padding" text="%options.pane.overlay.checkbox.use_as_base" />
+                                                            <HBox>
+                                                               <children>
+                                                                  <FlowPane hgap="10.0" prefWidth="187.0" vgap="10.0">
+                                                                     <children>
+            																				<CheckBox fx:id="overlayUseAsBaseCheckbox" mnemonicParsing="false" onAction="#overlayUseAsBaseCheckbox_onAction" styleClass="controls-padding" text="%options.pane.overlay.checkbox.use_as_base" />
+                                                                        <CheckBox fx:id="clipPortraitCheckbox" mnemonicParsing="false" onAction="#overlayUseAsBaseCheckbox_onAction" styleClass="controls-padding" text="%options.pane.overlay.checkbox.clip_portrait" />
+                                                                     </children>
+                                                                  </FlowPane>
+                                                               </children>
+                                                            </HBox>
                                                             <HBox spacing="5.0">
                                                                <children>
-                                                                  <Slider fx:id="overlayTransparencySlider" blockIncrement="0.5" majorTickUnit="0.25" max="1.0" maxWidth="1.7976931348623157E308" minorTickCount="5" value="1.0" HBox.hgrow="ALWAYS" />
-                                                                  <Label graphicTextGap="0.0" text="%options.pane.overlay.slider.Opacity">
+                                                                  <Slider fx:id="overlayTransparencySlider" blockIncrement="0.5" majorTickUnit="0.25" max="1.0" maxWidth="1.7976931348623157E308" minorTickCount="5" prefHeight="14.0" prefWidth="100.0" value="1.0" HBox.hgrow="SOMETIMES" />
+                                                                  <Label graphicTextGap="0.0" text="%options.pane.overlay.slider.Opacity" HBox.hgrow="ALWAYS">
                                                                      <opaqueInsets>
                                                                         <Insets />
                                                                      </opaqueInsets>

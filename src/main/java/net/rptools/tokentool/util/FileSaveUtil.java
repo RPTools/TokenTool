@@ -10,8 +10,11 @@ package net.rptools.tokentool.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -69,6 +72,31 @@ public class FileSaveUtil {
 
 			return lastFile;
 		}
+	}
+
+	public static String cleanFileName(String fileName) {
+		return fileName.replaceAll(AppConstants.VALID_FILE_NAME_REPLACEMENT_PATTERN, AppConstants.VALID_FILE_NAME_REPLACEMENT_CHARACTER);
+	}
+
+	/*
+	 * Attempt to find filename buried inside the URL e.g. https://vignette.wikia.nocookie.net/glass-cannon/images/b/bd/Barron.jpg/revision/latest/scale-to-width-down/552?cb=20170511190014
+	 */
+	public static String searchURL(String urlString) {
+		String imageTypes = "";
+
+		for (String type : ImageUtil.SUPPORTED_FILE_FILTER_ARRAY) {
+			if (imageTypes.isEmpty())
+				imageTypes = type;
+			else
+				imageTypes += "|" + type;
+		}
+		Pattern p = Pattern.compile("([\\w-]+)\\.(?i:" + imageTypes.replace(".", "") + ")");
+		Matcher m = p.matcher(urlString);
+
+		if (m.find())
+			return m.group(1);
+		else
+			return FilenameUtils.getBaseName(urlString);
 	}
 
 	public static File getLastFile() {

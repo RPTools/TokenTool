@@ -25,7 +25,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-
+import java.util.function.UnaryOperator;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FilenameUtils;
@@ -42,8 +42,6 @@ import javafx.concurrent.Task;
 import javafx.css.PseudoClass;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
@@ -57,6 +55,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.control.TextFormatter.Change;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeCell;
@@ -124,6 +124,7 @@ public class TokenTool_Controller {
 
 	@FXML private CheckBox useFileNumberingCheckbox;
 	@FXML private CheckBox overlayUseAsBaseCheckbox;
+	@FXML private CheckBox clipPortraitCheckbox;
 
 	@FXML private TextField fileNameTextField;
 	@FXML private Label fileNameSuffixLabel;
@@ -208,6 +209,7 @@ public class TokenTool_Controller {
 
 		assert useFileNumberingCheckbox != null : "fx:id=\"useFileNumberingCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert overlayUseAsBaseCheckbox != null : "fx:id=\"overlayUseAsBaseCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
+		assert clipPortraitCheckbox != null : "fx:id=\"clipPortraitCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
 
 		assert fileNameTextField != null : "fx:id=\"fileNameTextField\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert fileNameSuffixLabel != null : "fx:id=\"fileNameSuffixLabel\" was not injected: check your FXML file 'TokenTool.fxml'.";
@@ -255,6 +257,53 @@ public class TokenTool_Controller {
 				updateTokenPreviewImageView();
 			}
 		});
+
+		// // Restrict text field to valid filename characters
+		// Pattern validDoubleText = Pattern.compile("[^a-zA-Z0-9\\\\._ \\\\/`~!@#$%\\\\^&\\\\(\\\\)\\\\-\\\\=\\\\+\\\\[\\\\]\\\\{\\\\}',\\\\\\\\:]");
+		// Pattern validText = Pattern.compile("[^a-zA-Z0-9 ]");
+		// TextFormatter<> textFormatter = new TextFormatter<>(
+		// change -> {
+		// String newText = change.getControlNewText();
+		// if (validText.matcher(newText).matches()) {
+		// return change;
+		// } else
+		// return null;
+		// });
+
+		// UnaryOperator<TextFormatter.Change> filter = new UnaryOperator<TextFormatter.Change>() {
+		// @Override
+		// public TextFormatter.Change apply(TextFormatter.Change t) {
+		// String validText = "[^a-zA-Z0-9]";
+		//
+		// if (t.isReplaced())
+		// if (t.getText().matches(validText))
+		// t.setText(t.getControlText().substring(t.getRangeStart(), t.getRangeEnd()));
+		//
+		// if (t.isAdded()) {
+		// if (t.getText().matches(validText)) {
+		// return null;
+		// }
+		// }
+		//
+		// return t;
+		// }
+		// };
+
+		UnaryOperator<Change> filter = change -> {
+			String text = change.getText();
+
+			if (text.matches(AppConstants.VALID_FILE_NAME_PATTERN)) {
+				return change;
+			} else {
+				change.setText(FileSaveUtil.cleanFileName(text));
+				;
+				return change;
+			}
+			//
+			// return null;
+		};
+		TextFormatter<String> textFormatter = new TextFormatter<>(filter);
+		fileNameTextField.setTextFormatter(textFormatter);
 
 		// Effects
 		GaussianBlur gaussianBlur = new GaussianBlur(0);
@@ -387,7 +436,7 @@ public class TokenTool_Controller {
 				if (cbImage != null)
 					updatePortrait(cbImage);
 
-				updateFileNameTextField(FilenameUtils.getBaseName(clipboard.getUrl()));
+				updateFileNameTextField(FileSaveUtil.searchURL(clipboard.getUrl()));
 			} catch (IllegalArgumentException e) {
 				log.info(e);
 			}
@@ -397,7 +446,7 @@ public class TokenTool_Controller {
 				if (cbImage != null)
 					updatePortrait(cbImage);
 
-				updateFileNameTextField(FilenameUtils.getBaseName(clipboard.getString()));
+				updateFileNameTextField(FileSaveUtil.searchURL(clipboard.getString()));
 			} catch (IllegalArgumentException e) {
 				log.info(e);
 			}
@@ -525,7 +574,7 @@ public class TokenTool_Controller {
 			updatePortrait(db.getImage());
 			event.setDropCompleted(true);
 		} else if (db.hasUrl()) {
-			updateFileNameTextField(FilenameUtils.getBaseName(db.getUrl()));
+			updateFileNameTextField(FileSaveUtil.searchURL(db.getUrl()));
 			updatePortrait(new Image(db.getUrl()));
 			event.setDropCompleted(true);
 		}
@@ -674,7 +723,7 @@ public class TokenTool_Controller {
 
 	public void updateTokenPreviewImageView() {
 		tokenImageView.setImage(ImageUtil.composePreview(compositeTokenPane, backgroundColorPicker.getValue(),
-				portraitImageView, maskImageView, overlayImageView, overlayUseAsBaseCheckbox.isSelected()));
+				portraitImageView, maskImageView, overlayImageView, overlayUseAsBaseCheckbox.isSelected(), clipPortraitCheckbox.isSelected()));
 		tokenImageView.setPreserveRatio(true);
 	}
 
@@ -709,11 +758,17 @@ public class TokenTool_Controller {
 
 	private boolean writeTokenImage(File tokenFile) {
 		try {
-			Image tokenImage = ImageUtil.resizeCanvas(tokenImageView.getImage(), getOverlayWidth(), getOverlayHeight());
+			Image tokenImage;
+			if (clipPortraitCheckbox.isSelected())
+				tokenImage = ImageUtil.resizeCanvas(tokenImageView.getImage(), getOverlayWidth(), getOverlayHeight());
+			else
+				tokenImage = tokenImageView.getImage();
 
 			return ImageIO.write(SwingFXUtils.fromFXImage(tokenImage, null), "png", tokenFile);
 		} catch (IOException e) {
 			log.error("Unable to write token to file: " + tokenFile.getAbsolutePath(), e);
+		} catch (IndexOutOfBoundsException e) {
+			log.error("Image width/height out of bounds: " + getOverlayWidth() + " x " + getOverlayHeight(), e);
 		}
 
 		return false;
@@ -825,6 +880,10 @@ public class TokenTool_Controller {
 
 	public Color getBackgroundColor() {
 		return backgroundColorPicker.getValue();
+	}
+
+	public void setBackgroundColor(Color newColor) {
+		backgroundColorPicker.setValue(newColor);
 	}
 
 	public void refreshCache() {
@@ -1017,6 +1076,15 @@ public class TokenTool_Controller {
 			overlayUseAsBaseCheckbox.fire();
 	}
 
+	public boolean getClipPortraitCheckbox() {
+		return clipPortraitCheckbox.isSelected();
+	}
+
+	public void setClipPortraitCheckbox(boolean selected) {
+		if (selected)
+			clipPortraitCheckbox.fire();
+	}
+
 	public String getFileNameTextField() {
 		return fileNameTextField.getText();
 	}
@@ -1030,7 +1098,7 @@ public class TokenTool_Controller {
 			if (text == null || text.isEmpty())
 				fileNameTextField.setText(AppConstants.DEFAULT_TOKEN_NAME);
 			else
-				fileNameTextField.setText(text);
+				fileNameTextField.setText(FileSaveUtil.cleanFileName(text));
 	}
 
 	public boolean getUseFileNumberingCheckbox() {

@@ -33,11 +33,16 @@ public class AppConstants {
 	public static final String DEFAULT_TOKEN_NAME = "token";
 	public static final String DEFAULT_FILE_NAME_SUFFIX = "0001";
 
+	public static final String VALID_FILE_NAME_PATTERN = "[a-zA-Z0-9._ `~!@#$%^&()\\-=+\\[\\]{}',]*";
+	public static final String VALID_FILE_NAME_REPLACEMENT_PATTERN = "[^a-zA-Z0-9._ `~!@#$%^&()\\-=+\\[\\]{}',]";
+	public static final String VALID_FILE_NAME_REPLACEMENT_CHARACTER = "_";
+
 	public static final int THUMB_SIZE = 100;
 	public static final int MAX_RECENT_SIZE = 10;
 
 	public static final boolean DEFAULT_OVERLAY_ASPECT = true;
 	public static final boolean DEFAULT_OVERLAY_USE_BASE = false;
+	public static final boolean DEFAULT_OVERLAY_CLIP_PORTRAIT = true;
 	public static final boolean DEFAULT_USE_FILE_NUMBERING = false;
 	public static final double DEFAULT_OVERLAY_SIZE = 256;
 

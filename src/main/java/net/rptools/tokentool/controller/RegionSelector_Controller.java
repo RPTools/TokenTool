@@ -48,6 +48,8 @@ public class RegionSelector_Controller {
 
 		try {
 			stage.hide();
+			// Robot robot = new Robot(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
+			log.info("Rect: " + new Rectangle(x, y, sceneWidth, sceneHeight));
 			BufferedImage bi = new Robot().createScreenCapture(new Rectangle(x, y, sceneWidth, sceneHeight));
 			tokenTool_Controller.updatePortrait(SwingFXUtils.toFXImage(bi, null));
 		} catch (AWTException e) {

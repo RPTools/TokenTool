@@ -41,8 +41,9 @@ public class RegionSelector {
 			stage = new Stage();
 			Scene scene = new Scene(root);
 
-			// scene.setFill(Color.TRANSPARENT);
-			scene.setFill(new Color(0, 0, 0, 0.25));
+			scene.setFill(Color.TRANSPARENT);
+			// scene.setFill(new Color(0, 0, 0, 0.0));
+			stage.initOwner(TokenTool.getInstance().getStage());
 			stage.initStyle(StageStyle.TRANSPARENT);
 			stage.initModality(Modality.APPLICATION_MODAL);
 			stage.getIcons().add(new Image(getClass().getResourceAsStream(AppConstants.REGION_SELECTOR_ICON)));

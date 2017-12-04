@@ -16,7 +16,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import net.rptools.tokentool.AppConstants;
-import net.rptools.tokentool.AppSetup;
 import net.rptools.tokentool.client.TokenTool;
 
 public class Credits_Controller {
