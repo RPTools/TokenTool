@@ -49,8 +49,7 @@ public class AppConstants {
 	public static final File OVERLAY_DIR = AppSetup.getAppHome("overlays");
 	public static final File CACHE_DIR = AppSetup.getAppHome("cache");
 
-	public static final ExtensionFilter IMAGE_EXTENSION_FILTER = new ExtensionFilter(
-			DEFAULT_IMAGE_EXTENSION_DESCRIPTION, "*" + DEFAULT_IMAGE_EXTENSION);
+	public static final ExtensionFilter IMAGE_EXTENSION_FILTER = new ExtensionFilter(DEFAULT_IMAGE_EXTENSION_DESCRIPTION, "*" + DEFAULT_IMAGE_EXTENSION);
 
 	// public static final String DEFAULT_TOKEN_EXTENSION = ".rptok";
 	// public static final String DEFAULT_TOKEN_EXTENSION_DESCRIPTION = "MapTool Token";
