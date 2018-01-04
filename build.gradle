@@ -44,8 +44,8 @@ configurations {
 
 dependencies {
     osxTools 'com.oracle.appbundler:AppBundlerTask:1.0'
-    compile 'net.rptools.rplib:rplib:1.0.b136'
-    compile 'net.rptools.parser:parser:1.1.b24'
+    compile 'net.rptools.rplib:rplib:1.4.1.4'
+    compile 'net.rptools.parser:parser:1.4.0.0'
     compile 'com.withay:withay-util:1.0'
     compile 'com.thoughtworks.xstream:xstream:1.4.8'
     compile 'de.muntjak.tinylookandfeel:tinylaf-nocp:1.4.0'
