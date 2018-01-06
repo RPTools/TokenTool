@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.rptools.tokentool.controller.TokenTool_Controller">
+	<center>
+		<VBox prefHeight="800.0" prefWidth="800.0">
+			<children>
+				<MenuBar VBox.vgrow="NEVER">
+					<menus>
+						<Menu text="%menu.title.file">
+							<items>
+								<MenuItem fx:id="fileManageOverlaysMenu" onAction="#fileManageOverlaysMenu_onAction" text="%menu.title.file.manage.overlays" />
+								<MenuItem fx:id="fileSaveAsMenu" onAction="#fileSaveAsMenu_onAction" text="%menu.title.file.save.as" />
+								<SeparatorMenuItem mnemonicParsing="false" />
+								<MenuItem fx:id="fileExitMenu" onAction="#fileExitMenu_onAction" text="%menu.title.file.exit" />
+							</items>
+						</Menu>
+						<Menu text="%menu.title.edit">
+							<items>
+								<MenuItem fx:id="editCaptureScreenMenu" onAction="#editCaptureScreenMenu_onAction" text="%menu.title.edit.capture.screen" />
+								<SeparatorMenuItem mnemonicParsing="false" />
+								<MenuItem fx:id="editCopyImageMenu" onAction="#editCopyImageMenu_onAction" text="%menu.title.edit.copy.image">
+									<accelerator>
+										<KeyCodeCombination alt="UP" code="C" control="ANY" meta="UP" shift="UP" shortcut="UP" />
+									</accelerator>
+								</MenuItem>
+								<MenuItem fx:id="editPasteImageMenu" onAction="#editPasteImageMenu_onAction" text="%menu.title.edit.paste.image">
+									<accelerator>
+										<KeyCodeCombination alt="UP" code="V" control="ANY" meta="UP" shift="UP" shortcut="UP" />
+									</accelerator>
+								</MenuItem>
+							</items>
+						</Menu>
+						<Menu fx:id="helpAboutMenu" onAction="#helpAboutMenu_onAction" text="%menu.title.help">
+							<items>
+								<MenuItem text="%menu.title.help.about" />
+							</items>
+						</Menu>
+					</menus>
+				</MenuBar>
+				<HBox spacing="5.0" VBox.vgrow="ALWAYS">
+					<children>
+						<StackPane styleClass="composite-view-checkered" HBox.hgrow="ALWAYS">
+							<children>
+								<StackPane fx:id="compositeTokenPane" onDragDone="#compositeTokenPane_DragDone" onDragDropped="#compositeTokenPane_DragDropped" onDragOver="#compositeTokenPane_DragOver" onMouseDragged="#compositeTokenPane_MouseDragged" onMouseEntered="#compositeTokenPane_MouseEntered" onMouseExited="#compositeTokenPane_MouseExited" onMousePressed="#compositeTokenPane_MousePressed" onMouseReleased="#compositeTokenPane_MouseReleased" onRotate="#compositeTokenPane_OnRotate" onScroll="#compositeTokenPane_OnScroll" onZoom="#compositeTokenPane_OnZoom">
+									<children>
+										<ScrollPane fx:id="portraitScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER">
+											<content>
+												<ImageView fx:id="portraitImageView" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" scaleX="0.6" scaleY="0.6" translateX="25.0" translateY="115.0">
+													<image>
+														<Image url="@../image/creative_commons_portrait.png" />
+													</image>
+												</ImageView>
+											</content>
+										</ScrollPane>
+										<Group fx:id="compositeGroup">
+											<children>
+												<ImageView fx:id="maskImageView" fitHeight="256.0" fitWidth="256.0" layoutX="1.0" layoutY="1.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true" visible="false">
+													<image>
+														<Image url="@../image/gear-chrome-mask.png" />
+													</image>
+												</ImageView>
+												<ImageView fx:id="overlayImageView" fitHeight="256.0" fitWidth="256.0" layoutX="1.0" layoutY="1.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
+													<image>
+														<Image url="@../image/gear-chrome-no-mask.png" />
+													</image>
+												</ImageView>
+											</children>
+										</Group>
+										<Pane fx:id="onMousePane" prefHeight="200.0" prefWidth="200.0" />
+									</children>
+								</StackPane>
+							</children>
+						</StackPane>
+						<VBox alignment="TOP_CENTER" spacing="5.0">
+							<children>
+								<BorderPane fx:id="tokenPreviewPane" styleClass="token-view" VBox.vgrow="NEVER">
+									<center>
+										<StackPane maxHeight="200.0" maxWidth="200.0" minHeight="200.0" minWidth="200.0" BorderPane.alignment="CENTER">
+											<children>
+												<ImageView fx:id="tokenImageView" fitHeight="190.0" fitWidth="190.0" onDragDetected="#tokenImageView_OnDragDetected" onDragDone="#tokenImageView_OnDragDone" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
+													<image>
+														<Image url="@../image/gear-chrome-no-mask.png" />
+													</image>
+													<StackPane.margin>
+														<Insets />
+													</StackPane.margin>
+												</ImageView>
+											</children>
+										</StackPane>
+									</center>
+								</BorderPane>
+								<AnchorPane VBox.vgrow="ALWAYS">
+									<children>
+										<AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+											<children>
+												<Accordion AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+													<panes>
+														<TitledPane fx:id="backgroundOptionsPane" expanded="false" text="%options.pane.portrait">
+															<content>
+																<VBox spacing="5.0">
+																	<children>
+																		<Label maxWidth="1.7976931348623157E308" text="%options.pane.portrait.label.Background_Color">
+																			<VBox.margin>
+																				<Insets bottom="-4.0" />
+																			</VBox.margin>
+																		</Label>
+																		<ColorPicker fx:id="backgroundColorPicker" editable="true" maxWidth="1.7976931348623157E308" minWidth="180.0" onAction="#backgroundColorPicker_onAction" promptText="%options.pane.portrait.color.prompt" VBox.vgrow="ALWAYS" />
+																		<Button fx:id="removeBackgroundButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeBackgroundButton_onAction" text="Remove Background Color">
+                                                         <font>
+                                                            <Font size="11.0" />
+                                                         </font></Button>
+                                                      <Label text="%options.pane.portrait.label.Opacity">
+                                                         <VBox.margin>
+                                                            <Insets top="10.0" />
+                                                         </VBox.margin>
+                                                      </Label>
+                                                      <Slider fx:id="portraitTransparencySlider" blockIncrement="0.5" majorTickUnit="1.0" max="1.0" minorTickCount="1" value="1.0" />
+                                                      <Label text="%options.pane.portrait.label.Gaussian_Blur">
+                                                         <VBox.margin>
+                                                            <Insets />
+                                                         </VBox.margin>
+                                                      </Label>
+                                                      <Slider fx:id="portraitBlurSlider" blockIncrement="0.25" majorTickUnit="2.0" max="63.0" minorTickCount="25" />
+                                                      <Label text="%options.pane.portrait.label.Glow" />
+                                                      <Slider fx:id="portraitGlowSlider" blockIncrement="0.1" majorTickUnit="1.0" max="1.0" minorTickCount="1" />
+																	</children>
+																</VBox>
+															</content>
+														</TitledPane>
+														<TitledPane fx:id="saveOptionsPane" expanded="false" text="%options.pane.naming">
+															<content>
+																<VBox spacing="10.0">
+																	<children>
+																		<Label styleClass="controls-label" text="%controls.filenameLabel.text">
+																			<opaqueInsets>
+																				<Insets />
+																			</opaqueInsets>
+																			<VBox.margin>
+																				<Insets bottom="-8.0" left="2.0" />
+																			</VBox.margin>
+																		</Label>
+																		<TextField fx:id="fileNameTextField" maxWidth="1.7976931348623157E308" text="token" />
+																		<CheckBox fx:id="useFileNumberingCheckbox" mnemonicParsing="false" onAction="#useFileNumberingCheckbox_onAction" styleClass="controls" text="%controls.useFileNumberingCheckbox.text" />
+																		<HBox alignment="CENTER_LEFT" spacing="5.0">
+																			<children>
+																				<Label fx:id="fileNameSuffixLabel" disable="true" styleClass="controls-label" text="%controls.filenameSuffixLabel.text" />
+																				<TextField fx:id="fileNameSuffixTextField" disable="true" prefColumnCount="3" text="0001" HBox.hgrow="ALWAYS">
+																					<HBox.margin>
+																						<Insets />
+																					</HBox.margin>
+																					<tooltip>
+																						<Tooltip text="%controls.filenameSuffixLabel.tooltip" />
+																					</tooltip>
+																				</TextField>
+																			</children>
+																			<VBox.margin>
+																				<Insets />
+																			</VBox.margin>
+																		</HBox>
+																	</children>
+																</VBox>
+															</content>
+														</TitledPane>
+														<TitledPane fx:id="overlayOptionsPane" expanded="true" text="%options.pane.overlay">
+															<content>
+																<AnchorPane>
+																	<children>
+																		<VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+																			<children>
+																				<StackPane>
+																					<children>
+																						<Label fx:id="overlayNameLabel" alignment="BOTTOM_LEFT" graphicTextGap="0.0" text="Gear, Chrome" textFill="#900b0b" StackPane.alignment="CENTER_LEFT">
+																							<font>
+																								<Font name="System Bold Italic" size="11.0" />
+																							</font>
+																							<StackPane.margin>
+																								<Insets />
+																							</StackPane.margin>
+																						</Label>
+																						<ProgressBar fx:id="overlayTreeProgressBar" opacity="0.0" prefWidth="189.0" progress="0.0" />
+																						<Label fx:id="progressBarLabel" contentDisplay="CENTER" graphicTextGap="0.0">
+																							<opaqueInsets>
+																								<Insets />
+																							</opaqueInsets>
+																							<font>
+																								<Font name="System Italic" size="11.0" />
+																							</font>
+																							<padding>
+																								<Insets bottom="2.0" />
+																							</padding>
+																						</Label>
+																					</children>
+																				</StackPane>
+																				<TreeView fx:id="overlayTreeView" prefWidth="50.0" showRoot="false" VBox.vgrow="ALWAYS" />
+                                                            <HBox>
+                                                               <children>
+                                                                  <FlowPane hgap="10.0" prefWidth="187.0" vgap="10.0">
+                                                                     <children>
+            																				<CheckBox fx:id="overlayUseAsBaseCheckbox" mnemonicParsing="false" onAction="#overlayUseAsBaseCheckbox_onAction" styleClass="controls-padding" text="%options.pane.overlay.checkbox.use_as_base" />
+                                                                        <CheckBox fx:id="clipPortraitCheckbox" mnemonicParsing="false" onAction="#overlayUseAsBaseCheckbox_onAction" styleClass="controls-padding" text="%options.pane.overlay.checkbox.clip_portrait" />
+                                                                     </children>
+                                                                  </FlowPane>
+                                                               </children>
+                                                            </HBox>
+                                                            <HBox spacing="5.0">
+                                                               <children>
+                                                                  <Slider fx:id="overlayTransparencySlider" blockIncrement="0.5" majorTickUnit="0.25" max="1.0" maxWidth="1.7976931348623157E308" minorTickCount="5" prefHeight="14.0" prefWidth="100.0" value="1.0" HBox.hgrow="SOMETIMES" />
+                                                                  <Label graphicTextGap="0.0" text="%options.pane.overlay.slider.Opacity" HBox.hgrow="ALWAYS">
+                                                                     <opaqueInsets>
+                                                                        <Insets />
+                                                                     </opaqueInsets>
+                                                                     <HBox.margin>
+                                                                        <Insets />
+                                                                     </HBox.margin>
+                                                                  </Label>
+                                                               </children>
+                                                               <padding>
+                                                                  <Insets top="5.0" />
+                                                               </padding>
+                                                            </HBox>
+      																				<HBox maxWidth="1.7976931348623157E308" spacing="4.0">
+      																					<children>
+      																						<VBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
+      																							<children>
+      																								<Spinner fx:id="overlayWidthSpinner" editable="true" initialValue="256d" max="1000d" min="50d" styleClass="split-arrows-horizontal" VBox.vgrow="ALWAYS" />
+      																								<Spinner fx:id="overlayHeightSpinner" editable="true" initialValue="256d" max="1000d" min="50d" styleClass="split-arrows-horizontal" VBox.vgrow="ALWAYS" />
+      																							</children>
+      																						</VBox>
+      																						<AnchorPane>
+      																							<children>
+      																								<ToggleButton fx:id="overlayAspectToggleButton" contentDisplay="TOP" graphicTextGap="0.0" mnemonicParsing="false" onAction="#overlayAspectToggleButton_onAction" selected="true" styleClass="aspect-lock-toggle-button" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0">
+      																									<padding>
+      																										<Insets bottom="8.0" left="4.0" right="4.0" top="8.0" />
+      																									</padding>
+      																									<tooltip>
+      																										<Tooltip text="%options.pane.overlay.tooltip.aspect" />
+      																									</tooltip>
+      																								</ToggleButton>
+      																							</children>
+      																						</AnchorPane>
+      																					</children>
+      																				</HBox>
+																			</children>
+																		</VBox>
+																	</children>
+																</AnchorPane>
+															</content>
+														</TitledPane>
+													</panes>
+												</Accordion>
+											</children>
+										</AnchorPane>
+									</children>
+								</AnchorPane>
+							</children>
+						</VBox>
+					</children>
+					<VBox.margin>
+						<Insets />
+					</VBox.margin>
+				</HBox>
+			</children>
+			<stylesheets>
+				<URL value="@../css/TokenTool.css" />
+			</stylesheets>
+		</VBox>
+	</center>
+	<padding>
+		<Insets bottom="3.0" left="3.0" right="3.0" />
+	</padding>
+</BorderPane>

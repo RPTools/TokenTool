@@ -1,279 +1,203 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-import java.text.SimpleDateFormat
-import org.ajoberstar.grgit.*
+/*
+* For more details take a look at the Java Quickstart chapter in the Gradle
+* user guide available at https://docs.gradle.org/4.1/userguide/tutorial_java_projects.html
+*/
 
-
-apply plugin: 'java'
-apply plugin: 'findbugs'
-apply plugin: 'pmd'
-apply plugin: 'application'
-apply plugin: 'eclipse'
-apply plugin: 'launch4gradle'
-
-
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-
-mainClassName = 'net.rptools.tokentool.TokenTool'
-version = getVersionName()
-
-ext.repo = Grgit.open(project.file('.'))
-ext.finalName = 'TokenTool'
-ext.finalWinVersion = '1.0.33.0'
-ext.finalVersion = '1.0b33'
-
-task wrapper(type: Wrapper) {
-    gradleVersion='2.1'
-}
+import org.gradle.plugins.ide.eclipse.model.AccessRule
 
 buildscript {
-    repositories {
+	dependencies {
+		classpath "com.diffplug.spotless:spotless-plugin-gradle:3.7.0"
+	}
+
+	repositories {
+		jcenter()
 		mavenCentral()
-		mavenLocal()
-    }
-    dependencies {
-        classpath 'org.ajoberstar:gradle-git:0.11.2'
-        classpath 'cc.cu.netvl.gradle:launch4gradle:1'
-    }
-}
-
-configurations {
-    osxTools
-}
-
-
-dependencies {
-    osxTools 'com.oracle.appbundler:AppBundlerTask:1.0'
-    compile 'net.rptools.rplib:rplib:1.4.1.4'
-    compile 'net.rptools.parser:parser:1.4.0.0'
-    compile 'com.withay:withay-util:1.0'
-    compile 'com.thoughtworks.xstream:xstream:1.4.8'
-    compile 'de.muntjak.tinylookandfeel:tinylaf-nocp:1.4.0'
-    compile 'net.java.abeille:abeille-formsrt:2.0'
-    compile 'commons-logging:commons-logging:1.1.1'
-    compile 'log4j:log4j:1.2.16'
-    compile 'commons-io:commons-io:2.0'
-}
-
-ext.compileDate = new Date();
-ext.yyyymmdd = (new SimpleDateFormat('yyyyMMDD')).format(ext.compileDate);
-
-
-repositories {
-    mavenCentral()
-    maven {
-        url = 'http://maptool.craigs-stuff.net/repo/'
-    }
-    maven {
-        url = 'http://www.nerps.net/repo/'
-    }
-}
-
-
-/*
- * Gets the version name from the latest Git tag
- */
-
-def getVersionName() {
-
-    if (project.hasProperty('buildVersion')) {
-        return buildVersion
-    } else {
-        def repo = Grgit.open(project.file('.'))
-        def tagName = repo.tag.list()[0].fullName.replace('refs/tags/', '')
-        def tagCommit = repo.tag.list()[0].commit.id
-        def headCommit = repo.head().id
-        def headAbbrvId = repo.head().abbreviatedId
-
-        if (tagCommit == headCommit) {
-            return tagName
-        } else {
-            return tagName + '-' + headAbbrvId
-        }
-    }
-}
-
-findbugs {
-    ignoreFailures = true
-    toolVersion = '3.0.0'
-    effort = 'max'
-    sourceSets = []  // Empty source set so it wont run during build/check
-}
-
-pmd {
-    ignoreFailures = true
-    sourceSets = []  // Empty source set so it wont run during tebuild/check
-}
-
-
-
-task showBuildVersion() << {
-    println 'Build Version Number = ' + project.version
-}
-
-task copyLibs(type: Sync) {
-    from configurations.compile
-    into jar.destinationDir.getPath() + '/lib'
-}
-
-jar {
-    manifest.attributes(
-        'Main-Class': mainClassName,
-        'Class-Path': configurations.runtime.files.collect { "lib/" + it.name }.join(' ')
-    )
-}
-assemble.dependsOn += copyLibs;
-
-
-task fatJar(type: Jar) {
-	//create a single Jar with all dependencies
-	
-	manifest {
-        attributes 'Implementation-Title': 'TokenTool',  
-        	'Implementation-Version': version,
-        	'Main-Class': mainClassName
-    }
-    baseName = 'TokenTool'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
-
-launch4j {
-	//create windows executable using launch4j (must have it installed first)
-    //launch4jProgram = 'D:/programs/launch4j/launch4jc.exe'
-
-    executable {
-		
-		headerType = 'GUI'
-		outputFileName = finalName + '-' + finalVersion + '.exe'
-		dontWrapJar = false
-		//errTitle
-		downloadUrl = 'http://java.com/download'
-		supportUrl  = 'http://forums.rptools.net/'
-		//cmdLine
-		//chdir
-		stayAlive = false
-		icon = file('other-resources/tokenTool-512px.ico')	
-
-		classPath {
-			mainClass = mainClassName
-		}
-   
-   		jre {
-   			//path
-   			bundledJre64Bit = false
-   			minVersion = '1.6.0'
-   			//maxVersion
-   			jdkPreference = 'PREFER_JRE'
-   			runtimeBits = 'BITS_64_OR_32'
-   			//initialHeapSize
-   			//initialHeapPercent
-   			//maxHeapSize
-   			//maxHeapPercent
-   		}
-   		splash {
-			file = file('/other-resources/TokenTool_splash.bmp')
-			waitForWindow  = true
-			timeout = 60
-			timeoutErr = true
-		}
-
-		versionInfo {
-			fileVersion = finalWinVersion
-			txtFileVersion = finalVersion
-			fileDescription = 'TokenTool powered by RPTools'
-			copyright = '2015'
-			productVersion = finalWinVersion
-			txtProductVersion = finalVersion
-			productName = finalName
-			companyName = 'RPTools'
-			internalName = finalName
-			originalFilename  = finalName + '.exe'
-		}
-
-		/*	
-		messages {
-			startupErr = 'some text'
-			bundledJreErr = 'some text'
-			jreVersionErr = 'some text'
-			launcherErr = 'some text'
-		}
-		*/
 	}
 }
 
-task copyProjectFiles(type: Sync) {
-    from jar.destinationDir.getPath()
-    into 'build/tmp/dist'
-    outputs.upToDateWhen {
-        false
-    }
-}
-copyProjectFiles.mustRunAfter('jar')
+// Apply the java plugin to add support for Java
+apply plugin: 'base'
+apply plugin: 'application'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'com.diffplug.gradle.spotless'
 
-task zipRelease(dependsOn: copyProjectFiles, type: Zip) {
-    from 'build/tmp/dist/'
-    into  ''
-    baseName = 'tokentool-' + getVersionName()
-    destinationDir new File(projectDir, 'build')
-    outputs.upToDateWhen {
-        false
-    }
-}
+// Definitions
+defaultTasks 'clean', 'build'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
+// Don't fail build if tests fail until tests are cleaned up
+test.ignoreFailures = true
 
+// Used by gradle assemble & run tasks
+mainClassName = 'net.rptools.tokentool.client.TokenTool'
 
-task osxApp(dependsOn: copyProjectFiles) << {
-    def baseDir = '.'
-    def buildVersion = rootProject.getVersionName()
-    def mainClassName = mainClassName
-    def sourceDir = 'build/tmp/dist'
-    ant {
-        taskdef(
-            name: 'bundleapp',
-            classname: 'com.oracle.appbundler.AppBundlerTask',
-            classpath: configurations.osxTools.asPath
-        )
-        bundleapp(
-            outputdirectory: 'build/tmp/',
-            name: 'TokenTool-' + buildVersion,
-            displayname: 'TokenTool-' + buildVersion,
-            identifier: 'net.rptools.tokentool',
-            mainclassname: mainClassName,
-            signature: 'RPTM',
-            icon: 'build-resources/tokentool-icon.icns'
-        ) {
-            classpath(dir: sourceDir) {
-                include(name: '*.jar')
-                include(name: '**/*.jar')
-            }
-            option(value: '-Dapple.laf-useScreenMenuBar=true')
-            option(value: '-Dfile.encoding=UTF-8')
-            option(value: '-Xmx768m')
-            option(value: '-Xss4m')
-            option(value: '-Dcom.apple.textantialiasing=true')
-            option(value: '-Dcom.apple.antialiasing=true')
-            option(value: '-Djava.library.path=$APP_ROOT/Contents/Java')
-        }
-    }
+// Current Build version
+version = '2.0'
+
+// Custom properties
+ext {
+	vendor = "Nerps" // Change to RPTools or "" for official builds
+	preloaderClassName = 'net.rptools.tokentool.client.SplashScreenLoader'
+	msiVersion = '2.0.0'
 }
 
-task zipOSXApp(dependsOn: osxApp, type: Zip) {
-    from 'build/tmp/TokenTool-' + getVersionName() + '.app'
-    into  'TokenTool-' + getVersionName() + '.app'
-    baseName = 'tokentool-' + getVersionName() + '-osx'
-    destinationDir new File(projectDir, 'build')
-    outputs.upToDateWhen {
-        false
-    }
+// Default parameters for gradle run command
+run {
+	args = [ '-v='+version, '-vendor='+vendor ]
+	applicationDefaultJvmArgs = [ "-Djavafx.preloader=" + preloaderClassName, "-Dsentry.environment=Development" ]
+
+	if(System.getProperty("exec.args") != null) {
+		args System.getProperty("exec.args").split()
+	}
+}
+
+spotless {
+	java {
+		licenseHeaderFile	'spotless.license.java'
+		eclipse().configFile('build-resources/eclipse.prefs.formatter.xml')
+		removeUnusedImports()
+	}
+
+	format 'misc', {
+		target '**/*.gradle', '**/.gitignore'
+
+		// spotless has built-in rules for most basic formatting tasks
+		trimTrailingWhitespace()
+		// or spaces. Takes an integer argument if you don't like 4
+		indentWithTabs()
+	}
+}
+
+// Set eclipse natures, access rules, and other settings
+// https://docs.gradle.org/current/dsl/org.gradle.plugins.ide.eclipse.model.EclipseProject.html
+eclipse {
+	project {
+		natures 'org.eclipse.buildship.core.gradleprojectnature'
+		buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
+	}
+
+	classpath {
+		file {
+			withXml {
+				def node = it.asNode()
+				node.appendNode('classpathentry', [kind: 'con', path: 'org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER'])
+			}
+
+			whenMerged {
+				def jre = entries.find { it.path.contains 'org.eclipse.jdt.launching.JRE_CONTAINER' }
+				jre.accessRules.add(new AccessRule('0', 'javafx/**'))
+			}
+		}
+	}
+}
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+	jcenter()
+	mavenCentral()
+	maven { url = 'http://maptool.craigs-stuff.net/repo/' }
+	maven { url = 'http://www.nerps.net/repo/' }
+	mavenLocal()
 }
 
 
+// In this section you declare the dependencies for your production and test code
+dependencies {
+	// For Sentry bug reporting
+	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.8.2'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8.2'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.8.2'	// Bridges v1 to v2 for other code in other libs
 
-task release(dependsOn: assemble) {
-    println 'Creating Release'
+	compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+	compile group: 'commons-logging', name: 'commons-logging', version: '1.2'
+
+	compile group: 'io.sentry', name: 'sentry', version: '1.6.1'
+	compile group: 'io.sentry', name: 'sentry-log4j2', version: '1.6.1'
+
+	// Image processing lib
+	compile group: 'com.twelvemonkeys.imageio', name: 'imageio-core', version: '3.3.2'	// https://mvnrepository.com/artifact/com.twelvemonkeys.imageio/imageio-core
+	compile group: 'com.twelvemonkeys.imageio', name: 'imageio-psd', version: '3.3.2'	// https://mvnrepository.com/artifact/com.twelvemonkeys.imageio/imageio-psd
+
+	// Other public libs
+	compile group: 'commons-io', name: 'commons-io', version: '2.6'						// https://mvnrepository.com/artifact/commons-io/commons-io
+	compile group: 'commons-cli', name: 'commons-cli', version: '1.4'					// https://mvnrepository.com/artifact/commons-cli/commons-cli
+	compile group: 'org.reflections', name: 'reflections', version: '0.9.10'			// https://mvnrepository.com/artifact/commons-cli/commons-cli
 }
-release.dependsOn += zipRelease
-release.dependsOn += zipOSXApp
 
+task uberJar(type: Jar) {
+	group = 'distribution'
+	description = 'Create uber jar for native installers'
+
+	manifest {
+		attributes 'Implementation-Title': project.name,
+		'Implementation-Version': version,
+		'Implementation-Vendor': vendor,
+		'Built-By': System.getProperty('user.name'),
+		'Built-Date': new Date(),
+		'Built-JDK': System.getProperty('java.version'),
+		'Source-Compatibility': project.sourceCompatibility,
+		'Target-Compatibility': project.targetCompatibility,
+		'Main-Class': project.mainClassName,
+		'JavaFX-Preloader-Class' : preloaderClassName
+	}
+
+	from {
+		configurations.compile.collect {
+			it.isDirectory() ? it : zipTree(it)
+		}
+	}
+	with jar
+	exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
+}
+
+task copyLicense(type: Copy) {
+	from('license')
+	into('build/libs/')
+	include('*')
+}
+
+task deploy(dependsOn: [uberJar, copyLicense]) {
+	group = 'distribution'
+	description = 'Create native installers'
+
+	tasks.findByName('copyLicense').mustRunAfter 'uberJar'
+
+	doLast {
+		// Using the -deploy Command with Bundler Arguments
+		// 		javapackager -deploy -native exe -BsystemWide=true -BjvmOptions=-Xmx128m -BjvmOptions=-Xms128m -outdir packages -outfile BrickBreaker -srcdir dist
+		//		-srcfiles BrickBreaker.jar -appclass brickbreaker.Main -name BrickBreaker -title "BrickBreaker demo"
+		// *Note: You can specify a JRE using "-Bruntime=../../../deploy-ready-jre"
+		//		  It will bundle system/workspace JDK by default
+		def javapackager_deploy = exec {
+			workingDir "${project.projectDir.absolutePath}"
+
+			commandLine "javapackager",
+				"-deploy", "-v",
+				"-native", "installer",
+				"-appclass", mainClassName,
+				"-preloader", preloaderClassName,
+				"-srcdir", "build/libs",
+				"-srcfiles", jar.archiveName,
+				"-srcfiles", "COPYING.AFFERO",
+				"-outdir", "releases/release-"+version,
+				"-outfile", project.name,
+				"-name", project.name,
+				"-title", project.name,
+				"-vendor", vendor,
+				"-BinstalldirChooser=true",
+				"-BsystemWide=false",
+				"-BmenuHint=true",
+				"-Bwin.menuGroup=" + vendor,
+				"-BshortcutHint=true",
+				"-BappVersion=" + version,
+				"-Bwin.msi.productVersion=" + msiVersion,
+				"-BlicenseFile=COPYING.AFFERO",
+				"-BlicenseType=GNU AFFERO GENERAL PUBLIC LICENSE",
+				"-Bcategory=Graphics",
+				"-Bemail=tokentool@nerps.net"
+		}
+	}
+}

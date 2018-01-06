@@ -1,35 +1,12 @@
-Token Tool
-==========
+[![Build Status](https://travis-ci.org/JamzTheMan/TokenTool.svg?branch=2.0)](https://travis-ci.org/JamzTheMan/TokenTool)
+[![Build status](https://ci.appveyor.com/api/projects/status/jxic7g0ph02fqkic?svg=true)](https://ci.appveyor.com/project/JamzTheMan/TokenTool)
 
-This project builds the Token Tool. It uses the 1.4 libraries.
+# TokenTool 2.0
+A Token creation tool to create png images suitable for Virtual Table Tops. Now infused with Nerps!
 
-Building
-========
+Rewritten in JavaFX 8 to bring a modern and updated UI as well as a few new features! TokenTool 2.0 now supports PSD format for 'overlays' to allow for better masking by supporting 'layers'. To create your own 'overlay' you can use any version of PhotoShop or GIMP and add your masking layer as the first (bottom) layer and your overlay image as the second (top) layer.
 
-This project depends on the launch4j gradle plugin found 
-[here](https://github.com/netvl/launch4gradle). You will need to build and 
-install that plugin using a **native gradle installation**, so that is available
-in your local maven repository for use, before you will be able to complete this
-build.
-
-Releasing
-=========
-
-Run the following gradle targets:
-
-```bash
-./gradlew build release startScripts
-```
-
-To create the output zips in **build/**
-
-To run these you can:
-
-1. extract the zip files into an **install/** directory
-2. create a **bin/** folder in the resulting **install/** directory
-3. copy **build/scripts/tokentool[.bat]** into the newly created **install/bin/** directory
-4. make sure **tokentool[.bat]** is executable
-5. move the **tokentool<garbagehere>.jar** to the **install/lib** directory
-5. run **tokentool[.bat]** (change directory or double click, assuming your OS has
-support) for these files.
-
+New features will be added in the coming months such:
+* PDF image extraction (make tokens out images from modules quick and easy!)
+* Additional post processing "Effects" (like color shifting, sepia, etc)
+* Image search, look for that favorite Drow image!

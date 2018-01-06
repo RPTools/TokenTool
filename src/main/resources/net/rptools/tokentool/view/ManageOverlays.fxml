@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="600.0" prefWidth="800.0" stylesheets="@../css/TokenTool.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.rptools.tokentool.controller.ManageOverlays_Controller">
+	<children>
+		<SplitPane dividerPositions="0.25, 0.8" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+			<items>
+				<VBox>
+					<children>
+						<AnchorPane>
+							<children>
+								<Label alignment="CENTER" styleClass="hortaFont" text="%ManageOverlays.label.Directory" textAlignment="CENTER" wrapText="false">
+									<opaqueInsets>
+										<Insets />
+									</opaqueInsets>
+									<textFill>
+										<Color blue="0.624" green="0.624" red="0.624" fx:id="x21" />
+									</textFill>
+									<padding>
+										<Insets bottom="1.0" left="5.0" right="5.0" top="5.0" />
+									</padding>
+								</Label>
+                        <HBox layoutX="103.0" layoutY="7.0" spacing="5.0" AnchorPane.rightAnchor="5.0">
+                           <children>
+                              <Button fx:id="addFolderButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#addFolderButton_onAction" styleClass="add-folder-button">
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                              </Button>
+      								<Button fx:id="deleteFolderButton" mnemonicParsing="false" onAction="#deleteFolderButton_onAction" styleClass="delete-button" />
+                           </children>
+                        </HBox>
+							</children>
+						</AnchorPane>
+						<ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
+							<content>
+								<TreeView fx:id="overlayTreeView" prefHeight="200.0" prefWidth="200.0">
+									<opaqueInsets>
+										<Insets />
+									</opaqueInsets>
+								</TreeView>
+							</content>
+						</ScrollPane>
+						<AnchorPane>
+							<children>
+								<Button fx:id="restoreButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#restoreButton_onAction" style="-fx-font-size: 15;" styleClass="hortaFont" text="%ManageOverlays.button.Restore_Default_Overlays" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+									<font>
+										<Font size="10.0" />
+									</font>
+								</Button>
+							</children>
+						</AnchorPane>
+					</children>
+				</VBox>
+				<VBox>
+					<children>
+						<AnchorPane>
+							<children>
+								<Label alignment="CENTER" layoutX="5.0" styleClass="hortaFont" text="%ManageOverlays.label.Overlays" textAlignment="CENTER" wrapText="false">
+									<opaqueInsets>
+										<Insets />
+									</opaqueInsets>
+									<textFill>
+										<Color blue="0.624" green="0.624" red="0.624" fx:id="x211" />
+									</textFill>
+									<padding>
+										<Insets bottom="1.0" left="5.0" right="5.0" top="5.0" />
+									</padding>
+								</Label>
+                        <HBox layoutX="300.0" layoutY="7.0" spacing="5.0" AnchorPane.rightAnchor="5.0">
+                           <children>
+                              <Button fx:id="addOverlayButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#addOverlayButton_onAction" styleClass="add-overlay-button">
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                              </Button>
+      								<Button fx:id="deleteOverlayButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#deleteOverlayButton_onAction" styleClass="delete-button">
+      									<opaqueInsets>
+      										<Insets />
+      									</opaqueInsets>
+      								</Button>
+                           </children>
+                        </HBox>
+							</children>
+						</AnchorPane>
+						<ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
+							<content>
+								<FlowPane fx:id="overlayViewFlowPane" hgap="4.0" onDragDone="#overlayViewFlowPane_DragDone" onDragDropped="#overlayViewFlowPane_DragDropped" onDragOver="#overlayViewFlowPane_DragOver" prefHeight="200.0" style="-fx-background-color: white; -fx-border-width: 2; -fx-border-color: lightgrey;" vgap="4.0">
+									<padding>
+										<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+									</padding>
+								</FlowPane>
+							</content>
+						</ScrollPane>
+					</children>
+				</VBox>
+				<VBox>
+					<children>
+						<Label alignment="CENTER" style="&#10;" styleClass="hortaFont" text="%ManageOverlays.label.Details" textAlignment="CENTER" wrapText="false">
+							<opaqueInsets>
+								<Insets />
+							</opaqueInsets>
+									<textFill>
+								<Color blue="0.624" green="0.624" red="0.624" fx:id="x2" />
+							</textFill>
+							<padding>
+								<Insets bottom="1.0" left="5.0" right="5.0" top="5.0" />
+							</padding>
+						</Label>
+						<VBox prefHeight="200.0" prefWidth="100.0" spacing="2.0" style="-fx-background-color: white; -fx-border-width: 2; -fx-border-color: lightgrey;" VBox.vgrow="ALWAYS">
+							<children>
+								<Label fx:id="overlayName" text="Filename" wrapText="true">
+									<font>
+										<Font name="System Bold" size="16.0" />
+									</font>
+								</Label>
+								<Label fx:id="overlayDescription" text="%ManageOverlays.label.Image_Type_Description" />
+								<Label fx:id="overlayDimensions" layoutX="17.0" layoutY="44.0" text="300 x 300" />
+								<ImageView fx:id="overlayLayerImage" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+									<VBox.margin>
+										<Insets top="10.0" />
+									</VBox.margin>
+								</ImageView>
+								<ImageView fx:id="overlayLayerMask" fitHeight="200.0" fitWidth="200.0" layoutX="17.0" layoutY="87.0" pickOnBounds="true" preserveRatio="true">
+									<VBox.margin>
+										<Insets top="10.0" />
+									</VBox.margin>
+								</ImageView>
+							</children>
+							<opaqueInsets>
+								<Insets />
+							</opaqueInsets>
+							<VBox.margin>
+								<Insets />
+							</VBox.margin>
+							<padding>
+								<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+							</padding>
+						</VBox>
+					</children>
+				</VBox>
+			</items>
+		</SplitPane>
+	</children>
+</VBox>

@@ -1,0 +1,35 @@
+version: '{branch}.{build}'
+pull_requests:
+  do_not_increment_build_number: true
+image: Visual Studio 2017
+platform: x64
+before_build:
+- gradlew.bat spotlessApply
+build_script:
+- gradlew.bat build
+artifacts:
+- path: releases\release-*\bundles\TokenTool-*.exe
+  name: TokenTool-Install
+- path: releases\release-*\TokenTool-*.jar
+  name: TokenTool-Jar
+deploy_script:
+- gradlew.bat deploy
+deploy:
+- provider: GitHub
+  description: Windows release from AppVeyor
+  tag: $(APPVEYOR_REPO_TAG_NAME)
+  auth_token:
+    secure: HXIHe/F7K2yGOZ0I56DW5PevrQDe+zjyunjORGKYaUGxFtvPYPcmOdjZT69tzHcS
+  artifact: TokenTool-Install, TokenTool-Jar
+  draft: true
+  prerelease: false
+  force_update: false
+  on:
+    appveyor_repo_tag: true
+notifications:
+- provider: Slack
+  incoming_webhook: https://hooks.slack.com/services/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
+  channel: '#development'
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
