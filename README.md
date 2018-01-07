@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/JamzTheMan/TokenTool.svg?branch=2.0)](https://travis-ci.org/JamzTheMan/TokenTool)
-[![Build status](https://ci.appveyor.com/api/projects/status/jxic7g0ph02fqkic?svg=true)](https://ci.appveyor.com/project/JamzTheMan/TokenTool)
+[![Build Status](https://travis-ci.org/RPTools/tokentool.svg?branch=master)](https://travis-ci.org/RPTools/tokentool)
+[![Build status](https://ci.appveyor.com/api/projects/status/v0fve3b6uj3r8gwq?svg=true)](https://ci.appveyor.com/project/cwisniew/tokentool)
 
 # TokenTool 2.0
 A Token creation tool to create png images suitable for Virtual Table Tops. Now infused with Nerps!
