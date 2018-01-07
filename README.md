@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/RPTools/tokentool.svg?branch=master)](https://travis-ci.org/RPTools/tokentool)
+[![Build Status](https://travis-ci.org/RPTools/tokentool.svg?branch=ci-fixes)](https://travis-ci.org/RPTools/tokentool)
 [![Build status](https://ci.appveyor.com/api/projects/status/v0fve3b6uj3r8gwq?svg=true)](https://ci.appveyor.com/project/cwisniew/tokentool)
 
 # TokenTool 2.0
