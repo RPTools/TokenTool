@@ -7,7 +7,6 @@ before_build:
 - gradlew.bat spotlessApply
 build_script:
 - gradlew.bat deploy
-- dir Deployments
 artifacts:
 - path: releases\release-*\bundles\tokentool-*.exe
   name: TokenTool-Install
