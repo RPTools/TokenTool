@@ -7,8 +7,6 @@ before_build:
 - gradlew.bat spotlessApply
 build_script:
 - gradlew.bat build
-after_build:
-  - dir Deployments
 artifacts:
 - path: releases\release-*\bundles\tokentool-*.exe
   name: TokenTool-Install
@@ -16,8 +14,7 @@ artifacts:
   name: TokenTool-Jar
 deploy_script:
 - gradlew.bat deploy
-after_deploy:
-  - dir Deployments
+- dir Deployments
 deploy:
 - provider: GitHub
   description: Windows release from AppVeyor
