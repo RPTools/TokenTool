@@ -8,9 +8,9 @@ before_build:
 build_script:
 - gradlew.bat build
 artifacts:
-- path: releases\release-*\bundles\TokenTool-*.exe
+- path: releases\release-*\bundles\tokentool-*.exe
   name: TokenTool-Install
-- path: releases\release-*\TokenTool-*.jar
+- path: releases\release-*\tokentool-*.jar
   name: TokenTool-Jar
 deploy_script:
 - gradlew.bat deploy
