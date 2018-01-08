@@ -37,6 +37,6 @@ deploy:
   tag_name: $TRAVIS_TAG
   draft: true
   on:
-    repo: JamzTheMan/TokenTool
+    repo: RPTools/tokentool
     tags: true
     all_branches: true
