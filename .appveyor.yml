@@ -12,7 +12,7 @@ artifacts:
   name: TokenTool-Install
 - path: releases\release-*\tokentool-*.jar
   name: TokenTool-Jar
-deploy_script:
+before_deploy:
 - gradlew.bat deploy
 - dir Deployments
 deploy:
