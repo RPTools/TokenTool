@@ -6,8 +6,6 @@ platform: x64
 before_build:
 - gradlew.bat spotlessApply
 build_script:
-- gradlew.bat build
-before_deploy:
 - gradlew.bat deploy
 - dir Deployments
 artifacts:
