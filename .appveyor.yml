@@ -19,8 +19,8 @@ deploy:
   auth_token:
     secure: J2mFPaAOI3z2AOUG28I1mFzTB5eIJ7cyAJpEBHRtRA3s2Zz54IUzKt+MuT3ufw6D
   artifact: TokenTool-Install, TokenTool-Jar
-  draft: true
-  prerelease: false
+  draft: false
+  prerelease: true
   force_update: false
   on:
     appveyor_repo_tag: true
