@@ -39,7 +39,7 @@ version = '2.0'
 
 // Custom properties
 ext {
-	vendor = "Nerps" // Change to RPTools or "" for official builds
+	vendor = "RPTools" // Change to RPTools or "" for official builds
 	preloaderClassName = 'net.rptools.tokentool.client.SplashScreenLoader'
 	msiVersion = '2.0.0'
 }
@@ -197,7 +197,7 @@ task deploy(dependsOn: [uberJar, copyLicense]) {
 				"-BlicenseFile=COPYING.AFFERO",
 				"-BlicenseType=GNU AFFERO GENERAL PUBLIC LICENSE",
 				"-Bcategory=Graphics",
-				"-Bemail=tokentool@nerps.net"
+				"-Bemail=tokentool@" + vendor + ".net"
 		}
 	}
 }
