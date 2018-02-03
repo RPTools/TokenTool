@@ -6,30 +6,28 @@ platform: x64
 before_build:
 - gradlew.bat spotlessApply
 build_script:
-- gradlew.bat build
-artifacts:
-- path: releases\release-*\bundles\TokenTool-*.exe
-  name: TokenTool-Install
-- path: releases\release-*\TokenTool-*.jar
-  name: TokenTool-Jar
-deploy_script:
 - gradlew.bat deploy
+artifacts:
+- path: releases\release-*\bundles\tokentool-*.exe
+  name: TokenTool-Install
+- path: releases\release-*\tokentool-*.jar
+  name: TokenTool-Jar
 deploy:
 - provider: GitHub
   description: Windows release from AppVeyor
   tag: $(APPVEYOR_REPO_TAG_NAME)
   auth_token:
-    secure: HXIHe/F7K2yGOZ0I56DW5PevrQDe+zjyunjORGKYaUGxFtvPYPcmOdjZT69tzHcS
+    secure: J2mFPaAOI3z2AOUG28I1mFzTB5eIJ7cyAJpEBHRtRA3s2Zz54IUzKt+MuT3ufw6D
   artifact: TokenTool-Install, TokenTool-Jar
-  draft: true
-  prerelease: false
+  draft: false
+  prerelease: true
   force_update: false
   on:
     appveyor_repo_tag: true
 notifications:
-- provider: Slack
-  incoming_webhook: https://hooks.slack.com/services/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
-  channel: '#development'
+- provider: Webhook
+  url: https://discordapp.com/api/webhooks/399650806032367616/7biqTSlqVIGCAsqZR1vzq8neErZ2kzmDZ5Y4llL0WFwST073vC24_Btqm6uePNU1DWOC
+  method: GET
   on_build_success: true
   on_build_failure: true
   on_build_status_changed: true

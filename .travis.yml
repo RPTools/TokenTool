@@ -14,8 +14,6 @@ addons:
     - fakeroot
 script: 
   - ./gradlew build
-notifications:
-  slack: nerps:JumMHisqOlXac7be25Ca8FbN
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -28,14 +26,15 @@ before_deploy:
 deploy:
   provider: releases
   api_key:
-    secure: reFts6i0FCeE1tQpcUEBT35bnjZjZvbj9mwJBm8qHpjF/obKmFvioQCT8mGPo83n3qTUC+2atOVsiqyEpYfqWXrkk/cy8mySxaGr77czuJVXhboGv5AUFJiJ78ehMs7Rqdxs0TnHq99eBTw3S70vMCQXZQD/N2EcXpmziSP2g/SkAdoLh/i9rshexqczvoEnEidYTlHACVS+09Rr8CGDkjwzU6TxOejUZPmsaETjbGNa8R9tUv7aDDHhloRDkLLDU+bw0ZNcRLadUj6PgjKv+HTtohSS0etsd8HCngF4lqBaV6gQAZ43XEe60YI9X7q083XZchOwC6G53q28GG9GDcSGqp0YLotkX6N/2K7XL6oLgD1Hd/0hPNsN10NFps50hT59312bvUVZiozQtSM+NgSPlljVuepgdBTVilSKoOU1tPaSaQvSndzdjpkDP9Gy8M7Ydci1Ir5wqHjJSlbN6Z0DMJU0xc9y44HLni9YKzUUJHXU3rtSftHpmjStqHaAopvxUPBLJZrjOSCl5wrcVuXAa0gGekOH2WXTDiESp4+h2Afc7KGv0Yj7TTpzJaGpxQH5r/3YOdZdPSn0xciVU0C/dkDhI2Zj+omTuR9iBFCop2AlcmLSmlIcINfZPfMYCH7vdoorXgyciBNMCn3sb/qoffFIIfR1R2krlyR07RY=
+    secure: hTBFlftPw61rqEx5+4z+VUHxDWi6l9wcIKQFipLnVHlLeQ1neW1pZ8y7WBvXUWCtZ3/D0iTVJpMlWtpWnu6OoMDbFRAOfy2/2kU7bGUDGoH0QGGwrXjAGhs7GY3s+6eu1/uRWUsZ3Ys/vrBrJxyADGThdhD0QxwQ7SuuwM0ERvD94JuyjfvCFZ6xvOjccYdzilmxC4cRvOrBqv1PHTOLkPoQcXsP/FqUdzUAXrud5iUFw8+4el6kLZT/vmbIE8EdpocAKca8QOjf1AMWCPnr5JwKU+n2PUpEqI1WtFA9PatjR2M1e0yvQFWT0mb/rcfZ6LJEPb/s6cFlHCa0aosgV+aj6tN6K81zLj65L+Vv6F4dJNqW40wkBXRfcen0SR4duLlKx5jSHm3XA6Q5b9aI8+XL12cmFZoKYG+yuVgCYAx/qxHBs6es/wMaGkNrxataKsfzwm4Dw8QGKu+115bsxEywFhEbQfFYvClP9/WFEgrdBdP2bplLpFSGDgv2n6DmJq083CV7bJmxgoqhAhjCry/UL9DG0WFtE1FqWsoxzAUoklDxAE0zgW9D66Xucp5dthuVJbzMpxUiR5zRf8npz/NaRAH7EK1ROl9ue67mtuUobMN7+lnG3pszyxTT/y7kqy0OWFvaGnXJ4UMPbBnXXYdFKc+rSO86/4aWWVE3lwQ=
   file_glob: true
   file: releases/release-*/bundles/*
   overwrite: true
   skip_cleanup: true
   target_commitish: $TRAVIS_COMMIT
   tag_name: $TRAVIS_TAG
-  draft: true
+  draft: false
+  prerelease: true
   on:
     repo: RPTools/tokentool
     tags: true
