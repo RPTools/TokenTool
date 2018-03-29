@@ -44,7 +44,7 @@
 								<MenuItem fx:id="fileManageOverlaysMenu" onAction="#fileManageOverlaysMenu_onAction" text="%menu.title.file.manage.overlays" />
 								<MenuItem fx:id="fileSaveAsMenu" onAction="#fileSaveAsMenu_onAction" text="%menu.title.file.save.as">
                            <accelerator>
-                              <KeyCodeCombination alt="UP" code="S" control="ANY" meta="UP" shift="ANY" shortcut="UP" />
+                              <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="ANY" shortcut="UP" />
                            </accelerator></MenuItem>
 								<SeparatorMenuItem mnemonicParsing="false" />
 								<MenuItem fx:id="fileExitMenu" onAction="#fileExitMenu_onAction" text="%menu.title.file.exit" />
@@ -56,12 +56,12 @@
 								<SeparatorMenuItem mnemonicParsing="false" />
 								<MenuItem fx:id="editCopyImageMenu" onAction="#editCopyImageMenu_onAction" text="%menu.title.edit.copy.image">
 									<accelerator>
-										<KeyCodeCombination alt="UP" code="C" control="ANY" meta="UP" shift="UP" shortcut="UP" />
+										<KeyCodeCombination alt="UP" code="C" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
 									</accelerator>
 								</MenuItem>
 								<MenuItem fx:id="editPasteImageMenu" onAction="#editPasteImageMenu_onAction" text="%menu.title.edit.paste.image">
 									<accelerator>
-										<KeyCodeCombination alt="UP" code="V" control="ANY" meta="UP" shift="UP" shortcut="UP" />
+										<KeyCodeCombination alt="UP" code="V" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
 									</accelerator>
 								</MenuItem>
 							</items>
