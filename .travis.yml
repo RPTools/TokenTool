@@ -6,14 +6,6 @@ matrix:
     osx_image: xcode10
 script: 
   - ./gradlew build
-after_success:
-  - wget $TRAVIS_DISCORD_WEBHOOK_SCRIPT_URL
-  - chmod +x send.sh
-  - ./send.sh success $DISCORD_URL
-after_failure:
-  - wget $TRAVIS_DISCORD_WEBHOOK_SCRIPT_URL
-  - chmod +x send.sh
-  - ./send.sh failure $DISCORD_URL
 before_deploy:
  - ./gradlew deploy
 deploy:
@@ -31,3 +23,13 @@ deploy:
     repo: $REPO
     tags: true
     all_branches: true
+notifications:
+  webhooks:
+    on_success:
+      - wget $TRAVIS_DISCORD_WEBHOOK_SCRIPT_URL
+      - chmod +x send.sh
+      - ./send.sh success $DISCORD_URL
+    on_failure:
+      - wget $TRAVIS_DISCORD_WEBHOOK_SCRIPT_URL
+      - chmod +x send.sh
+      - ./send.sh failure $DISCORD_URL
