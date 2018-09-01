@@ -3,13 +3,7 @@ sudo: false
 matrix:
   include:
   - os: osx
-    osx_image: xcode9.2
-    before_install:
-      - brew update
-        # This is a workaround because someone broke brew casks... https://github.com/Homebrew/homebrew-cask/issues/49716
-      - find "$(brew --prefix)/Caskroom/"*'/.metadata' -type f -name '*.rb' | xargs grep 'EOS.undent' --files-with-matches | xargs sed -i '' 's/EOS.undent/EOS/'
-      - brew cask reinstall java
-      - java -version
+    osx_image: xcode10
 script: 
   - ./gradlew build
 after_success:
@@ -31,8 +25,7 @@ before_deploy:
  - ./gradlew deploy
 deploy:
   provider: releases
-  api_key:
-    secure: $GITHUB_RELEASE_KEY
+  api_key: $GITHUB_RELEASE_KEY
   file_glob: true
   file: releases/release-*/*
   overwrite: true
