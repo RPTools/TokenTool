@@ -21,9 +21,9 @@ install:
 build_script:
   - ./gradlew build
 after_build:
-  - ./gradlew deploy
+  - ps: if($env:appveyor_repo_tag -eq 'True') { gradlew deploy } else { echo "Not creating deploy artifacts because this is not a tag build" }
 artifacts:
-- path: releases\release-*\TokenTool-*.jar
+- path: build\libs\TokenTool-*.jar
   name: TokenTool-Jar
 - path: releases\release-*\TokenTool-*.exe
   name: TokenTool-Windows
