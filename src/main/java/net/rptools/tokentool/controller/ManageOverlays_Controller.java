@@ -84,19 +84,19 @@ public class ManageOverlays_Controller {
 
 	@FXML
 	void initialize() {
-		assert overlayViewFlowPane != null : "fx:id=\"overlayViewFlowPane\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
-		assert overlayTreeView != null : "fx:id=\"overlayTreeView\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
-		assert detailsVBox != null : "fx:id=\"detailsVBox\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
-		assert overlayName != null : "fx:id=\"overlayName\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
-		assert overlayDescription != null : "fx:id=\"overlayDescription\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
-		assert overlayDimensions != null : "fx:id=\"overlayDimensions\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
-		assert overlayLayerImage != null : "fx:id=\"overlayLayerImage\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
-		assert overlayLayerMask != null : "fx:id=\"overlayLayerMask\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
-		assert addOverlayButton != null : "fx:id=\"addOverlayButton\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
-		assert deleteOverlayButton != null : "fx:id=\"deleteOverlayButton\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
-		assert addFolderButton != null : "fx:id=\"addFolderButton\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
-		assert deleteFolderButton != null : "fx:id=\"deleteFolderButton\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
-		assert restoreButton != null : "fx:id=\"restoreButton\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
+		assert overlayViewFlowPane != null : "fx:id=\"overlayViewFlowPane\" was not injected: check your FXML file '" + AppConstants.MANAGE_OVERLAYS_FXML + "'.";
+		assert overlayTreeView != null : "fx:id=\"overlayTreeView\" was not injected: check your FXML file '" + AppConstants.MANAGE_OVERLAYS_FXML + "'.";
+		assert detailsVBox != null : "fx:id=\"detailsVBox\" was not injected: check your FXML file '" + AppConstants.MANAGE_OVERLAYS_FXML + "'.";
+		assert overlayName != null : "fx:id=\"overlayName\" was not injected: check your FXML file '" + AppConstants.MANAGE_OVERLAYS_FXML + "'.";
+		assert overlayDescription != null : "fx:id=\"overlayDescription\" was not injected: check your FXML file '" + AppConstants.MANAGE_OVERLAYS_FXML + "'.";
+		assert overlayDimensions != null : "fx:id=\"overlayDimensions\" was not injected: check your FXML file '" + AppConstants.MANAGE_OVERLAYS_FXML + "'.";
+		assert overlayLayerImage != null : "fx:id=\"overlayLayerImage\" was not injected: check your FXML file '" + AppConstants.MANAGE_OVERLAYS_FXML + "'.";
+		assert overlayLayerMask != null : "fx:id=\"overlayLayerMask\" was not injected: check your FXML file '" + AppConstants.MANAGE_OVERLAYS_FXML + "'.";
+		assert addOverlayButton != null : "fx:id=\"addOverlayButton\" was not injected: check your FXML file '" + AppConstants.MANAGE_OVERLAYS_FXML + "'.";
+		assert deleteOverlayButton != null : "fx:id=\"deleteOverlayButton\" was not injected: check your FXML file '" + AppConstants.MANAGE_OVERLAYS_FXML + "'.";
+		assert addFolderButton != null : "fx:id=\"addFolderButton\" was not injected: check your FXML file '" + AppConstants.MANAGE_OVERLAYS_FXML + "'.";
+		assert deleteFolderButton != null : "fx:id=\"deleteFolderButton\" was not injected: check your FXML file '" + AppConstants.MANAGE_OVERLAYS_FXML + "'.";
+		assert restoreButton != null : "fx:id=\"restoreButton\" was not injected: check your FXML file '" + AppConstants.MANAGE_OVERLAYS_FXML + "'.";
 
 		executorService = Executors.newSingleThreadScheduledExecutor(runable -> {
 			loadOverlaysThread = Executors.defaultThreadFactory().newThread(runable);
@@ -426,10 +426,8 @@ public class ManageOverlays_Controller {
 	@FXML
 	void overlayViewFlowPane_DragOver(DragEvent event) {
 		if (event.getDragboard().hasImage() || event.getDragboard().hasFiles() || event.getDragboard().hasUrl()) {
-			// TODO: Set Pane color to an alpha green
 			event.acceptTransferModes(TransferMode.COPY);
 		} else {
-			// TODO: Set Pane color to an alpha red?
 			event.acceptTransferModes(TransferMode.ANY);
 		}
 	}

@@ -1,35 +1,47 @@
 version: '{branch}.{build}'
 pull_requests:
   do_not_increment_build_number: true
-image: Visual Studio 2017
+skip_non_tags: false
 platform: x64
-before_build:
-- gradlew.bat spotlessApply
+image: 
+   - Visual Studio 2017
+   - Ubuntu
+init:
+  - cmd: git config --global core.autocrlf true
+install:
+  - sh: echo oracle-java10-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+  - sh: sudo add-apt-repository ppa:linuxuprising/java
+  - sh: sudo apt update
+  - sh: sudo apt install -y oracle-java10-installer
+  - sh: sudo apt install -y oracle-java10-set-default
+  - sh: export JAVA_HOME=/usr/lib/jvm/java-10-oracle
+  - sh: echo java home is $JAVA_HOME
+  - sh: sudo apt install -y fakeroot
+  - ./gradlew -version
 build_script:
-- gradlew.bat build
+  - ./gradlew build
+after_build:
+  - ./gradlew deploy
 artifacts:
-- path: releases\release-*\bundles\TokenTool-*.exe
-  name: TokenTool-Install
 - path: releases\release-*\TokenTool-*.jar
   name: TokenTool-Jar
-deploy_script:
-- gradlew.bat deploy
+- path: releases\release-*\TokenTool-*.exe
+  name: TokenTool-Windows
+- path: releases\release-*\tokentool-*.deb
+  name: TokenTool-Linux
 deploy:
 - provider: GitHub
   description: Windows release from AppVeyor
-  tag: $(APPVEYOR_REPO_TAG_NAME)
-  auth_token:
-    secure: HXIHe/F7K2yGOZ0I56DW5PevrQDe+zjyunjORGKYaUGxFtvPYPcmOdjZT69tzHcS
-  artifact: TokenTool-Install, TokenTool-Jar
-  draft: true
-  prerelease: false
+  auth_token: $(GITHUB_RELEASE_KEY)
+  artifact: TokenTool-Jar, TokenTool-Windows, TokenTool-Linux
+  draft: false
+  prerelease: true
   force_update: false
   on:
-    appveyor_repo_tag: true
-notifications:
-- provider: Slack
-  incoming_webhook: https://hooks.slack.com/services/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
-  channel: '#development'
-  on_build_success: true
-  on_build_failure: true
-  on_build_status_changed: true
+    APPVEYOR_REPO_TAG: true
+on_success:
+  - ps: Invoke-RestMethod $env:APPVEYOR_DISCORD_WEBHOOK_SCRIPT_URL -o send.ps1
+  - ps: ./send.ps1 success $env:DISCORD_URL
+on_failure:
+  - ps: Invoke-RestMethod $env:APPVEYOR_DISCORD_WEBHOOK_SCRIPT_URL -o send.ps1
+  - ps: ./send.ps1 failure $env:DISCORD_URL

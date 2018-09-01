@@ -1,7 +1,7 @@
 # Gradle
 ################################################################################
 .gradle
-/gradle.properties
+gradle-local.properties
 /gradlew.bat
 /gradlew
 
@@ -26,6 +26,7 @@ Thumbs.db
 .classpath
 .history
 workbench.xmi
+.settings/*
 
 # Keystore
 build-resources/rptools-keystore
@@ -42,3 +43,5 @@ bin/*
 sentry-events/*
 /bin/
 /build/
+package/windows/TokenTool.iss
+

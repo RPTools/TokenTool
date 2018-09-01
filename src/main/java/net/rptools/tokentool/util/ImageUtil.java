@@ -9,6 +9,7 @@
 package net.rptools.tokentool.util;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -70,11 +71,13 @@ public class ImageUtil {
 		Image thumb = null;
 		String fileURL = filePath.toUri().toURL().toString();
 
+		if (THUMB_SIZE > 0) {
+			thumbView.setFitWidth(THUMB_SIZE);
+			thumbView.setPreserveRatio(true);
+		}
+
 		if (ImageUtil.SUPPORTED_IMAGE_FILE_FILTER.accept(null, fileURL)) {
-			if (THUMB_SIZE <= 0)
-				thumb = processMagenta(new Image(fileURL), COLOR_THRESHOLD, overlayWanted);
-			else
-				thumb = processMagenta(new Image(fileURL, THUMB_SIZE, THUMB_SIZE, true, true), COLOR_THRESHOLD, overlayWanted);
+			thumb = processMagenta(new Image(fileURL), COLOR_THRESHOLD, overlayWanted);
 		} else if (ImageUtil.PSD_FILE_FILTER.accept(null, fileURL)) {
 			ImageInputStream is = null;
 			PSDImageReader reader = null;
@@ -124,12 +127,6 @@ public class ImageUtil {
 
 					// Lets pad the overlay with transparency to make it the same size as the PSD canvas size
 					thumb = resizeCanvas(SwingFXUtils.toFXImage(thumbBI, null), width, height, x, y);
-
-					// Finally set ImageView to thumbnail size
-					if (THUMB_SIZE > 0) {
-						thumbView.setFitWidth(THUMB_SIZE);
-						thumbView.setPreserveRatio(true);
-					}
 				}
 			} catch (Exception e) {
 				log.error("Processing: " + file.getAbsolutePath(), e);
@@ -214,6 +211,10 @@ public class ImageUtil {
 	 * Crop image to smallest width/height based on transparency
 	 */
 	private static Image autoCropImage(Image imageSource) {
+		return autoCropImage(imageSource, Color.TRANSPARENT, null);
+	}
+
+	public static Image autoCropImage(Image imageSource, Color backgroundColor, Image backgroundImage) {
 		ImageView croppedImageView = new ImageView(imageSource);
 		PixelReader pixelReader = imageSource.getPixelReader();
 
@@ -247,22 +248,32 @@ public class ImageUtil {
 		Rectangle2D viewPort = new Rectangle2D(minX, minY, maxX - minX, maxY - minY);
 		SnapshotParameters parameter = new SnapshotParameters();
 		parameter.setViewport(viewPort);
-		parameter.setFill(Color.TRANSPARENT);
+		parameter.setFill(backgroundColor);
 
-		return croppedImageView.snapshot(parameter, null);
+		if (backgroundImage != null) {
+			return new Group(new ImageView(backgroundImage), croppedImageView).snapshot(parameter, null);
+		} else {
+			return croppedImageView.snapshot(parameter, null);
+		}
 	}
 
-	public static Image composePreview(StackPane compositeTokenPane, Color bgColor, ImageView portraitImageView, ImageView maskImageView, ImageView overlayImageView, boolean useAsBase,
-			boolean clipImage) {
+	public static Image composePreview(StackPane compositeTokenPane, ImageView backgroundImageView, Color bgColor, ImageView portraitImageView, ImageView maskImageView, ImageView overlayImageView,
+			boolean useAsBase, boolean clipImage) {
+
 		// Process layout as maskImage may have changed size if the overlay was changed
 		compositeTokenPane.layout();
 		SnapshotParameters parameter = new SnapshotParameters();
 		Image finalImage = null;
 		Group blend;
 
+		// check if there is a mask image
+		if (maskImageView.getFitWidth() <= 0 || maskImageView.getFitHeight() <= 0)
+			clipImage = false;
+
 		if (clipImage) {
 			// We need to clip the portrait image first then blend the overlay image over it
 			// We will first get a snapshot of the portrait equal to the mask overlay image width/height
+			// We will then get a snapshot of the background image, if any.
 			double x, y, width, height;
 
 			x = maskImageView.getParent().getLayoutX();
@@ -272,18 +283,22 @@ public class ImageUtil {
 
 			Rectangle2D viewPort = new Rectangle2D(x, y, width, height);
 			Rectangle2D maskViewPort = new Rectangle2D(1, 1, width, height);
+			WritableImage newBackgroundImage = new WritableImage((int) width, (int) height);
 			WritableImage newImage = new WritableImage((int) width, (int) height);
 			WritableImage newMaskImage = new WritableImage((int) width, (int) height);
 
+			ImageView newBackgroundImageView = new ImageView();
 			ImageView overlayCopyImageView = new ImageView();
 			ImageView clippedImageView = new ImageView();
 
 			parameter.setViewport(viewPort);
 			parameter.setFill(bgColor);
+			backgroundImageView.snapshot(parameter, newBackgroundImage);
+
+			parameter.setFill(Color.TRANSPARENT);
 			portraitImageView.snapshot(parameter, newImage);
 
 			parameter.setViewport(maskViewPort);
-			parameter.setFill(Color.TRANSPARENT);
 			maskImageView.setVisible(true);
 			maskImageView.snapshot(parameter, newMaskImage);
 			maskImageView.setVisible(false);
@@ -291,6 +306,7 @@ public class ImageUtil {
 			clippedImageView.setFitWidth(width);
 			clippedImageView.setFitHeight(height);
 			clippedImageView.setImage(clipImageWithMask(newImage, newMaskImage));
+			newBackgroundImageView.setImage(clipImageWithMask(newBackgroundImage, newMaskImage));
 
 			// Our masked portrait image is now stored in clippedImageView, lets now blend the overlay image over it
 			// We'll create a temporary group to hold our temporary ImageViews's and blend them and take a snapshot
@@ -300,9 +316,9 @@ public class ImageUtil {
 			overlayCopyImageView.setOpacity(overlayImageView.getOpacity());
 
 			if (useAsBase) {
-				blend = new Group(overlayCopyImageView, clippedImageView);
+				blend = new Group(newBackgroundImageView, overlayCopyImageView, clippedImageView);
 			} else {
-				blend = new Group(clippedImageView, overlayCopyImageView);
+				blend = new Group(newBackgroundImageView, clippedImageView, overlayCopyImageView);
 			}
 
 			// Last, we'll clean up any excess transparent edges by cropping it
@@ -343,7 +359,6 @@ public class ImageUtil {
 					pixelWriter.setColor(readX, readY, Color.TRANSPARENT);
 				else
 					pixelWriter.setColor(readX, readY, pixelColor);
-
 			}
 		}
 
@@ -376,11 +391,23 @@ public class ImageUtil {
 		}
 	}
 
+	public static byte[] imageToBytes(BufferedImage image) throws IOException {
+		return imageToBytes(image, "png");
+	}
+
+	public static byte[] imageToBytes(BufferedImage image, String format) throws IOException {
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream(10000);
+		ImageIO.write(image, format, outStream);
+
+		return outStream.toByteArray();
+	}
+
 	/*
 	 * These are the file types supported by TokenTool
 	 */
 	public static final String[] SUPPORTED_FILE_FILTER_ARRAY = new String[] { ".psd", ".png", ".gif", ".jpg", ".jpeg", ".bmp" };
 	public static final IOFileFilter SUPPORTED_FILE_FILTER = new SuffixFileFilter(SUPPORTED_FILE_FILTER_ARRAY);
+	public static final ExtensionFilter SUPPORTED_PDF_EXTENSION_FILTER = new ExtensionFilter("PDF Files", "*.pdf");
 
 	public static final List<ExtensionFilter> GET_EXTENSION_FILTERS() {
 		List<ExtensionFilter> extensionFilters = new ArrayList<ExtensionFilter>();

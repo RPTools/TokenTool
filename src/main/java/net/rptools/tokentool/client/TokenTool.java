@@ -15,6 +15,8 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.ResourceBundle;
 
+import javax.imageio.spi.IIORegistry;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -22,14 +24,15 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.appender.FileAppender;
 
+import io.sentry.Sentry;
 import javafx.application.Application;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
 import javafx.application.Preloader;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TreeItem;
@@ -37,7 +40,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.AppPreferences;
 import net.rptools.tokentool.AppSetup;
@@ -68,20 +70,38 @@ public class TokenTool extends Application {
 
 	private static int overlayCount = 0;
 	private static int loadCount = 1;
-	private static double deltaX = 0;
-	private static double deltaY = 0;
 
 	private static TreeItem<Path> overlayTreeItems;
 	private static Stage stage;
 
+	static {
+		// This will inject additional data tags in log4j2 which will be picked up by Sentry.io
+		System.setProperty("log4j2.isThreadContextMapInheritable", "true");
+		ThreadContext.put("OS", System.getProperty("os.name")); // Added to the JavaFX Application Thread thread...
+	}
+
 	@Override
 	public void init() throws Exception {
+		// Since we are using multiple plugins (Twelve Monkeys for PSD and JAI for jpeg2000) in the same uber jar,
+		// the META-INF/services/javax.imageio.spi.ImageReaderSpi gets overwritten. So we need to register them manually:
+		// https://github.com/jai-imageio/jai-imageio-core/issues/29
+		IIORegistry registry = IIORegistry.getDefaultInstance();
+		registry.registerServiceProvider(new com.github.jaiimageio.jpeg2000.impl.J2KImageReaderSpi());
+
 		appInstance = this;
 		VERSION = getVersion();
 
 		// Lets install/update the overlays if newer version
 		AppSetup.install(VERSION);
 		log = LogManager.getLogger(TokenTool.class);
+
+		// Log some basic info
+		log.info("Environment: " + Sentry.getStoredClient().getEnvironment());
+		if (!Sentry.getStoredClient().getEnvironment().toLowerCase().equals("production"))
+			log.info("Not in Produciton mode and thus will not log any events to Sentry.io");
+
+		log.info("Release: " + Sentry.getStoredClient().getRelease());
+		log.info("OS: " + ThreadContext.get("OS"));
 		log.info("3D Hardware Available? " + Platform.isSupported(ConditionalFeature.SCENE3D));
 
 		// Now lets cache any overlays we find and update preLoader with progress
@@ -93,11 +113,17 @@ public class TokenTool extends Application {
 	}
 
 	@Override
-	public void start(Stage primaryStage) throws IOException {
+	public void start(Stage primaryStage) {
 		stage = primaryStage;
 		setUserAgentStylesheet(STYLESHEET_MODENA); // Setting the style back to the new Modena
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(AppConstants.TOKEN_TOOL_FXML), ResourceBundle.getBundle(AppConstants.TOKEN_TOOL_BUNDLE));
-		root = fxmlLoader.load();
+
+		try {
+			root = fxmlLoader.load();
+		} catch (IOException e) {
+			log.error("Error loading " + AppConstants.TOKEN_TOOL_FXML, e);
+		}
+
 		tokentool_Controller = (TokenTool_Controller) fxmlLoader.getController();
 
 		Scene scene = new Scene(root);
@@ -105,54 +131,12 @@ public class TokenTool extends Application {
 		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream(AppConstants.TOKEN_TOOL_ICON)));
 		primaryStage.setScene(scene);
 
-		primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
-			if (Double.isNaN(oldVal.doubleValue()))
-				return;
-
-			deltaX += newVal.doubleValue() - oldVal.doubleValue();
-
-			// Only adjust on even width adjustments
-			if (deltaX > 1 || deltaX < -1) {
-				if (deltaX % 2 == 0) {
-					tokentool_Controller.updatePortraitLocation(deltaX, 0);
-					deltaX = 0;
-				} else {
-					tokentool_Controller.updatePortraitLocation(deltaX - 1, 0);
-					deltaX = 1;
-				}
-			}
-		});
-
-		primaryStage.heightProperty().addListener((obs, oldVal, newVal) -> {
-			if (Double.isNaN(oldVal.doubleValue()))
-				return;
-
-			deltaY += newVal.doubleValue() - oldVal.doubleValue();
-
-			// Only adjust on even width adjustments
-			if (deltaY > 1 || deltaY < -1) {
-				if (deltaY % 2 == 0) {
-					tokentool_Controller.updatePortraitLocation(0, deltaY);
-					deltaY = 0;
-				} else {
-					tokentool_Controller.updatePortraitLocation(0, deltaY - 1);
-					deltaY = 1;
-				}
-			}
-		});
-
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-			@Override
-			public void handle(WindowEvent event) {
-				tokentool_Controller.exitApplication();
-			}
-		});
-
 		// Load all the overlays into the treeview
 		tokentool_Controller.updateOverlayTreeview(overlayTreeItems);
 
 		// Restore saved settings
 		AppPreferences.restorePreferences(tokentool_Controller);
+		tokentool_Controller.updateTokenPreviewImageView();
 
 		// Add recent list to treeview
 		tokentool_Controller.updateOverlayTreeViewRecentFolder(true);
@@ -160,10 +144,17 @@ public class TokenTool extends Application {
 		// Set the Overlay Options accordion to be default open view
 		tokentool_Controller.expandOverlayOptionsPane(true);
 
+		primaryStage.setOnCloseRequest(e -> tokentool_Controller.exitApplication());
 		primaryStage.show();
 
 		// Finally, update token preview image after everything is done loading
 		Platform.runLater(() -> tokentool_Controller.updateTokenPreviewImageView());
+	}
+
+	@Override
+	public void stop() {
+		// Make sure any hanging threads are closed as well...
+		System.exit(0);
 	}
 
 	public static TokenTool getInstance() {
@@ -261,7 +252,7 @@ public class TokenTool extends Application {
 				return cmd.getOptionValue(searchValue);
 			}
 		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
+			// We don't have the logger instance at this point yet...
 			e1.printStackTrace();
 		}
 
@@ -279,7 +270,7 @@ public class TokenTool extends Application {
 	}
 
 	/**
-	 * Legacy, it simply launches the FX Application which calls init() then start()
+	 * Legacy, it simply launches the FX Application which calls init() then start(). Also sets/calls the preloader class
 	 * 
 	 * @author Jamz
 	 * @since 2.0
@@ -289,11 +280,13 @@ public class TokenTool extends Application {
 	 */
 	public static void main(String[] args) {
 		Options cmdOptions = new Options();
-		cmdOptions.addOption("v", "version", true, "override version number"); //$NON-NLS-2$ //$NON-NLS-3$
-		cmdOptions.addOption("n", "vendor", true, "override vendor"); //$NON-NLS-2$ //$NON-NLS-3$
+		cmdOptions.addOption("v", "version", true, "override version number");
+		cmdOptions.addOption("n", "vendor", true, "override vendor");
 
 		VERSION = getCommandLineStringOption(cmdOptions, "version", args);
 		VENDOR = getCommandLineStringOption(cmdOptions, "vendor", args);
+
+		System.setProperty("javafx.preloader", "net.rptools.tokentool.client.SplashScreenLoader");
 
 		launch(args);
 	}

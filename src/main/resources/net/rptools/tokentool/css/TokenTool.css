@@ -1,3 +1,8 @@
+/* 	For reference... 
+	https://docs.oracle.com/javase/10/docs/api/javafx/scene/doc-files/cssref.html
+	http://www.oracle.com/technetwork/articles/javafx/javafx-css-159889.html
+*/
+
 /* Add custom font */
 @font-face {
     font-family: Horta;
@@ -6,7 +11,7 @@
 
 .hortaFont {
 	-fx-font-family: "Horta";
-	-fx-font-size: 20;
+	-fx-font-size: 20.0;
 }
 
 /* leaf is a PsuedoClass added via the controller to child-only nodes, e.g. overlays... */
@@ -96,33 +101,66 @@
 }
 
 .add-folder-button {
-	-fx-min-width: 26px;
-	-fx-min-height: 24px;
+	-fx-min-width: 26.0px;
+	-fx-min-height: 24.0px;
 	-fx-background-image: url("../image/folder.png");
-	-fx-background-size: 20px 20px;
+	-fx-background-size: 20.0px 20.0px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
 
 .add-overlay-button {
-	-fx-min-width: 26px;
-	-fx-min-height: 24px;
+	-fx-min-width: 26.0px;
+	-fx-min-height: 24.0px;
 	-fx-background-image: url("../image/add.png");
-	-fx-background-size: 20px 20px;
+	-fx-background-size: 20.0px 20.0px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
 
 .delete-button {
-	-fx-min-width: 26px;
-	-fx-min-height: 24px;
+	-fx-min-width: 26.0px;
+	-fx-min-height: 24.0px;
 	-fx-background-image: url("../image/trash.png");
-	-fx-background-size: 20px 20px;
+	-fx-background-size: 20.0px 20.0px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
 
+
 /* CSS For Credits window */
 .text-area, .text-area .viewport, .text-area .content {
     -fx-background-color: transparent ;
+}
+
+
+/* 
+ * For PDF pagination 
+ * https://stackoverflow.com/questions/46563798/javafx-pagination-button-sizes-and-style 
+ */
+.pagination {
+	-fx-base: black;
+	-fx-arrow-button-gap: 5.0px;
+}
+.pagination .toggle-button, .mypage {
+	-fx-background-radius:15.0px;
+	-fx-padding: 0.0px;
+}
+.pagination .button{
+	-fx-padding: 5.0 15.0 5.0 15.0px;
+}
+.pagination .label {
+	-fx-text-fill: white;
+}
+.pagination > .pagination-control > .control-box {
+    -fx-spacing: 10.0px;
+    -fx-font-size: 12.0;
+}
+.pagination > .pagination-control {
+    -fx-font-size: 14.0;
+}
+.pagination > .pagination-control > .control-box > .left-arrow-button,
+.pagination > .pagination-control > .control-box > .right-arrow-button {
+    -fx-min-width: 40.0;
+    -fx-background-radius:15.0px;
 }

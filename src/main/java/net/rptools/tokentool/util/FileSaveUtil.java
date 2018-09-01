@@ -10,6 +10,8 @@ package net.rptools.tokentool.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,17 +27,26 @@ public class FileSaveUtil {
 	private static final Logger log = LogManager.getLogger(FileSaveUtil.class);
 	private static File lastFile = null;
 
-	public File getTempFileName(boolean asToken, boolean useNumbering, String tempFileName,
-			TextField fileNameSuffix) throws IOException {
-
-		return new File(System.getProperty("java.io.tmpdir"), getFileName(asToken, useNumbering, tempFileName, fileNameSuffix).getName());
+	public File getTempFileName(boolean asToken, boolean useNumbering, String tempFileName, TextField fileNameSuffix) throws IOException {
+		return getTempFileName(asToken, useNumbering, tempFileName, fileNameSuffix, true);
 	}
 
-	public File getFileName(boolean asToken, boolean useNumbering, String tempFileName, TextField fileNameSuffix)
-			throws IOException {
-		final String _extension;
+	public File getTempFileName(boolean asToken, boolean useNumbering, String tempFileName, TextField fileNameSuffix, boolean advanceFileNameSuffix) throws IOException {
+		return new File(System.getProperty("java.io.tmpdir"), getFileName(asToken, useNumbering, tempFileName, fileNameSuffix, advanceFileNameSuffix).getName());
+	}
 
-		_extension = AppConstants.DEFAULT_IMAGE_EXTENSION;
+	public File getTempFileName(String tempFileName) throws IOException {
+		final String _extension = AppConstants.DEFAULT_IMAGE_EXTENSION;
+
+		if (!tempFileName.endsWith(_extension))
+			tempFileName += _extension;
+
+		return new File(System.getProperty("java.io.tmpdir"), tempFileName);
+	}
+
+	public File getFileName(boolean asToken, boolean useNumbering, String tempFileName, TextField fileNameSuffix, boolean advanceFileNameSuffix)
+			throws IOException {
+		final String _extension = AppConstants.DEFAULT_IMAGE_EXTENSION;
 
 		if (useNumbering) {
 			int dragCounter;
@@ -47,7 +58,8 @@ public class FileSaveUtil {
 
 			String leadingZeroes = "%0" + fileNameSuffix.getLength() + "d";
 
-			fileNameSuffix.setText(String.format(leadingZeroes, dragCounter + 1));
+			if (advanceFileNameSuffix)
+				fileNameSuffix.setText(String.format(leadingZeroes, dragCounter + 1));
 
 			if (tempFileName.isEmpty())
 				tempFileName = AppConstants.DEFAULT_TOKEN_NAME;
@@ -75,7 +87,17 @@ public class FileSaveUtil {
 	}
 
 	public static String cleanFileName(String fileName) {
-		return fileName.replaceAll(AppConstants.VALID_FILE_NAME_REPLACEMENT_PATTERN, AppConstants.VALID_FILE_NAME_REPLACEMENT_CHARACTER);
+		String decodedFileName = fileName;
+
+		try {
+			decodedFileName = URLDecoder.decode(decodedFileName, "UTF-8").toString();
+		} catch (UnsupportedEncodingException e) {
+			log.error("Issue decoding file name: " + fileName, e);
+		} finally {
+			decodedFileName = decodedFileName.replaceAll(AppConstants.VALID_FILE_NAME_REPLACEMENT_PATTERN, AppConstants.VALID_FILE_NAME_REPLACEMENT_CHARACTER);
+		}
+
+		return decodedFileName;
 	}
 
 	/*
