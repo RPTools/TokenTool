@@ -14,13 +14,6 @@ after_failure:
   - wget $TRAVIS_DISCORD_WEBHOOK_SCRIPT_URL
   - chmod +x send.sh
   - ./send.sh failure $DISCORD_URL
-before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-cache:
-  directories:
-  - "$HOME/.gradle/caches/"
-  - "$HOME/.gradle/wrapper/"
 before_deploy:
  - ./gradlew deploy
 deploy:
