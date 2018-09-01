@@ -170,6 +170,8 @@ task uberJar(type: Jar) {
 	group = 'distribution'
 	description = 'Create uber jar for native installers'
 
+	baseName project.name + '-' + tagVersion
+
 	manifest {
 		attributes 'Implementation-Title': project.name,
 		'Implementation-Version': tagVersion,
