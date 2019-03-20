@@ -46,6 +46,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
@@ -132,6 +133,7 @@ public class TokenTool_Controller {
 	@FXML private Label overlayNameLabel;
 	@FXML private ColorPicker backgroundColorPicker;
 	@FXML private ToggleButton overlayAspectToggleButton;
+	@FXML private Button removeBackgroundButton;
 
 	@FXML private Slider portraitTransparencySlider;
 	@FXML private Slider portraitBlurSlider;
@@ -221,6 +223,7 @@ public class TokenTool_Controller {
 		assert portraitTransparencySlider != null : "fx:id=\"portraitTransparencySlider\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert portraitBlurSlider != null : "fx:id=\"portraitBlurSlider\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert portraitGlowSlider != null : "fx:id=\"portraitGlowSlider\" was not injected: check your FXML file 'TokenTool.fxml'.";
+		assert removeBackgroundButton != null : "fx:id=\"removeBackgroundButton\" was not injected: check your FXML file 'TokenTool.fxml'.";
 
 		assert overlayTransparencySlider != null : "fx:id=\"overlayTransparencySlider\" was not injected: check your FXML file 'TokenTool.fxml'.";
 

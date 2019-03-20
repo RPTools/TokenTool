@@ -141,7 +141,7 @@
 																			</VBox.margin>
 																		</Label>
 																		<ColorPicker fx:id="backgroundColorPicker" editable="true" maxWidth="1.7976931348623157E308" minWidth="180.0" onAction="#backgroundColorPicker_onAction" promptText="%options.pane.portrait.color.prompt" VBox.vgrow="ALWAYS" />
-																		<Button fx:id="removeBackgroundButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeBackgroundButton_onAction" text="Remove Background Color">
+																		<Button fx:id="removeBackgroundButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeBackgroundButton_onAction" text="%option.pane.portrait.button.RemoveBackgroundColor">
                                                          <font>
                                                             <Font size="11.0" />
                                                          </font></Button>
