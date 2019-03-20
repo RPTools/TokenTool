@@ -370,9 +370,10 @@ public class ImageUtil {
 
 	public static String getFileType(File imageFile) {
 		if (FilenameUtils.getExtension(imageFile.getName()).toLowerCase().equals("psd")) {
-			return "Adobe Photoshop Image";
+			return I18N.getString("imageFile.adobe.photoshop.image")
+					;
 		} else {
-			return FilenameUtils.getExtension(imageFile.getName()).toUpperCase() + " File";
+			return FilenameUtils.getExtension(imageFile.getName()).toUpperCase() + I18N.getString("imageFile.fileExtension.label");
 		}
 	}
 
@@ -384,12 +385,12 @@ public class ImageUtil {
 
 	public static final List<ExtensionFilter> GET_EXTENSION_FILTERS() {
 		List<ExtensionFilter> extensionFilters = new ArrayList<ExtensionFilter>();
-		extensionFilters.add(new ExtensionFilter("All Images", "*.psd", "*.png", "*.gif", "*.jpg", "*.jpeg", "*.bmp"));
-		extensionFilters.add(new ExtensionFilter("PSD Files", "*.psd"));
-		extensionFilters.add(new ExtensionFilter("PNG Files", "*.png"));
-		extensionFilters.add(new ExtensionFilter("JPG Files", "*.jpg"));
-		extensionFilters.add(new ExtensionFilter("JPEG Files", "*.jpeg"));
-		extensionFilters.add(new ExtensionFilter("BMP Files", "*.bmp"));
+		extensionFilters.add(new ExtensionFilter(I18N.getString("imageFile.fileExtension.openFile.allExtensions"), "*.psd", "*.png", "*.gif", "*.jpg", "*.jpeg", "*.bmp"));
+		extensionFilters.add(new ExtensionFilter("PNG "  + I18N.getString("imageFile.fileExtension.openFileExtension"), "*.png"));
+		extensionFilters.add(new ExtensionFilter("JPG "  + I18N.getString("imageFile.fileExtension.openFileExtension"), "*.jpg"));
+		extensionFilters.add(new ExtensionFilter("PSD "  + I18N.getString("imageFile.fileExtension.openFileExtension"), "*.psd"));
+		extensionFilters.add(new ExtensionFilter("JPEG " + I18N.getString("imageFile.fileExtension.openFileExtension"), "*.jpeg"));
+		extensionFilters.add(new ExtensionFilter("BMP "  + I18N.getString("imageFile.fileExtension.openFileExtension"), "*.bmp"));
 
 		return extensionFilters;
 	}

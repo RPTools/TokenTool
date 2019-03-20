@@ -265,6 +265,7 @@ public class ManageOverlays_Controller {
 
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle(I18N.getString("ManageOverlays.dialog.delete.title"));
+		alert.setHeaderText(I18N.getString("ManageOverlays.dialog.header.confirmation"));
 		alert.setContentText(confirmationText);
 
 		Optional<ButtonType> result = alert.showAndWait();
@@ -288,6 +289,7 @@ public class ManageOverlays_Controller {
 
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle(I18N.getString("ManageOverlays.dialog.delete.dir.title"));
+		alert.setHeaderText(I18N.getString("ManageOverlays.dialog.header.confirmation"));
 		alert.setContentText(confirmationText);
 
 		Optional<ButtonType> result = alert.showAndWait();
@@ -375,6 +377,7 @@ public class ManageOverlays_Controller {
 	void restoreButton_onAction(ActionEvent event) {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle(I18N.getString("ManageOverlays.dialog.restore.overlays.title"));
+		alert.setHeaderText(I18N.getString("ManageOverlays.dialog.header.confirmation"));
 		alert.setContentText(I18N.getString("ManageOverlays.dialog.restore.overlays.content_text"));
 
 		Optional<ButtonType> result = alert.showAndWait();
