@@ -15,12 +15,20 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 public class StageResizeMoveUtil {
 	public static void addResizeListener(Stage stage) {
 		addResizeListener(stage, 0, 0, Double.MAX_VALUE, Double.MAX_VALUE);
+
+		stage.addEventHandler(KeyEvent.KEY_RELEASED, (KeyEvent event) -> {
+			if (event.getCode() == KeyCode.ESCAPE) {
+				stage.close();
+			}
+		});
 	}
 
 	public static void addResizeListener(Stage stage, double minWidth, double minHeight, double maxWidth, double maxHeight) {

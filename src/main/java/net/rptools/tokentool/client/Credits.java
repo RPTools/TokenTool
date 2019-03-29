@@ -13,6 +13,9 @@ import java.util.ResourceBundle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,7 +25,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import net.rptools.tokentool.AppConstants;
+import net.rptools.tokentool.AppPreferences;
 import net.rptools.tokentool.controller.TokenTool_Controller;
+import net.rptools.tokentool.model.Window_Preferences;
 import net.rptools.tokentool.util.I18N;
 
 public class Credits {
@@ -47,9 +52,16 @@ public class Credits {
 			stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				@Override
 				public void handle(WindowEvent event) {
+					AppPreferences.setPreference(AppPreferences.WINDOW_CREDITS_PREFERENCES, new Window_Preferences(stage).toJson());
 					stage.hide();
 				}
 			});
+
+			String preferencesJson = AppPreferences.getPreference(AppPreferences.WINDOW_CREDITS_PREFERENCES, null);
+			if (preferencesJson != null) {
+				Window_Preferences window_Preferences = new Gson().fromJson(preferencesJson, new TypeToken<Window_Preferences>() {}.getType());
+				window_Preferences.setWindow(stage);
+			}
 
 			stage.show();
 		} catch (Exception e) {

@@ -12,6 +12,11 @@ import java.util.ResourceBundle;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -20,9 +25,12 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import net.rptools.tokentool.AppConstants;
+import net.rptools.tokentool.AppPreferences;
 import net.rptools.tokentool.controller.RegionSelector_Controller;
 import net.rptools.tokentool.controller.TokenTool_Controller;
+import net.rptools.tokentool.model.Window_Preferences;
 import net.rptools.tokentool.util.StageResizeMoveUtil;
 
 public class RegionSelector {
@@ -49,11 +57,16 @@ public class RegionSelector {
 			stage.getIcons().add(new Image(getClass().getResourceAsStream(AppConstants.REGION_SELECTOR_ICON)));
 			stage.setScene(scene);
 
-			StageResizeMoveUtil.addResizeListener(stage);
+			String preferencesJson = AppPreferences.getPreference(AppPreferences.WINDOW_REGION_SELECTOR_PREFERENCES, null);
+			if (preferencesJson != null) {
+				Window_Preferences window_Preferences = new Gson().fromJson(preferencesJson, new TypeToken<Window_Preferences>() {}.getType());
+				window_Preferences.setWindow(stage);
+			}
 
+			StageResizeMoveUtil.addResizeListener(stage);
 			stage.show();
 		} catch (Exception e) {
-			log.error(e);
+			log.error("Error creating RegionSelector!", e);
 		}
 	}
 

@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.StackPane;
+import net.rptools.tokentool.AppConstants;
 
 public class SplashScreen_Controller {
 	private static String versionPrefix;
@@ -25,10 +26,10 @@ public class SplashScreen_Controller {
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void initialize() {
-		assert splashLayout != null : "fx:id=\"splashLayout\" was not injected: check your FXML file 'SplashScreenLoader.fxml'.";
-		assert loadProgress != null : "fx:id=\"loadProgress\" was not injected: check your FXML file 'SplashScreenLoader.fxml'.";
-		assert progressLabel != null : "fx:id=\"progressText\" was not injected: check your FXML file 'SplashScreenLoader.fxml'.";
-		assert versionLabel != null : "fx:id=\"versionLabel\" was not injected: check your FXML file 'SplashScreenLoader.fxml'.";
+		assert splashLayout != null : "fx:id=\"splashLayout\" was not injected: check your FXML file '" + AppConstants.SPLASH_SCREEN_FXML + "'.";
+		assert loadProgress != null : "fx:id=\"loadProgress\" was not injected: check your FXML file '" + AppConstants.SPLASH_SCREEN_FXML + "'.";
+		assert progressLabel != null : "fx:id=\"progressText\" was not injected: check your FXML file '" + AppConstants.SPLASH_SCREEN_FXML + "'.";
+		assert versionLabel != null : "fx:id=\"versionLabel\" was not injected: check your FXML file '" + AppConstants.SPLASH_SCREEN_FXML + "'.";
 
 		versionPrefix = getVersionLabel() + " ";
 	}

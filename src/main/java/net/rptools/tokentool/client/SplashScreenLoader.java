@@ -19,14 +19,11 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.*;
 import javafx.util.Duration;
+import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.controller.SplashScreen_Controller;
 import javafx.scene.layout.StackPane;
 
 public class SplashScreenLoader extends Preloader {
-	private final String TOKEN_TOOL_SPLASH_ICON = "/net/rptools/tokentool/image/token_tool_splash_icon.png";
-	private final String SPLASH_SCREEN_FXML = "/net/rptools/tokentool/view/SplashScreenLoader.fxml";
-	private final String TOKEN_TOOL_BUNDLE = "net.rptools.tokentool.i18n.TokenTool";
-
 	private Stage stage;
 	private StackPane root;
 	private SplashScreen_Controller controller;
@@ -34,14 +31,14 @@ public class SplashScreenLoader extends Preloader {
 	public void start(Stage stage) throws Exception {
 		setUserAgentStylesheet(STYLESHEET_CASPIAN); // I like the look of the this progress bar better for this screen...
 
-		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(SPLASH_SCREEN_FXML), ResourceBundle.getBundle(TOKEN_TOOL_BUNDLE));
+		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(AppConstants.SPLASH_SCREEN_FXML), ResourceBundle.getBundle(AppConstants.TOKEN_TOOL_BUNDLE));
 		root = (StackPane) fxmlLoader.load();
 		controller = (SplashScreen_Controller) fxmlLoader.getController();
 		controller.setVersionLabel(TokenTool.getVersion());
 
 		Scene scene = new Scene(root);
 		stage.initStyle(StageStyle.UNDECORATED);
-		stage.getIcons().add(new Image(getClass().getResourceAsStream(TOKEN_TOOL_SPLASH_ICON)));
+		stage.getIcons().add(new Image(getClass().getResourceAsStream(AppConstants.TOKEN_TOOL_ICON)));
 		stage.setScene(scene);
 		stage.show();
 

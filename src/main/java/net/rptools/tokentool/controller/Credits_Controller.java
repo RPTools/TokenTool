@@ -26,8 +26,8 @@ public class Credits_Controller {
 
 	@FXML
 	void initialize() {
-		assert rptoolsHyperlink != null : "fx:id=\"rptoolsHyperlink\" was not injected: check your FXML file 'Credits.fxml'.";
-		assert versionLabel != null : "fx:id=\"versionLabel\" was not injected: check your FXML file 'Credits.fxml'.";
+		assert rptoolsHyperlink != null : "fx:id=\"rptoolsHyperlink\" was not injected: check your FXML file '" + AppConstants.CREDITS_FXML + "'.";
+		assert versionLabel != null : "fx:id=\"versionLabel\" was not injected: check your FXML file '" + AppConstants.CREDITS_FXML + "'.";
 
 		versionLabel.setText(versionLabel.getText() + " " + TokenTool.getVersion());
 	}

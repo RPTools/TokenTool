@@ -20,10 +20,15 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import net.rptools.tokentool.client.TokenTool;
+import net.rptools.tokentool.util.I18N;
 import net.rptools.tokentool.util.ImageUtil;
 
 /**
@@ -32,18 +37,19 @@ import net.rptools.tokentool.util.ImageUtil;
 public class AppSetup {
 	private static Logger log; // Don't instantiate until install gets and sets user_home/logs directory
 
-	private static final String DEFAULT_OVERLAYS = "net/rptools/tokentool/overlays/v2";
+	private static final String DEFAULT_OVERLAYS = "net/rptools/tokentool/overlays/";
 	private static final String USER_HOME;
 
 	static {
 		USER_HOME = System.getProperty("user.home");
+		ThreadContext.put("OS", System.getProperty("os.name")); // Added to the JavaFX-Launcher thread...
 	}
 
 	public static void install(String versionString) {
 		System.setProperty("appHome", getAppHome("logs").getAbsolutePath());
 		log = LogManager.getLogger(AppSetup.class);
 
-		File overlayVer = new File(getAppHome().getAbsolutePath() + "/version.txt");
+		File overlayVerFile = new File(getAppHome().getAbsolutePath() + "/version.txt");
 		Collection<File> existingOverLays = FileUtils.listFiles(AppConstants.OVERLAY_DIR, ImageUtil.SUPPORTED_FILE_FILTER, TrueFileFilter.INSTANCE);
 		log.info("Overlays installed: " + existingOverLays.size());
 
@@ -51,35 +57,67 @@ public class AppSetup {
 		// Overlays are stored in a version packaged structure so we can later install only newer overlays if wanted
 		String installedVersion = "0";
 		try {
-			if (overlayVer.exists()) {
-				installedVersion = FileUtils.readFileToString(overlayVer, Charset.defaultCharset());
+			if (overlayVerFile.exists()) {
+				installedVersion = FileUtils.readFileToString(overlayVerFile, Charset.defaultCharset());
 			} else {
-				FileUtils.writeStringToFile(overlayVer, versionString, Charset.defaultCharset());
+				FileUtils.writeStringToFile(overlayVerFile, versionString, Charset.defaultCharset());
 			}
 		} catch (IOException ioe) {
 			log.error(ioe);
 		}
 
-		if (existingOverLays.isEmpty() || isNewerVersion(TokenTool.getVersion(), installedVersion)) {
+		if (existingOverLays.isEmpty()) {
 			try {
 				installDefaultOverlays();
 			} catch (IOException e) {
-				log.error(e);
+				log.error("Error installing overlays upon detecting no overlays are installed...", e);
+			}
+		} else if (isNewerVersion(TokenTool.getVersion(), installedVersion)) {
+			log.info("New version detected.");
+
+			try {
+				confirmInstallOverlays(installNewOverlays(installedVersion));
+			} catch (IOException e) {
+				log.error("Error installing overlays upon detecting a new version installed...", e);
 			}
 
 			// Update version file to new version
 			try {
-				FileUtils.writeStringToFile(overlayVer, versionString, Charset.defaultCharset());
+				FileUtils.writeStringToFile(overlayVerFile, versionString, Charset.defaultCharset());
 			} catch (IOException e) {
 				log.error(e);
 			}
 		}
 	}
 
+	private static void confirmInstallOverlays(int overlaysInstalled) {
+		if (overlaysInstalled <= 0)
+			return;
+
+		Platform.runLater(() -> {
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle(I18N.getString("AppSetup.dialog.install.overlays.confirmation.title"));
+			alert.setContentText(overlaysInstalled + " " + I18N.getString("AppSetup.dialog.install.overlays.confirmation"));
+
+			alert.showAndWait();
+		});
+
+		log.info(overlaysInstalled + " New overlays installed.");
+	}
+
 	public static void installDefaultOverlays() throws IOException {
-		// Create the overlay directory
+		installNewOverlays("0.0"); // Install all overlays
+	}
+
+	/*
+	 * OK so here will will only install any overlays that are in a directory with a newer version than what is installed. So, if a user skips versions and goes from 2 to 2.3 any overlays in 2.1, 2.2,
+	 * and 2.3 will get installed. I'm doing it this way in cause a user reorganizes his directory structure or deletes overlays he doesn't want, we don't reinstall them and annoy the user!
+	 */
+	public static int installNewOverlays(String currentVersion) throws IOException {
+		// Create the overlay directory if it doesn't already exist
 		File overlayDir = AppConstants.OVERLAY_DIR;
 		overlayDir.mkdirs();
+		int overlaysInstalled = 0;
 
 		// Copy default overlays from resources
 		// https://dzone.com/articles/get-all-classes-within-package
@@ -90,14 +128,23 @@ public class AppSetup {
 			URL inputUrl = AppSetup.class.getClassLoader().getResource(resourcePath);
 			String resourceName = resourcePath.substring(DEFAULT_OVERLAYS.length());
 
-			try {
-				log.info("Installing overlay: " + resourceName);
-				FileUtils.copyURLToFile(inputUrl, new File(overlayDir, resourceName));
-			} catch (IOException e) {
-				log.error("ERROR writing " + inputUrl);
-				log.error(e);
+			int verIndex = resourceName.indexOf("/");
+			String resourceVerion = resourceName.substring(1, verIndex).replace("_", ".");
+
+			if (isNewerVersion(resourceVerion, currentVersion)) {
+				File resourceFile = new File(overlayDir, resourceName.substring(resourceVerion.length() + 1, resourceName.length()));
+				log.info("Installing overlay: " + resourceFile);
+
+				try {
+					FileUtils.copyURLToFile(inputUrl, resourceFile);
+					overlaysInstalled++;
+				} catch (IOException e) {
+					log.error("ERROR copying " + inputUrl + " to " + resourceFile, e);
+				}
 			}
 		}
+
+		return overlaysInstalled;
 	}
 
 	public static File getAppHome() {
@@ -127,6 +174,10 @@ public class AppSetup {
 		return home;
 	}
 
+	public static File getTmpDir() {
+		return getAppHome("tmp");
+	}
+
 	/**
 	 * A convenience method to break up the version number string into it's component version identifiers and test if version is newer than existing version
 	 * 
@@ -147,21 +198,25 @@ public class AppSetup {
 		String[] installedVersions = installedVersion.indexOf(".") > 0 ? installedVersion.split("\\.") : new String[] { installedVersion };
 
 		int i = 0;
-		for (String ver : versions) {
-			int v = Integer.parseInt(ver);
-			int iv = 0;
+		try {
+			for (String ver : versions) {
+				int v = Integer.parseInt(ver);
+				int iv = 0;
 
-			if (installedVersions.length > i)
-				iv = Integer.parseInt(installedVersions[i]);
+				if (installedVersions.length > i)
+					iv = Integer.parseInt(installedVersions[i]);
 
-			if (v > iv) {
-				log.info("New version detected.");
-				return true;
-			} else if (iv > v) {
-				return false;
+				if (v > iv) {
+					return true;
+				} else if (iv > v) {
+					return false;
+				}
+
+				i++;
 			}
-
-			i++;
+		} catch (NumberFormatException e) {
+			log.warn("Unable to parse version, installedVersion: " + version + ", " + installedVersion);
+			return false;
 		}
 
 		return false;

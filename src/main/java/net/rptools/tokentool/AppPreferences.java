@@ -10,10 +10,10 @@ package net.rptools.tokentool;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -24,61 +24,103 @@ import org.apache.logging.log4j.Logger;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
 import net.rptools.tokentool.client.TokenTool;
 import net.rptools.tokentool.controller.TokenTool_Controller;
+import net.rptools.tokentool.model.Window_Preferences;
 import net.rptools.tokentool.util.FileSaveUtil;
 
 public class AppPreferences {
 	private static final Logger log = LogManager.getLogger(AppPreferences.class);
-	private static final Preferences prefs = Preferences.userNodeForPackage(net.rptools.tokentool.client.TokenTool.class);
+	private static final Preferences prefs = Preferences.userNodeForPackage(TokenTool.class);
 
+	// _PREFERENCES are stored as JSON objects
 	private static final String OVERLAY_ASPECT = "overlayAspectToggleButton";
 	private static final String OVERLAY_WIDTH = "overlayWidthSpinner";
 	private static final String OVERLAY_HEIGHT = "overlayHeightSpinner";
 	private static final String OVERLAY_USE_BASE = "overlayUseAsBaseCheckbox";
 	private static final String OVERLAY_CLIP_PORTRAIT = "clipPortraitCheckbox";
-	private static final String BACKGROUND_COLOR_RED = "backgroundColor_RED";
-	private static final String BACKGROUND_COLOR_BLUE = "backgroundColor_BLUE";
-	private static final String BACKGROUND_COLOR_GREEN = "backgroundColor_GREEN";
-	private static final String BACKGROUND_COLOR_ALPHA = "backgroundColor_ALPHA";
-	private static final String LAST_FILE = "lastFileSaved";
-	private static final String LAST_PORTRAIT_FILE = "lastPortrait";
+	private static final String LAST_TOKEN_SAVE_LOCATION = "lastFileSaved";
 	private static final String FILE_NAME_TEXT_FIELD = "fileNameTextField";
 	private static final String FILE_NAME_SUFFIX_TEXT_FIELD = "fileNameSuffixTextField";
 	private static final String USE_FILE_NUMBERING = "useFileNumberingCheckbox";
+	private static final String SAVE_PORTRAIT_ON_DRAG = "savePortraitOnDragCheckbox";
+	private static final String USE_BACKGROUND_ON_DRAG = "useBackgroundOnDragCheckbox";
+
 	private static final String RECENT_OVERLAY_COUNT = "recent_overlay_count";
 	private static final String RECENT_OVERLAY = "recent_overlay_";
-	private static final String PORTRAIT_X = "portrait_x";
-	private static final String PORTRAIT_Y = "portrait_y";
-	private static final String PORTRAIT_ROTATION = "portrait_rotation";
-	private static final String PORTRAIT_ZOOM = "portrait_zoom";
-	private static final String WINDOW_X = "window_x";
-	private static final String WINDOW_Y = "window_y";
-	private static final String WINDOW_WIDTH = "window_width";
-	private static final String WINDOW_HEIGHT = "window_height";
+	private static final String PORTRAIT_IMAGEVIEW_PREFERENCES = "portraitImageView_preferences";
+	private static final String BACKGROUND_IMAGEVIEW_PREFERENCES = "backgroundImageView_preferences";
+
+	private static final String WINDOW_MAIN_PREFERENCES = "windowMain_preferences";
+	public static final String WINDOW_MANAGE_OVERLAYS_PREFERENCES = "windowManageOverlays_preferences";
+	public static final String WINDOW_PDF_PREFERENCES = "windowPdf_preferences";
+	public static final String WINDOW_REGION_SELECTOR_PREFERENCES = "windowRegionSelector_preferences";
+	public static final String WINDOW_CREDITS_PREFERENCES = "windowCredits_preferences";
+
+	public static final String LAST_PDF_FILE = "lastPdfFileSaved";
+	public static final String LAST_BACKGROUND_IMAGE_FILE = "lastBackgroundImageFile";
+	public static final String LAST_PORTRAIT_IMAGE_FILE = "lastPortraitImageFile";
+
+	private static final String PORTRAIT_TRANSPARENCY = "portraitTransparency";
+	private static final String PORTRAIT_BLUR = "portraitBlur";
+	private static final String PORTRAIT_GLOW = "portraitGlow";
+
+	private static final String OVERLAY_TRANSPARENCY = "overlayTransparency";
+	private static final String PORTRAIT_NAME_TEXT_FIELD = "portraitNameTextField";
+	private static final String USE_TOKEN_NAME = "useTokenNameCheckbox";
+	private static final String PORTRAIT_NAME_SUFFIX_TEXT_FIELD = "portraitNameSuffixTextField";
+
+	public static void setPreference(String preference, String value) {
+		prefs.put(preference, value);
+	}
+
+	public static void setPreference(String preference, boolean value) {
+		prefs.putBoolean(preference, value);
+	}
+
+	public static void setPreference(String preference, int value) {
+		prefs.putInt(preference, value);
+	}
+
+	public static void setPreference(String preference, double value) {
+		prefs.putDouble(preference, value);
+	}
+
+	public static String getPreference(String preference, String defaultVal) {
+		return prefs.get(preference, defaultVal);
+	}
+
+	public static boolean getPreference(String preference, boolean defaultVal) {
+		return prefs.getBoolean(preference, defaultVal);
+	}
+
+	public static int getPreference(String preference, int defaultVal) {
+		return prefs.getInt(preference, defaultVal);
+	}
+
+	public static double getPreference(String preference, double devaultVal) {
+		return prefs.getDouble(preference, devaultVal);
+	}
 
 	public static void savePreferences(TokenTool_Controller tokentool_Controller) {
-		log.info("Saving preferences...");
+		log.info("Saving preferences to " + prefs.toString());
 
 		// Save Overlay details
 		prefs.putBoolean(OVERLAY_ASPECT, tokentool_Controller.getOverlayAspect());
-		prefs.putDouble(OVERLAY_WIDTH, tokentool_Controller.getOverlayWidth());
-		prefs.putDouble(OVERLAY_HEIGHT, tokentool_Controller.getOverlayHeight());
+		prefs.putInt(OVERLAY_WIDTH, tokentool_Controller.getOverlayWidth());
+		prefs.putInt(OVERLAY_HEIGHT, tokentool_Controller.getOverlayHeight());
 		prefs.putBoolean(OVERLAY_USE_BASE, tokentool_Controller.getOverlayUseAsBase());
 		prefs.putBoolean(OVERLAY_CLIP_PORTRAIT, tokentool_Controller.getClipPortraitCheckbox());
-
-		// Save Portrait background color
-		prefs.putDouble(BACKGROUND_COLOR_RED, tokentool_Controller.getBackgroundColor().getRed());
-		prefs.putDouble(BACKGROUND_COLOR_GREEN, tokentool_Controller.getBackgroundColor().getGreen());
-		prefs.putDouble(BACKGROUND_COLOR_BLUE, tokentool_Controller.getBackgroundColor().getBlue());
-		prefs.putDouble(BACKGROUND_COLOR_ALPHA, tokentool_Controller.getBackgroundColor().getOpacity());
 
 		// Save naming details
 		prefs.putBoolean(USE_FILE_NUMBERING, tokentool_Controller.getUseFileNumberingCheckbox());
 		prefs.put(FILE_NAME_TEXT_FIELD, tokentool_Controller.getFileNameTextField());
 		prefs.put(FILE_NAME_SUFFIX_TEXT_FIELD, tokentool_Controller.getFileNameSuffixTextField());
+		prefs.put(PORTRAIT_NAME_TEXT_FIELD, tokentool_Controller.getPortraitNameTextField());
+		prefs.putBoolean(USE_TOKEN_NAME, tokentool_Controller.getUseTokenNameCheckbox());
+		prefs.put(PORTRAIT_NAME_SUFFIX_TEXT_FIELD, tokentool_Controller.getPortraitNameSuffixTextField());
+		prefs.putBoolean(SAVE_PORTRAIT_ON_DRAG, tokentool_Controller.getSavePortraitOnDragCheckbox());
+		prefs.putBoolean(USE_BACKGROUND_ON_DRAG, tokentool_Controller.getUseBackgroundOnDragCheckbox());
 
 		// Save recent overlays used
 		log.debug("...saving recent overlay count");
@@ -95,7 +137,9 @@ public class AppPreferences {
 		try {
 			if (FileSaveUtil.getLastFile() != null)
 				if (FileSaveUtil.getLastFile().getParentFile().exists())
-					prefs.put(LAST_FILE, FileSaveUtil.getLastFile().getCanonicalPath());
+					prefs.put(LAST_TOKEN_SAVE_LOCATION, FileSaveUtil.getLastFile().getCanonicalPath());
+		} catch (NullPointerException e) {
+			log.warn("No last save location to save...");
 		} catch (IOException e) {
 			log.error("Error saving last file preference.", e);
 		}
@@ -104,48 +148,57 @@ public class AppPreferences {
 		try {
 			File lastPortrait = new File(AppConstants.CACHE_DIR, "last_portrait.png");
 			ImageIO.write(SwingFXUtils.fromFXImage(tokentool_Controller.getPortraitImage(), null), "png", lastPortrait);
-			prefs.put(LAST_PORTRAIT_FILE, lastPortrait.getCanonicalPath());
+			prefs.put(PORTRAIT_IMAGEVIEW_PREFERENCES, tokentool_Controller.getPortrait_Preferences(lastPortrait.getCanonicalPath()));
+		} catch (NullPointerException e) {
+			log.warn("No portrait to save...");
 		} catch (IOException e) {
 			log.error("Error saving last portrait preference.", e);
 		}
 
-		// Save last portraits position and zoom
-		ImageView portraitImageView = tokentool_Controller.getPortraitImageView();
-		prefs.putDouble(PORTRAIT_X, portraitImageView.getTranslateX());
-		prefs.putDouble(PORTRAIT_Y, portraitImageView.getTranslateY());
-		prefs.putDouble(PORTRAIT_ROTATION, portraitImageView.getRotate());
-		prefs.putDouble(PORTRAIT_ZOOM, portraitImageView.getScaleY());
+		// Save last background used
+		try {
+			Image backgroundImage = tokentool_Controller.getBackgroundImage();
+			if (backgroundImage != null) {
+				File lastBackground = new File(AppConstants.CACHE_DIR, "last_background.png");
+				ImageIO.write(SwingFXUtils.fromFXImage(tokentool_Controller.getBackgroundImage(), null), "png", lastBackground);
+				prefs.put(BACKGROUND_IMAGEVIEW_PREFERENCES, tokentool_Controller.getBackground_Preferences(lastBackground.getCanonicalPath()));
+			} else {
+				prefs.put(BACKGROUND_IMAGEVIEW_PREFERENCES, tokentool_Controller.getBackground_Preferences(null));
+			}
+		} catch (IOException e) {
+			log.error("Error saving last background preference.", e);
+		}
 
 		// Save window size/position
-		prefs.putDouble(WINDOW_X, TokenTool.getInstance().getStage().getX());
-		prefs.putDouble(WINDOW_Y, TokenTool.getInstance().getStage().getY());
-		prefs.putDouble(WINDOW_WIDTH, TokenTool.getInstance().getStage().getWidth());
-		prefs.putDouble(WINDOW_HEIGHT, TokenTool.getInstance().getStage().getHeight());
+		prefs.put(WINDOW_MAIN_PREFERENCES, new Window_Preferences(TokenTool.getInstance().getStage()).toJson());
 	}
 
 	public static void restorePreferences(TokenTool_Controller tokentool_Controller) {
-		log.info("Restoring preferences...");
+		log.info("Restoring preferences from " + prefs.toString());
 
 		// Restore Overlay details
 		tokentool_Controller.setOverlayAspect(prefs.getBoolean(OVERLAY_ASPECT, AppConstants.DEFAULT_OVERLAY_ASPECT));
-		tokentool_Controller.setOverlayWidth(prefs.getDouble(OVERLAY_WIDTH, AppConstants.DEFAULT_OVERLAY_SIZE));
-		tokentool_Controller.setOverlayHeight(prefs.getDouble(OVERLAY_HEIGHT, AppConstants.DEFAULT_OVERLAY_SIZE));
+		tokentool_Controller.setOverlayWidth(prefs.getInt(OVERLAY_WIDTH, AppConstants.DEFAULT_OVERLAY_SIZE));
+		tokentool_Controller.setOverlayHeight(prefs.getInt(OVERLAY_HEIGHT, AppConstants.DEFAULT_OVERLAY_SIZE));
 		tokentool_Controller.setOverlayUseAsBase(prefs.getBoolean(OVERLAY_USE_BASE, AppConstants.DEFAULT_OVERLAY_USE_BASE));
 		tokentool_Controller.setClipPortraitCheckbox(prefs.getBoolean(OVERLAY_CLIP_PORTRAIT, AppConstants.DEFAULT_OVERLAY_CLIP_PORTRAIT));
-
-		// Save Portrait background color
-		double red = prefs.getDouble(BACKGROUND_COLOR_RED, 0);
-		double grn = prefs.getDouble(BACKGROUND_COLOR_GREEN, 0);
-		double blu = prefs.getDouble(BACKGROUND_COLOR_BLUE, 0);
-		double alpha = prefs.getDouble(BACKGROUND_COLOR_ALPHA, 0);
-
-		if (red + grn + blu + alpha > 0)
-			tokentool_Controller.setBackgroundColor(new Color(red, grn, blu, alpha));
 
 		// Restore naming details
 		tokentool_Controller.setUseFileNumberingCheckbox(prefs.getBoolean(USE_FILE_NUMBERING, AppConstants.DEFAULT_USE_FILE_NUMBERING));
 		tokentool_Controller.setFileNameTextField(prefs.get(FILE_NAME_TEXT_FIELD, AppConstants.DEFAULT_TOKEN_NAME));
 		tokentool_Controller.setFileNameSuffixTextField(prefs.get(FILE_NAME_SUFFIX_TEXT_FIELD, AppConstants.DEFAULT_FILE_NAME_SUFFIX));
+		tokentool_Controller.setUseTokenNameCheckbox(prefs.getBoolean(USE_TOKEN_NAME, AppConstants.DEFAULT_USE_TOKEN_NAME));
+		tokentool_Controller.setPortraitNameTextField(prefs.get(PORTRAIT_NAME_TEXT_FIELD, AppConstants.DEFAULT_PORTRAIT_NAME_TEXT_FIELD));
+		tokentool_Controller.setPortraitNameSuffixTextField(prefs.get(PORTRAIT_NAME_SUFFIX_TEXT_FIELD, AppConstants.DEFAULT_PORTRAIT_NAME_SUFFIX_TEXT_FIELD));
+		tokentool_Controller.setUseBackgroundOnDragCheckbox(prefs.getBoolean(USE_BACKGROUND_ON_DRAG, AppConstants.DEFAULT_USE_BACKGROUND_ON_DRAG));
+		tokentool_Controller.setSavePortraitOnDragCheckbox(prefs.getBoolean(SAVE_PORTRAIT_ON_DRAG, AppConstants.DEFAULT_SAVE_PORTRAIT_ON_DRAG));
+
+		// Restore Portrait Effects
+		tokentool_Controller.getPortraitTransparencySlider().setValue(prefs.getDouble(PORTRAIT_TRANSPARENCY, AppConstants.DEFAULT_PORTRAIT_TRANSPARENCY));
+		tokentool_Controller.getPortraitBlurSlider().setValue(prefs.getDouble(PORTRAIT_BLUR, AppConstants.DEFAULT_PORTRAIT_BLUR));
+		tokentool_Controller.getPortraitGlowSlider().setValue(prefs.getDouble(PORTRAIT_GLOW, AppConstants.DEFAULT_PORTRAIT_GLOW));
+
+		tokentool_Controller.getOverlayTransparencySlider().setValue(prefs.getDouble(OVERLAY_TRANSPARENCY, AppConstants.DEFAULT_OVERLAY_TRANSPARENCY));
 
 		// Restore recent overlays used
 		int overlayCount = prefs.getInt(RECENT_OVERLAY_COUNT, 0);
@@ -158,44 +211,24 @@ public class AppPreferences {
 		}
 
 		// Restore window size/position
-		double window_x = prefs.getDouble(WINDOW_X, 0);
-		TokenTool.getInstance().getStage().setX(window_x);
-
-		double window_y = prefs.getDouble(WINDOW_Y, 0);
-		TokenTool.getInstance().getStage().setY(window_y);
-
-		log.info("Restoring window position x, y: " + window_x + ", " + window_y);
-
-		double window_width = prefs.getDouble(WINDOW_WIDTH, 0);
-		if (window_width > 0)
-			TokenTool.getInstance().getStage().setWidth(window_width);
-
-		double window_height = prefs.getDouble(WINDOW_HEIGHT, 0);
-		if (window_height > 0)
-			TokenTool.getInstance().getStage().setHeight(window_height);
+		String windowMain_Preferences = prefs.get(WINDOW_MAIN_PREFERENCES, new Window_Preferences(AppConstants.WINDOW_WIDTH, AppConstants.WINDOW_HEIGHT).toJson());
+		tokentool_Controller.setWindoFrom_Preferences(windowMain_Preferences);
 
 		// Restore location of save
-		FileSaveUtil.setLastFile(prefs.get(LAST_FILE, null));
+		FileSaveUtil.setLastFile(prefs.get(LAST_TOKEN_SAVE_LOCATION, null));
 
 		// Restore last portrait used
-		String lastPortraitPath = prefs.get(LAST_PORTRAIT_FILE, null);
-		if (lastPortraitPath != null)
-			if (!lastPortraitPath.isEmpty()) {
-				File lastPortrait = new File(lastPortraitPath);
-				if (lastPortrait.exists())
-					try {
-						Image portraitImage = new Image(lastPortrait.toURI().toURL().toExternalForm());
+		tokentool_Controller.setPortraitFrom_Preferences(prefs.get(PORTRAIT_IMAGEVIEW_PREFERENCES, null));
+		tokentool_Controller.setBackgroundFrom_Preferences(prefs.get(BACKGROUND_IMAGEVIEW_PREFERENCES, null));
 
-						// Restore last portraits position and zoom
-						double x = prefs.getDouble(PORTRAIT_X, 0);
-						double y = prefs.getDouble(PORTRAIT_Y, 0);
-						double r = prefs.getDouble(PORTRAIT_ROTATION, 0);
-						double s = prefs.getDouble(PORTRAIT_ZOOM, 1);
+	}
 
-						tokentool_Controller.setPortraitImage(portraitImage, x, y, r, s);
-					} catch (MalformedURLException e) {
-						log.error("Error loading last portrait preference.", e);
-					}
-			}
+	public static void removeAllPreferences() {
+		try {
+			prefs.clear();
+			prefs.flush();
+		} catch (BackingStoreException e) {
+			log.error("Error removing all preferences from backing store!", e);
+		}
 	}
 }

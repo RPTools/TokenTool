@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane fx:id="selectionStackPane" minHeight="300.0" minWidth="300.0" styleClass="selection-region-pane" stylesheets="@../css/TokenTool.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.rptools.tokentool.controller.RegionSelector_Controller">
+<StackPane fx:id="selectionStackPane" minHeight="300.0" minWidth="300.0" styleClass="selection-region-pane" stylesheets="@../css/TokenTool.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.rptools.tokentool.controller.RegionSelector_Controller">
 	<children>
 		<GridPane>
 			<columnConstraints>
