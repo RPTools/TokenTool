@@ -36,7 +36,7 @@
 			<children>
 				<ImageView fitHeight="65.0" fitWidth="71.0" layoutX="7.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="15.0">
 					<image>
-						<Image url="@../image/nerps_logo.png" />
+						<Image url="@../image/rptools_logo.png" />
 					</image>
 				</ImageView>
 				<ImageView fitHeight="75.0" fitWidth="180.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="25.0" AnchorPane.rightAnchor="0.0">

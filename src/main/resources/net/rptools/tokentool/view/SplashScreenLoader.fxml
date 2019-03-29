@@ -43,16 +43,10 @@
 			<Insets left="5.0" top="3.0" />
 		</StackPane.margin>
 	</Label>
-	<ImageView fx:id="nerpsLogoImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" scaleX="0.4" scaleY="0.4" translateX="-175.0"
+	<ImageView fx:id="venderLogoImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" scaleX="0.4" scaleY="0.4" translateX="-175.0"
 		translateY="55.0">
 		<image>
-			<Image url="@../image/nerps_logo.png" />
-		</image>
-	</ImageView>
-	<ImageView fx:id="infusedWithNerpsImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" scaleX="1.4" scaleY="1.4" translateX="-20.0"
-		translateY="72.0">
-		<image>
-			<Image url="@../image/infused_with_nerps.png" />
+			<Image url="@../image/rptools_logo.png" />
 		</image>
 	</ImageView>
 	<ImageView fx:id="byRP_ToolsImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" scaleX="0.7" scaleY="0.7" translateX="130.0"
