@@ -767,6 +767,7 @@ public class TokenTool_Controller {
     String confirmationText = I18N.getString("TokenTool.dialog.reset.confirmation.text");
 
     Alert alert = new Alert(AlertType.CONFIRMATION);
+    alert.setHeaderText(I18N.getString("TokenTool.dialog.confirmation.header"));
     alert.setTitle(I18N.getString("TokenTool.dialog.reset.confirmation.title"));
     alert.setContentText(confirmationText);
 
@@ -1140,7 +1141,7 @@ public class TokenTool_Controller {
   @FXML
   void portraitMenuItem_OnAction(ActionEvent event) {
     String menuText = ((RadioMenuItem) event.getSource()).getText();
-    layerMenuButton.setText(menuText + " Layer"); // TODO: i18n this shit
+    layerMenuButton.setText(menuText + I18N.getString("controls.layers.menu.layer.text"));
     portraitMenuItem.setSelected(true);
   }
 
@@ -1822,8 +1823,12 @@ public class TokenTool_Controller {
   }
 
   public void exitApplication() {
-    // Lets update the recent list to current overlay...
-    updateOverlayTreeViewRecentFolder(true);
+    try {
+      // Lets update the recent list to current overlay...
+      updateOverlayTreeViewRecentFolder(true);
+    } catch (NullPointerException npe) {
+      log.info("Unable to updateOverlayTreeViewRecentFolder on exit.");
+    }
 
     try {
       AppPreferences.savePreferences(this);

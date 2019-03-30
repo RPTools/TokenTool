@@ -394,9 +394,10 @@ public class ImageUtil {
 
   public static String getFileType(File imageFile) {
     if (FilenameUtils.getExtension(imageFile.getName()).toLowerCase().equals("psd")) {
-      return "Adobe Photoshop Image";
+      return "Adobe Photoshop " + I18N.getString("imageUtil.filetype.label.image");
     } else {
-      return FilenameUtils.getExtension(imageFile.getName()).toUpperCase() + " File";
+      return FilenameUtils.getExtension(imageFile.getName()).toUpperCase()
+          + I18N.getString("imageUtil.filetype.label.extension");
     }
   }
 
@@ -424,12 +425,24 @@ public class ImageUtil {
   public static final List<ExtensionFilter> GET_EXTENSION_FILTERS() {
     List<ExtensionFilter> extensionFilters = new ArrayList<ExtensionFilter>();
     extensionFilters.add(
-        new ExtensionFilter("All Images", "*.psd", "*.png", "*.gif", "*.jpg", "*.jpeg", "*.bmp"));
-    extensionFilters.add(new ExtensionFilter("PSD Files", "*.psd"));
-    extensionFilters.add(new ExtensionFilter("PNG Files", "*.png"));
-    extensionFilters.add(new ExtensionFilter("JPG Files", "*.jpg"));
-    extensionFilters.add(new ExtensionFilter("JPEG Files", "*.jpeg"));
-    extensionFilters.add(new ExtensionFilter("BMP Files", "*.bmp"));
+        new ExtensionFilter(
+            I18N.getString("imageUtil.filetype.label.all_images"),
+            "*.psd",
+            "*.png",
+            "*.gif",
+            "*.jpg",
+            "*.jpeg",
+            "*.bmp"));
+    extensionFilters.add(
+        new ExtensionFilter("PSD" + I18N.getString("imageUtil.filetype.label.files"), "*.psd"));
+    extensionFilters.add(
+        new ExtensionFilter("PNG" + I18N.getString("imageUtil.filetype.label.files"), "*.png"));
+    extensionFilters.add(
+        new ExtensionFilter("JPG" + I18N.getString("imageUtil.filetype.label.files"), "*.jpg"));
+    extensionFilters.add(
+        new ExtensionFilter("JPEG" + I18N.getString("imageUtil.filetype.label.files"), "*.jpeg"));
+    extensionFilters.add(
+        new ExtensionFilter("BMP" + I18N.getString("imageUtil.filetype.label.files"), "*.bmp"));
 
     return extensionFilters;
   }
