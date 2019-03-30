@@ -9,7 +9,7 @@ image:
 init:
   - cmd: git config --global core.autocrlf true
 install:
- - sh: cd ..
+  - sh: cd ..
   - sh: mkdir java
   - sh: cd java
   - sh: wget http://www.nerps.net/jdk10/jdk-10.0.2_linux-x64_bin.tar.gz
