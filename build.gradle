@@ -78,7 +78,7 @@ run {
 spotless {
 	java {
 		licenseHeaderFile	'spotless.license.java'
-		eclipse().configFile('build-resources/eclipse.prefs.formatter.xml')
+		googleJavaFormat()
 	}
 
 	format 'misc', {
@@ -87,7 +87,7 @@ spotless {
 		// spotless has built-in rules for most basic formatting tasks
 		trimTrailingWhitespace()
 		// or spaces. Takes an integer argument if you don't like 4
-		indentWithTabs()
+		indentWithSpaces(4)
 	}
 }
 
@@ -263,7 +263,7 @@ task deploy(dependsOn: [uberJar, copyPackageExtras, prepareInnoSetup]) {
 	}
 }
 
-task wrapper(type: Wrapper) {
+task createWrapper(type: Wrapper) {
 	gradleVersion = '5.2.1'
 }
 
