@@ -1823,8 +1823,12 @@ public class TokenTool_Controller {
   }
 
   public void exitApplication() {
-    // Lets update the recent list to current overlay...
-    updateOverlayTreeViewRecentFolder(true);
+    try {
+      // Lets update the recent list to current overlay...
+      updateOverlayTreeViewRecentFolder(true);
+    } catch (NullPointerException npe) {
+      log.info("Unable to updateOverlayTreeViewRecentFolder on exit.");
+    }
 
     try {
       AppPreferences.savePreferences(this);
