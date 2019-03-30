@@ -103,6 +103,7 @@ public class AppSetup {
     Platform.runLater(
         () -> {
           Alert alert = new Alert(AlertType.INFORMATION);
+          alert.setHeaderText(I18N.getString("TokenTool.dialog.confirmation.header"));
           alert.setTitle(I18N.getString("AppSetup.dialog.install.overlays.confirmation.title"));
           alert.setContentText(
               overlaysInstalled

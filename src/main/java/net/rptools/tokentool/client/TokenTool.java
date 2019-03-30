@@ -103,7 +103,7 @@ public class TokenTool extends Application {
     // Log some basic info
     log.info("Environment: " + Sentry.getStoredClient().getEnvironment());
     if (!Sentry.getStoredClient().getEnvironment().toLowerCase().equals("production"))
-      log.info("Not in Produciton mode and thus will not log any events to Sentry.io");
+      log.info("Not in Production mode and thus will not log any events to Sentry.io");
 
     log.info("Release: " + Sentry.getStoredClient().getRelease());
     log.info("OS: " + ThreadContext.get("OS"));
