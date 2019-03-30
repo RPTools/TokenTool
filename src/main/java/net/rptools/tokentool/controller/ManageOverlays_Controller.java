@@ -318,6 +318,7 @@ public class ManageOverlays_Controller {
     }
 
     Alert alert = new Alert(AlertType.CONFIRMATION);
+    alert.setHeaderText(I18N.getString("TokenTool.dialog.confirmation.header"));
     alert.setTitle(I18N.getString("ManageOverlays.dialog.delete.title"));
     alert.setContentText(confirmationText);
 
@@ -347,6 +348,7 @@ public class ManageOverlays_Controller {
     }
 
     Alert alert = new Alert(AlertType.CONFIRMATION);
+    alert.setHeaderText(I18N.getString("TokenTool.dialog.confirmation.header"));
     alert.setTitle(I18N.getString("ManageOverlays.dialog.delete.dir.title"));
     alert.setContentText(confirmationText);
 
@@ -417,6 +419,7 @@ public class ManageOverlays_Controller {
   @FXML
   void addFolderButton_onAction(ActionEvent event) {
     TextInputDialog dialog = new TextInputDialog();
+    dialog.setHeaderText(I18N.getString("TokenTool.dialog.confirmation.header"));
     dialog.setTitle(I18N.getString("ManageOverlays.filechooser.folder.title"));
     dialog.setContentText(I18N.getString("ManageOverlays.filechooser.folder.content_text"));
 
@@ -433,6 +436,7 @@ public class ManageOverlays_Controller {
   @FXML
   void restoreButton_onAction(ActionEvent event) {
     Alert alert = new Alert(AlertType.CONFIRMATION);
+    alert.setHeaderText(I18N.getString("TokenTool.dialog.confirmation.header"));
     alert.setTitle(I18N.getString("ManageOverlays.dialog.restore.overlays.title"));
     alert.setContentText(I18N.getString("ManageOverlays.dialog.restore.overlays.content_text"));
 
