@@ -1488,7 +1488,7 @@ public class TokenTool_Controller {
       log.info("overlayCount: " + overlayCount);
 
       treeItems = cacheOverlays(AppConstants.OVERLAY_DIR, null, AppConstants.THUMB_SIZE);
-    } catch (IOException e) {
+    } catch (IOException | NullPointerException e) {
       log.error("Error reloading overlay cache!", e);
     }
   }
@@ -1823,8 +1823,12 @@ public class TokenTool_Controller {
   }
 
   public void exitApplication() {
-    // Lets update the recent list to current overlay...
-    updateOverlayTreeViewRecentFolder(true);
+    try {
+      // Lets update the recent list to current overlay...
+      updateOverlayTreeViewRecentFolder(true);
+    } catch (NullPointerException npe) {
+      log.info("Unable to updateOverlayTreeViewRecentFolder on exit.");
+    }
 
     try {
       AppPreferences.savePreferences(this);
