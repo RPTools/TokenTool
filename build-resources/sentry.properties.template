@@ -1,0 +1,4 @@
+dsn=${SentryDSN}
+environment=${Environment}
+stacktrace.app.packages=net.rptools.tokentool
+release=${AppVersion}
