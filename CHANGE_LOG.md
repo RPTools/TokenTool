@@ -1,7 +1,5 @@
-TokenTool 2.1 - _Infused with Nerps!_
+TokenTool 2.1
 =====
-I'm excited to bring to you the next version of _Infused with Nerps!_ 
-
 You can now add background images, extract images from PDF files, and save the portrait alongside the token using the same background image and/or colors!  Several bug fixes and requested enhancements have also been added. 
 
 
