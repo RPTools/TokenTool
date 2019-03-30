@@ -1,10 +1,16 @@
 /*
- * This software Copyright by the RPTools.net development team, and licensed under the Affero GPL Version 3 or, at your option, any later version.
+ * This software Copyright by the RPTools.net development team, and
+ * licensed under the Affero GPL Version 3 or, at your option, any later
+ * version.
  *
- * TokenTool Source Code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * TokenTool Source Code is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * You should have received a copy of the GNU Affero General Public License * along with this source Code. If not, please visit <http://www.gnu.org/licenses/> and specifically the Affero license text
- * at <http://www.gnu.org/licenses/agpl.html>.
+ * You should have received a copy of the GNU Affero General Public
+ * License * along with this source Code.  If not, please visit
+ * <http://www.gnu.org/licenses/> and specifically the Affero license
+ * text at <http://www.gnu.org/licenses/agpl.html>.
  */
 package net.rptools.tokentool.controller;
 
@@ -15,42 +21,54 @@ import javafx.scene.layout.StackPane;
 import net.rptools.tokentool.AppConstants;
 
 public class SplashScreen_Controller {
-	private static String versionPrefix;
+  private static String versionPrefix;
 
-	@FXML private StackPane splashLayout;
+  @FXML private StackPane splashLayout;
 
-	@FXML private ProgressBar loadProgress;
+  @FXML private ProgressBar loadProgress;
 
-	@FXML private Label progressLabel;
-	@FXML private Label versionLabel;
+  @FXML private Label progressLabel;
+  @FXML private Label versionLabel;
 
-	@FXML // This method is called by the FXMLLoader when initialization is complete
-	void initialize() {
-		assert splashLayout != null : "fx:id=\"splashLayout\" was not injected: check your FXML file '" + AppConstants.SPLASH_SCREEN_FXML + "'.";
-		assert loadProgress != null : "fx:id=\"loadProgress\" was not injected: check your FXML file '" + AppConstants.SPLASH_SCREEN_FXML + "'.";
-		assert progressLabel != null : "fx:id=\"progressText\" was not injected: check your FXML file '" + AppConstants.SPLASH_SCREEN_FXML + "'.";
-		assert versionLabel != null : "fx:id=\"versionLabel\" was not injected: check your FXML file '" + AppConstants.SPLASH_SCREEN_FXML + "'.";
+  @FXML // This method is called by the FXMLLoader when initialization is complete
+  void initialize() {
+    assert splashLayout != null
+        : "fx:id=\"splashLayout\" was not injected: check your FXML file '"
+            + AppConstants.SPLASH_SCREEN_FXML
+            + "'.";
+    assert loadProgress != null
+        : "fx:id=\"loadProgress\" was not injected: check your FXML file '"
+            + AppConstants.SPLASH_SCREEN_FXML
+            + "'.";
+    assert progressLabel != null
+        : "fx:id=\"progressText\" was not injected: check your FXML file '"
+            + AppConstants.SPLASH_SCREEN_FXML
+            + "'.";
+    assert versionLabel != null
+        : "fx:id=\"versionLabel\" was not injected: check your FXML file '"
+            + AppConstants.SPLASH_SCREEN_FXML
+            + "'.";
 
-		versionPrefix = getVersionLabel() + " ";
-	}
+    versionPrefix = getVersionLabel() + " ";
+  }
 
-	public void setLoadProgress(Double progress) {
-		this.loadProgress.setProgress(progress);
-	}
+  public void setLoadProgress(Double progress) {
+    this.loadProgress.setProgress(progress);
+  }
 
-	public String getProgressLabel() {
-		return progressLabel.getText();
-	}
+  public String getProgressLabel() {
+    return progressLabel.getText();
+  }
 
-	public void setProgressLabel(String text) {
-		this.progressLabel.setText(text);
-	}
+  public void setProgressLabel(String text) {
+    this.progressLabel.setText(text);
+  }
 
-	public String getVersionLabel() {
-		return versionLabel.getText();
-	}
+  public String getVersionLabel() {
+    return versionLabel.getText();
+  }
 
-	public void setVersionLabel(String text) {
-		this.versionLabel.setText(versionPrefix + text);
-	}
+  public void setVersionLabel(String text) {
+    this.versionLabel.setText(versionPrefix + text);
+  }
 }
