@@ -1488,7 +1488,7 @@ public class TokenTool_Controller {
       log.info("overlayCount: " + overlayCount);
 
       treeItems = cacheOverlays(AppConstants.OVERLAY_DIR, null, AppConstants.THUMB_SIZE);
-    } catch (IOException | NullPointerException e) {
+    } catch (IOException e) {
       log.error("Error reloading overlay cache!", e);
     }
   }
