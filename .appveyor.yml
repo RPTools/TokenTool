@@ -9,19 +9,24 @@ image:
 init:
   - cmd: git config --global core.autocrlf true
 install:
-  - sh: echo oracle-java10-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
-  - sh: sudo add-apt-repository ppa:linuxuprising/java
-  - sh: sudo apt update
-  - sh: sudo apt install -y oracle-java10-installer
-  - sh: sudo apt install -y oracle-java10-set-default
-  - sh: export JAVA_HOME=/usr/lib/jvm/java-10-oracle
+ - sh: cd ..
+  - sh: mkdir java
+  - sh: cd java
+  - sh: wget http://www.nerps.net/jdk10/jdk-10.0.2_linux-x64_bin.tar.gz
+  - sh: tar zxf jdk-10.0.2_linux-x64_bin.tar.gz
+  - sh: export JAVA_HOME=$(pwd)/jdk-10.0.2
   - sh: echo java home is $JAVA_HOME
+  - sh: export PATH=$JAVA_HOME/bin:$PATH
+  - sh: echo $PATH
+  - sh: cd ../maptool
   - sh: sudo apt install -y fakeroot
   - ./gradlew -version
+  - java -version
 build_script:
   - ./gradlew build
 after_build:
-  - ps: if($env:APPVEYOR_REPO_TAG -eq 'True') { ./gradlew deploy } else { echo "Not creating deploy artifacts because this is not a tag build" }
+  - sh: if [[ $APPVEYOR_REPO_TAG == "true" ]]; then ./gradlew deploy; else echo "Not creating deploy artifacts because this is not a tag build."; fi
+  - cmd: IF "%APPVEYOR_REPO_TAG%"=="true" (gradlew deploy) ELSE (echo Not creating deploy artifacts because this is not a tag build.)
 artifacts:
 - path: build\libs\TokenTool-*.jar
   name: TokenTool-Jar
@@ -31,7 +36,7 @@ artifacts:
   name: TokenTool-Linux
 deploy:
 - provider: GitHub
-  description: Windows release from AppVeyor
+  description: Release build from AppVeyor
   auth_token: $(GITHUB_RELEASE_KEY)
   artifact: TokenTool-Jar, TokenTool-Windows, TokenTool-Linux
   draft: false
