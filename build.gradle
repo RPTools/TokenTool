@@ -18,7 +18,7 @@ buildscript {
 
 // Access Git info from build script
 plugins {
-	id "org.ajoberstar.grgit" version "2.3.0"
+	id "org.ajoberstar.grgit" version "3.0.0"
 }
 
 // Apply the java plugin to add support for Java
@@ -68,7 +68,7 @@ ext {
 // Default parameters for gradle run command
 run {
 	args = [ '-v='+tagVersion, '-vendor='+vendor ]
-	applicationDefaultJvmArgs = [ "-Dsentry.environment=Development" ]
+	applicationDefaultJvmArgs = [ "-Dsentry.environment=Development", "-Dfile.encoding=UTF-8" ]
 
 	if(System.getProperty("exec.args") != null) {
 		args System.getProperty("exec.args").split()
@@ -258,13 +258,13 @@ task deploy(dependsOn: [uberJar, copyPackageExtras, prepareInnoSetup]) {
 				"-BlicenseFile=COPYING.AFFERO",
 				"-BlicenseType='GNU AFFERO GENERAL PUBLIC LICENSE'",
 				"-Bcategory=Graphics",
-				"-Bemail=tokentool@nerps.net"
+				"-Bemail=tokentool@rptools.net"
 		}
 	}
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '4.8'
+	gradleVersion = '5.2.1'
 }
 
 // Configure current release tag in Sentry.io properties
