@@ -18,7 +18,7 @@ install:
   - sh: echo java home is $JAVA_HOME
   - sh: export PATH=$JAVA_HOME/bin:$PATH
   - sh: echo $PATH
-  - sh: cd ../maptool
+  - sh: cd ../tokentool
   - sh: sudo apt install -y fakeroot
   - ./gradlew -version
   - java -version
