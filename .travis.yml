@@ -2,33 +2,24 @@ language: java
 sudo: false
 matrix:
   include:
-  - os: linux
-    jdk: oraclejdk8
   - os: osx
-    osx_image: xcode8.3
-install: true
-addons:
-  apt:
-    packages:
-    - oracle-java8-installer
-    - fakeroot
+    osx_image: xcode10
 script: 
   - ./gradlew build
-before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-cache:
-  directories:
-  - "$HOME/.gradle/caches/"
-  - "$HOME/.gradle/wrapper/"
 before_deploy:
+   # Install Sentry.io CLI
+  - curl -sL https://sentry.io/get-cli/ | bash
+  - sentry-cli info
+  - echo Version is $TRAVIS_TAG
+  # Create a Sentry release
+  - sentry-cli releases new "$TRAVIS_TAG"
+  # Create Deploy Artifacts
   - ./gradlew deploy
 deploy:
   provider: releases
-  api_key:
-    secure: hTBFlftPw61rqEx5+4z+VUHxDWi6l9wcIKQFipLnVHlLeQ1neW1pZ8y7WBvXUWCtZ3/D0iTVJpMlWtpWnu6OoMDbFRAOfy2/2kU7bGUDGoH0QGGwrXjAGhs7GY3s+6eu1/uRWUsZ3Ys/vrBrJxyADGThdhD0QxwQ7SuuwM0ERvD94JuyjfvCFZ6xvOjccYdzilmxC4cRvOrBqv1PHTOLkPoQcXsP/FqUdzUAXrud5iUFw8+4el6kLZT/vmbIE8EdpocAKca8QOjf1AMWCPnr5JwKU+n2PUpEqI1WtFA9PatjR2M1e0yvQFWT0mb/rcfZ6LJEPb/s6cFlHCa0aosgV+aj6tN6K81zLj65L+Vv6F4dJNqW40wkBXRfcen0SR4duLlKx5jSHm3XA6Q5b9aI8+XL12cmFZoKYG+yuVgCYAx/qxHBs6es/wMaGkNrxataKsfzwm4Dw8QGKu+115bsxEywFhEbQfFYvClP9/WFEgrdBdP2bplLpFSGDgv2n6DmJq083CV7bJmxgoqhAhjCry/UL9DG0WFtE1FqWsoxzAUoklDxAE0zgW9D66Xucp5dthuVJbzMpxUiR5zRf8npz/NaRAH7EK1ROl9ue67mtuUobMN7+lnG3pszyxTT/y7kqy0OWFvaGnXJ4UMPbBnXXYdFKc+rSO86/4aWWVE3lwQ=
+  api_key: $GITHUB_RELEASE_KEY
   file_glob: true
-  file: releases/release-*/bundles/*
+  file: releases/release-*/*
   overwrite: true
   skip_cleanup: true
   target_commitish: $TRAVIS_COMMIT
@@ -36,6 +27,21 @@ deploy:
   draft: false
   prerelease: true
   on:
-    repo: RPTools/tokentool
+    repo: $REPO
     tags: true
     all_branches: true
+after_deploy:
+  # Finalize Sentry release
+  - sentry-cli releases finalize "$TRAVIS_TAG"
+  # Associate commits with the Sentry release
+  - sentry-cli releases set-commits "$TRAVIS_TAG" --auto
+  # Tell Sentry.io we have deployed a release
+  - sentry-cli releases deploys "$TRAVIS_TAG" new -e Production
+after_success:
+  - wget $TRAVIS_DISCORD_WEBHOOK_SCRIPT_URL
+  - chmod +x send.sh
+  - ./send.sh success $DISCORD_URL
+after_failure:
+  - wget $TRAVIS_DISCORD_WEBHOOK_SCRIPT_URL
+  - chmod +x send.sh
+  - ./send.sh failure $DISCORD_URL
