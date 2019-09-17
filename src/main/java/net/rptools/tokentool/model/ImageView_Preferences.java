@@ -29,9 +29,9 @@ import org.apache.logging.log4j.Logger;
 public class ImageView_Preferences {
   private static final Logger log = LogManager.getLogger(ImageView_Preferences.class);
 
-  double translateX, translateY, rotation, scale;
-  String filePath;
-  Color backgroundColor; // We'll save the background color with the background imageview...
+  private double translateX, translateY, rotation, scale;
+  private String filePath;
+  private Color backgroundColor; // We'll save the background color with the background ImageView...
 
   public ImageView_Preferences(ImageView imageView, String filePath) {
     setRotation(imageView.getRotate());
