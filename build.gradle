@@ -30,8 +30,8 @@ apply plugin: 'com.diffplug.gradle.spotless'
 
 // Definitions
 defaultTasks 'clean', 'build'
-sourceCompatibility = 10
-targetCompatibility = 10
+sourceCompatibility = 12
+targetCompatibility = 12
 
 // Don't fail build if tests fail until tests are cleaned up
 test.ignoreFailures = true
@@ -264,7 +264,7 @@ task deploy(dependsOn: [uberJar, copyPackageExtras, prepareInnoSetup]) {
 }
 
 task createWrapper(type: Wrapper) {
-    gradleVersion = '5.2.1'
+    gradleVersion = '5.6.2'
 }
 
 // Configure current release tag in Sentry.io properties
