@@ -1,11 +1,7 @@
 /*
 * For more details take a look at the Java Quick-start chapter in the Gradle
-* user guide available at https://docs.gradle.org/4.1/userguide/tutorial_java_projects.html
+* user guide available at https://docs.gradle.org/current/userguide/building_java_projects.html
 */
-
-
-import org.ajoberstar.grgit.Grgit
-import org.gradle.plugins.ide.eclipse.model.AccessRule
 
 buildscript {
     dependencies {
@@ -33,10 +29,13 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'com.diffplug.gradle.spotless'
 
+import org.gradle.plugins.ide.eclipse.model.AccessRule
+import org.ajoberstar.grgit.Grgit
+
 // Definitions
 defaultTasks 'clean', 'build'
-sourceCompatibility = 12
-targetCompatibility = 12
+sourceCompatibility = 13
+targetCompatibility = 13
 
 // Used by gradle assemble & run tasks
 mainClassName = 'net.rptools.tokentool.client.TokenTool'
@@ -55,11 +54,11 @@ ext {
     if (tags) {
         tagVersion = tags.getName()
         msiVersion = tagVersion
-        enviroment = "Production"
+        environment = "Production"
         sentryDSN = sentry_production_dsn
     } else {
         tagVersion = 'SNAPSHOT-' + revision
-        enviroment = "Development"
+        environment = "Development"
         sentryDSN = sentry_development_dsn
     }
 
@@ -186,7 +185,7 @@ task configSentryRelease(type: Copy) {
     rename("sentry.properties.template", "sentry.properties")
     def tokens = [
         AppVersion: "${tagVersion}",
-        Environment: "${enviroment}",
+        Environment: "${environment}",
         SentryDSN: "${sentryDSN}"
     ]
     expand(tokens)
@@ -246,52 +245,62 @@ task prepareInnoSetup(type: Copy) {
     inputs.properties(tokens)
 }
 
-task deploy(dependsOn: [uberJar, copyPackageExtras, prepareInnoSetup]) {
+//task deploy(dependsOn: [uberJar, copyPackageExtras, prepareInnoSetup]) {
+//    group = 'distribution'
+//    description = 'Create native installers'
+//
+//    tasks.findByName('copyPackageExtras').mustRunAfter 'uberJar'
+//
+//    doLast {
+//        println 'Deploying ' + project.name + " " + tagVersion + " by " + vendor
+//
+//        // Using the -deploy Command with Bundler Arguments
+//        // 		javapackager -deploy -native exe -BsystemWide=true -BjvmOptions=-Xmx128m -BjvmOptions=-Xms128m -outdir packages -outfile BrickBreaker -srcdir dist
+//        //		-srcfiles BrickBreaker.jar -appclass brickbreaker.Main -name BrickBreaker -title "BrickBreaker demo"
+//        // *Note: You can specify a JRE using "-Bruntime=../../../deploy-ready-jre"
+//        //		  It will bundle system/workspace JDK by default
+//        def javapackager_deploy = exec {
+//            workingDir "${project.projectDir.absolutePath}"
+//
+//            commandLine "javapackager",
+//                "-deploy", "-v",
+//                "-native", "installer",
+//                "-appclass", mainClassName,
+//                "-srcdir", "build/libs",
+//                "-outdir", "releases/release-"+tagVersion,
+//                "-outfile", project.name,
+//                "-name", project.name,
+//                "-description", project.name + " " + tagVersion + " by " + vendor,
+//                "-title", project.name,
+//                "-vendor", vendor,
+//                "-BdropinResourcesRoot=.",
+//                "-BinstalldirChooser=true",
+//                "-BsystemWide=false",
+//                "-BmenuHint=true",
+//                "-Bwin.menuGroup=" + vendor,
+//                "-BshortcutHint=true",
+//                "-BappVersion=" + tagVersion,
+//                "-Bwin.msi.productVersion=" + msiVersion,
+//                "-BlicenseFile=COPYING.AFFERO",
+//                "-BlicenseType='GNU AFFERO GENERAL PUBLIC LICENSE'",
+//                "-Bcategory=Graphics",
+//                "-Bemail=tokentool@rptools.net"
+//        }
+//    }
+//}
+
+task release() {
     group = 'distribution'
     description = 'Create native installers'
-
-    tasks.findByName('copyPackageExtras').mustRunAfter 'uberJar'
-
-    doLast {
-        println 'Deploying ' + project.name + " " + tagVersion + " by " + vendor
-
-        // Using the -deploy Command with Bundler Arguments
-        // 		javapackager -deploy -native exe -BsystemWide=true -BjvmOptions=-Xmx128m -BjvmOptions=-Xms128m -outdir packages -outfile BrickBreaker -srcdir dist
-        //		-srcfiles BrickBreaker.jar -appclass brickbreaker.Main -name BrickBreaker -title "BrickBreaker demo"
-        // *Note: You can specify a JRE using "-Bruntime=../../../deploy-ready-jre"
-        //		  It will bundle system/workspace JDK by default
-        def javapackager_deploy = exec {
-            workingDir "${project.projectDir.absolutePath}"
-
-            commandLine "javapackager",
-                "-deploy", "-v",
-                "-native", "installer",
-                "-appclass", mainClassName,
-                "-srcdir", "build/libs",
-                "-outdir", "releases/release-"+tagVersion,
-                "-outfile", project.name,
-                "-name", project.name,
-                "-description", project.name + " " + tagVersion + " by " + vendor,
-                "-title", project.name,
-                "-vendor", vendor,
-                "-BdropinResourcesRoot=.",
-                "-BinstalldirChooser=true",
-                "-BsystemWide=false",
-                "-BmenuHint=true",
-                "-Bwin.menuGroup=" + vendor,
-                "-BshortcutHint=true",
-                "-BappVersion=" + tagVersion,
-                "-Bwin.msi.productVersion=" + msiVersion,
-                "-BlicenseFile=COPYING.AFFERO",
-                "-BlicenseType='GNU AFFERO GENERAL PUBLIC LICENSE'",
-                "-Bcategory=Graphics",
-                "-Bemail=tokentool@rptools.net"
-        }
-    }
 }
 
 task createWrapper(type: Wrapper) {
     gradleVersion = '5.6.2'
+}
+
+// Gradle does not support JDK 13 until Gradle 6.0
+task createWrapperFromSnapshot(type: Wrapper) {
+    gradleVersion = '6.0-20190920115514+0000'
 }
 
 // Configure current release tag in Sentry.io properties
