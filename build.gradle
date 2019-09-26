@@ -13,7 +13,6 @@ buildscript {
         mavenCentral()
     }
 }
-
 // Access Git info from build script
 plugins {
     id 'application'
