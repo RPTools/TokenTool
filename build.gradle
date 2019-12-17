@@ -133,7 +133,7 @@ dependencies {
     implementation group: 'commons-logging', name: 'commons-logging', version: '1.2'
 
     implementation group: 'io.sentry', name: 'sentry', version: '1.7.5'
-    implementation group: 'io.sentry', name: 'sentry-log4j2', version: '1.7.5'
+    implementation group: 'io.sentry', name: 'sentry-log4j2', version: '1.7.29'
 
     // For PDF image extraction
     implementation 'org.apache.pdfbox:pdfbox:2.0.10'
