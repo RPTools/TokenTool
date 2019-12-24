@@ -18,7 +18,7 @@ buildscript {
 
 // Access Git info from build script
 plugins {
-    id "org.ajoberstar.grgit" version "3.0.0"
+    id "org.ajoberstar.grgit" version "4.0.1"
 }
 
 // Apply the java plugin to add support for Java
