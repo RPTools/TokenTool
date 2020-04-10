@@ -63,8 +63,6 @@ public class TokenTool extends Application {
   private static Stage stage;
 
   static {
-    System.setProperty("javafx.preloader", "net.rptools.tokentool.client.SplashScreenLoader");
-
     // This will inject additional data tags in log4j2 which will be picked up by Sentry.io
     System.setProperty("log4j2.isThreadContextMapInheritable", "true");
     ThreadContext.put(
@@ -251,5 +249,19 @@ public class TokenTool extends Application {
     }
 
     return root;
+  }
+
+  /**
+   * Legacy, it simply launches the FX Application which calls init() then start(). Also sets/calls
+   * the preloader class
+   *
+   * @author Jamz
+   * @since 2.0
+   * @param args the command line arguments
+   */
+  public static void main(String[] args) {
+    System.setProperty("javafx.preloader", "net.rptools.tokentool.client.SplashScreenLoader");
+
+    launch(args);
   }
 }
