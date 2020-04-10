@@ -27,15 +27,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class OverlayTreeItem extends TreeItem<Path> {
+
   private static final Logger log = LogManager.getLogger(OverlayTreeItem.class);
 
   private boolean isFirstTimeChildren = true;
   private boolean isFirstTimeLeaf = true;
   private boolean isLeaf;
-
-  public boolean isDirectory() {
-    return Files.isDirectory(getValue());
-  }
 
   public OverlayTreeItem(Path f) {
     super(f);
@@ -43,6 +40,10 @@ public class OverlayTreeItem extends TreeItem<Path> {
 
   public OverlayTreeItem(File f) {
     super(f.toPath());
+  }
+
+  public boolean isDirectory() {
+    return Files.isDirectory(getValue());
   }
 
   @Override
@@ -89,7 +90,7 @@ public class OverlayTreeItem extends TreeItem<Path> {
         return Files.list(getValue())
             .filter(Files::isDirectory)
             .map(OverlayTreeItem::new)
-            .collect(Collectors.toCollection(() -> FXCollections.observableArrayList()));
+            .collect(Collectors.toCollection(FXCollections::observableArrayList));
 
       } catch (IOException e) {
         e.printStackTrace();

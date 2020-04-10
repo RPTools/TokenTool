@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.ResourceBundle;
 import javafx.application.Application;
 import javafx.application.ConditionalFeature;
@@ -39,16 +38,9 @@ import net.rptools.tokentool.AppSetup;
 import net.rptools.tokentool.controller.TokenTool_Controller;
 import net.rptools.tokentool.util.I18N;
 import net.rptools.tokentool.util.ImageUtil;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.appender.FileAppender;
 
 /**
  * @author Jamz
@@ -57,19 +49,13 @@ import org.apache.logging.log4j.core.appender.FileAppender;
  *     will only show when defined as JavaFX-Preloader-Class in the JAR manifest.
  */
 public class TokenTool extends Application {
+
   private static TokenTool appInstance;
-
-  private static Logger
-      log; // Don't instantiate until AppSetup gets and sets user_home/logs directory in AppSetup
-
+  private static Logger log; // Don't instantiate until we set user_home/logs directory in AppSetup
   private static BorderPane root;
   private static TokenTool_Controller tokentool_Controller;
-
   private static String VERSION = "";
   private static String VENDOR = "";
-
-  private static final int THUMB_SIZE = 100;
-
   private static int overlayCount = 0;
   private static int loadCount = 1;
 
@@ -77,18 +63,60 @@ public class TokenTool extends Application {
   private static Stage stage;
 
   static {
+    System.setProperty("javafx.preloader", "net.rptools.tokentool.client.SplashScreenLoader");
+
     // This will inject additional data tags in log4j2 which will be picked up by Sentry.io
     System.setProperty("log4j2.isThreadContextMapInheritable", "true");
     ThreadContext.put(
         "OS", System.getProperty("os.name")); // Added to the JavaFX Application Thread thread...
   }
 
+  public static TokenTool getInstance() {
+    return appInstance;
+  }
+
+  public static String getVersion() {
+    if (!VERSION.isEmpty()) {
+      return VERSION;
+    }
+
+    VERSION = "DEVELOPMENT";
+
+    if (TokenTool.class.getPackage().getImplementationVersion() != null) {
+      VERSION = TokenTool.class.getPackage().getImplementationVersion().trim();
+    }
+
+    return VERSION;
+  }
+
+  public static String getVendor() {
+    if (!VENDOR.isEmpty()) {
+      return VENDOR;
+    }
+
+    if (TokenTool.class.getPackage().getImplementationVendor() != null) {
+      VENDOR = TokenTool.class.getPackage().getImplementationVendor().trim();
+    }
+
+    return VENDOR;
+  }
+
+  //  public static String getLoggerFileName() {
+  //    Logger loggerImpl = log;
+  //    Appender appender = loggerImpl.getAppenders().get("LogFile");
+  //
+  //    if (appender != null) {
+  //      return ((FileAppender) appender).getFileName();
+  //    } else {
+  //    return "NOT_CONFIGURED";
+  //    }
+  //  }
+
   @Override
   public void init() throws Exception {
-    // Since we are using multiple plugins (Twelve Monkeys for PSD and JAI for jpeg2000) in the same
-    // uber jar,
-    // the META-INF/services/javax.imageio.spi.ImageReaderSpi gets overwritten. So we need to
-    // register them manually:
+    // Since we are using multiple plugins (Twelve Monkeys for PSD and JAI for jpeg2000)
+    // in the same uber jar, the META-INF/services/javax.imageio.spi.ImageReaderSpi
+    // gets overwritten. So we need to register them manually:
     // https://github.com/jai-imageio/jai-imageio-core/issues/29
     IIORegistry registry = IIORegistry.getDefaultInstance();
     registry.registerServiceProvider(new com.github.jaiimageio.jpeg2000.impl.J2KImageReaderSpi());
@@ -102,8 +130,9 @@ public class TokenTool extends Application {
 
     // Log some basic info
     log.info("Environment: " + Sentry.getStoredClient().getEnvironment());
-    if (!Sentry.getStoredClient().getEnvironment().toLowerCase().equals("production"))
+    if (!Sentry.getStoredClient().getEnvironment().toLowerCase().equals("production")) {
       log.info("Not in Production mode and thus will not log any events to Sentry.io");
+    }
 
     log.info("Release: " + Sentry.getStoredClient().getRelease());
     log.info("OS: " + ThreadContext.get("OS"));
@@ -112,7 +141,7 @@ public class TokenTool extends Application {
     // Now lets cache any overlays we find and update preLoader with progress
     overlayCount =
         (int) Files.walk(AppConstants.OVERLAY_DIR.toPath()).filter(Files::isRegularFile).count();
-    overlayTreeItems = cacheOverlays(AppConstants.OVERLAY_DIR, null, THUMB_SIZE);
+    overlayTreeItems = cacheOverlays(AppConstants.OVERLAY_DIR, null);
 
     // All Done!
     notifyPreloader(new Preloader.ProgressNotification(1.0));
@@ -133,7 +162,7 @@ public class TokenTool extends Application {
       log.error("Error loading " + AppConstants.TOKEN_TOOL_FXML, e);
     }
 
-    tokentool_Controller = (TokenTool_Controller) fxmlLoader.getController();
+    tokentool_Controller = fxmlLoader.getController();
 
     Scene scene = new Scene(root);
     primaryStage.setTitle(I18N.getString("TokenTool.stage.title"));
@@ -168,24 +197,19 @@ public class TokenTool extends Application {
     System.exit(0);
   }
 
-  public static TokenTool getInstance() {
-    return appInstance;
-  }
-
   public Stage getStage() {
     return stage;
   }
 
   /**
-   * @author Jamz
    * @throws IOException
+   * @author Jamz
    * @since 2.0
    *     <p>This method loads and processes all the overlays found in user.home/overlays and it can
    *     take a minute to load as it creates thumbnail versions for the comboBox so we call this
    *     during the init and display progress in the preLoader (splash screen).
    */
-  private TreeItem<Path> cacheOverlays(File dir, TreeItem<Path> parent, int THUMB_SIZE)
-      throws IOException {
+  private TreeItem<Path> cacheOverlays(File dir, TreeItem<Path> parent) throws IOException {
     TreeItem<Path> root = new TreeItem<>(dir.toPath());
     root.setExpanded(false);
 
@@ -194,7 +218,7 @@ public class TokenTool extends Application {
     File[] files = dir.listFiles();
     for (File file : files) {
       if (file.isDirectory()) {
-        cacheOverlays(file, root, THUMB_SIZE);
+        cacheOverlays(file, root);
       } else {
         Path filePath = file.toPath();
         TreeItem<Path> imageNode =
@@ -211,13 +235,15 @@ public class TokenTool extends Application {
       // If a node has no children then it's an overlay, otherwise it's a directory...
       root.getChildren()
           .sort(
-              new Comparator<TreeItem<Path>>() {
-                @Override
-                public int compare(TreeItem<Path> o1, TreeItem<Path> o2) {
-                  if (o1.getChildren().size() == 0 && o2.getChildren().size() == 0) return 0;
-                  else if (o1.getChildren().size() == 0) return Integer.MAX_VALUE;
-                  else if (o2.getChildren().size() == 0) return Integer.MIN_VALUE;
-                  else return o1.getValue().compareTo(o2.getValue());
+              (o1, o2) -> {
+                if (o1.getChildren().size() == 0 && o2.getChildren().size() == 0) {
+                  return 0;
+                } else if (o1.getChildren().size() == 0) {
+                  return Integer.MAX_VALUE;
+                } else if (o2.getChildren().size() == 0) {
+                  return Integer.MIN_VALUE;
+                } else {
+                  return o1.getValue().compareTo(o2.getValue());
                 }
               });
 
@@ -225,74 +251,5 @@ public class TokenTool extends Application {
     }
 
     return root;
-  }
-
-  public static String getVersion() {
-    if (!VERSION.isEmpty()) return VERSION;
-
-    VERSION = "DEVELOPMENT";
-
-    if (TokenTool.class.getPackage().getImplementationVersion() != null) {
-      VERSION = TokenTool.class.getPackage().getImplementationVersion().trim();
-    }
-
-    return VERSION;
-  }
-
-  public static String getVendor() {
-    if (!VENDOR.isEmpty()) return VENDOR;
-
-    if (TokenTool.class.getPackage().getImplementationVendor() != null) {
-      VENDOR = TokenTool.class.getPackage().getImplementationVendor().trim();
-    }
-
-    return VENDOR;
-  }
-
-  private static String getCommandLineStringOption(
-      Options options, String searchValue, String[] args) {
-    CommandLineParser parser = new DefaultParser();
-
-    try {
-      CommandLine cmd = parser.parse(options, args);
-
-      if (cmd.hasOption(searchValue)) {
-        return cmd.getOptionValue(searchValue);
-      }
-    } catch (ParseException e1) {
-      // We don't have the logger instance at this point yet...
-      e1.printStackTrace();
-    }
-
-    return "";
-  }
-
-  public static String getLoggerFileName() {
-    org.apache.logging.log4j.core.Logger loggerImpl = (org.apache.logging.log4j.core.Logger) log;
-    Appender appender = loggerImpl.getAppenders().get("LogFile");
-
-    if (appender != null) return ((FileAppender) appender).getFileName();
-    else return "NOT_CONFIGURED";
-  }
-
-  /**
-   * Legacy, it simply launches the FX Application which calls init() then start(). Also sets/calls
-   * the preloader class
-   *
-   * @author Jamz
-   * @since 2.0
-   * @param args the command line arguments
-   */
-  public static void main(String[] args) {
-    Options cmdOptions = new Options();
-    cmdOptions.addOption("v", "version", true, "override version number");
-    cmdOptions.addOption("n", "vendor", true, "override vendor");
-
-    VERSION = getCommandLineStringOption(cmdOptions, "version", args);
-    VENDOR = getCommandLineStringOption(cmdOptions, "vendor", args);
-
-    System.setProperty("javafx.preloader", "net.rptools.tokentool.client.SplashScreenLoader");
-
-    launch(args);
   }
 }

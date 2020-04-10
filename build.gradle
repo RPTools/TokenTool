@@ -1,47 +1,31 @@
-/*
-* For more details take a look at the Java Quick-start chapter in the Gradle
-* user guide available at https://docs.gradle.org/current/userguide/building_java_projects.html
-*/
-
-buildscript {
-    dependencies {
-        classpath 'com.diffplug.spotless:spotless-plugin-gradle:3.24.2'
-    }
-
-    repositories {
-        jcenter()
-        mavenCentral()
-    }
-}
 // Access Git info from build script
 plugins {
-    id 'application'
+    id "application"
+    id "org.ajoberstar.grgit" version "4.0.1"
     id 'org.openjfx.javafxplugin' version '0.0.8'
     id 'org.beryx.jlink' version '2.17.5'
-    id "org.ajoberstar.grgit" version "3.1.1"
+    id "com.diffplug.gradle.spotless" version "3.28.0"
 }
 
-// Apply the java plugin to add support for Java
-apply plugin: 'base'
-apply plugin: 'application'
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'com.diffplug.gradle.spotless'
-
-import org.gradle.plugins.ide.eclipse.model.AccessRule
 import org.ajoberstar.grgit.Grgit
 
+// Apply the java plugin to add support for Java
+apply plugin: "base"
+apply plugin: "application"
+apply plugin: "java"
+apply plugin: 'com.diffplug.gradle.spotless'
+
 // Definitions
-defaultTasks 'clean', 'build'
-sourceCompatibility = 13
-targetCompatibility = 13
+defaultTasks "clean", "build"
+sourceCompatibility = 14
+targetCompatibility = 14
 
 // Used by gradle assemble & run tasks
-mainClassName = 'net.rptools.tokentool.client.TokenTool'
+mainClassName = "net.rptools.tokentool/net.rptools.tokentool.client.TokenTool"
 
 // Custom properties
 ext {
-    def repo = Grgit.open(currentDir: file('.'))
+    def repo = Grgit.open(currentDir: file("."))
     def head = repo.head()
     def tags = repo.tag.list().find {
         it.commit == head
@@ -56,28 +40,25 @@ ext {
         environment = "Production"
         sentryDSN = sentry_production_dsn
     } else {
-        tagVersion = 'SNAPSHOT-' + revision
+        tagVersion = msiVersion
+        project.description = "SNAPSHOT-" + revision
         environment = "Development"
         sentryDSN = sentry_development_dsn
     }
 
+
+    // Unable to use non-semver tagging because of .msi restrictions
+    // releaseDir = file("/releases/" + tagVersion + "/")
+    releaseDir = file("/releases/")
+
     // vendor, tagVersion, msiVersion, and DSNs defaults are set in gradle.properties
-    println 'Configuring for ' + project.name + " " + tagVersion + " by " + vendor
-}
-
-// Default parameters for gradle run command
-run {
-    args = [ '-v='+tagVersion, '-vendor='+vendor ]
-    applicationDefaultJvmArgs = [ "-Dsentry.environment=Development", "-Dfile.encoding=UTF-8" ]
-
-    if(System.getProperty("exec.args") != null) {
-        args System.getProperty("exec.args").split()
-    }
+    println "OS Detected: " + osdetector.os
+    println "Configuring for " + project.name + " " + tagVersion + " by " + vendor
 }
 
 spotless {
     java {
-        licenseHeaderFile	'spotless.license.java'
+        licenseHeaderFile 'spotless.license.java'
         googleJavaFormat()
     }
 
@@ -91,25 +72,107 @@ spotless {
     }
 }
 
-// Set eclipse natures, access rules, and other settings
-// https://docs.gradle.org/current/dsl/org.gradle.plugins.ide.eclipse.model.EclipseProject.html
-eclipse {
-    project {
-        natures 'org.eclipse.buildship.core.gradleprojectnature'
-        buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
+// Default parameters for gradle run command
+run {
+    args = ["-v=" + tagVersion, "-vendor=" + vendor]
+    applicationDefaultJvmArgs = ["-Dsentry.environment=Development", "-Dfile.encoding=UTF-8"]
+
+    if (System.getProperty("exec.args") != null) {
+        args System.getProperty("exec.args").split()
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': project.name,
+                'Implementation-Version': tagVersion,
+                'Implementation-Vendor': vendor,
+                'Git-Commit': revision,
+                'Git-Commit-SHA': revisionFull,
+                'Built-By': System.getProperty('user.name'),
+                'Built-Date': new Date(),
+                'Built-JDK': System.getProperty('java.version'),
+                'Source-Compatibility': project.sourceCompatibility,
+                'Target-Compatibility': project.targetCompatibility,
+                'Main-Class': project.mainClassName
+    }
+}
+
+javafx {
+    version = '14'
+    modules = ['javafx.base', 'javafx.controls', 'javafx.fxml', 'javafx.swing', 'javafx.graphics']
+}
+
+jlink {
+    options = ['--strip-debug', '--strip-native-commands', '--compress', '2', '--no-header-files', '--no-man-pages']
+
+    forceMerge('log4j-api', 'gson')
+
+    launcher {
+        name = 'TokenTool'
+        args = ['-v=' + tagVersion, '-vendor=' + vendor]
+        jvmArgs = ['-Dfile.encoding=UTF-8']
     }
 
-    classpath {
-        file {
-            withXml {
-                def node = it.asNode()
-                node.appendNode('classpathentry', [kind: 'con', path: 'org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER'])
-            }
+    jpackage {
+        // not working :(
+        // installerOutputDir = releaseDir
+        // installerOutputDir = file("releases")
+        // imageOutputDir = file("$buildDir/my-packaging-image")
+        outputDir = "../releases"
 
-            whenMerged {
-                def jre = entries.find { it.path.contains 'org.eclipse.jdt.launching.JRE_CONTAINER' }
-                jre.accessRules.add(new AccessRule('0', 'javafx/**'))
-            }
+        imageOptions = []
+        imageName = 'TokenTool'
+
+        installerName = 'TokenTool'
+        installerOptions = [
+                '--verbose',
+                '--description', project.description,
+                '--copyright', 'Copyright 2000-2020 RPTools.net',
+                '--license-file', 'package/license/COPYING.AFFERO',
+                '--app-version', tagVersion,
+                '--vendor', vendor
+        ]
+
+        if (osdetector.os.is('windows')) {
+            println "Setting Windows installer options"
+            imageOptions += ['--icon', 'package/windows/TokenTool.ico']
+            installerOptions += [
+                    '--win-dir-chooser',
+                    '--win-per-user-install',
+                    '--win-shortcut',
+                    '--win-menu',
+                    '--win-menu-group', 'RPTools'
+            ]
+        }
+
+        if (osdetector.os.is('osx')) {
+            println "Setting MacOS installer options"
+            imageOptions += ['--icon', 'package/macosx/tokentool-icon.icns']
+            installerOptions += [
+
+            ]
+        }
+
+        if (osdetector.os.is('unix')) {
+            println "Setting Linux installer options"
+            imageOptions += ['--icon', 'package/linux/tokentool.png']
+            installerOptions += [
+                    '--linux-menu-group', 'RPTools',
+                    '--linux-shortcut'
+            ]
+
+            // if (installerType == 'deb') {
+            //     installerOptions += [
+            //             '--linux-deb-maintainer', 'office@walczak.it'
+            //     ]
+            // }
+
+            // if (installerType == 'rpm') {
+            //     installerOptions += [
+            //             '--linux-rpm-license-type', 'GPLv3'
+            //     ]
+            // }
         }
     }
 }
@@ -118,64 +181,43 @@ eclipse {
 repositories {
     jcenter()
     mavenCentral()
-    mavenLocal()
 }
 
-// Add JavaFX Modules
-javafx {
-    version = "13"
-    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.swing', 'javafx.graphics' ]
-}
-
-application {
-    applicationDefaultJvmArgs =  [
-            "--add-opens=javafx.graphics/javafx.scene.paint=ALL-UNNAMED",
-            "--add-opens=javafx.graphics/com.sun.prism.paint=ALL-UNNAMED",
-    ]
-}
-
-jlink {
-    launcher {
-        name = 'TokenTool'
-    }
-}
-
-// In this section you declare the dependencies for your production and test code
 dependencies {
-    // JavaFX
-    implementation group: 'org.openjfx', name: 'javafx-base', version: '13'
-    implementation group: 'org.openjfx', name: 'javafx-controls', version: '13'
-    implementation group: 'org.openjfx', name: 'javafx-fxml', version: '13'
-    implementation group: 'org.openjfx', name: 'javafx-swing', version: '13'
-    implementation group: 'org.openjfx', name: 'javafx-graphics', version: '13'
+    // Logging
+    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.1'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.1'
 
-    // For Sentry bug reporting
-    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.0'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.0'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.11.0'	    // Bridges v1 to v2 for other code in other libs
+    // Note: log4j-1.2-api versions 2.12.1+ breaks logging
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.12.0'
 
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.28'
-    implementation group: 'commons-logging', name: 'commons-logging', version: '1.2'
+    // Bridges v1 to v2 for other code in other libs
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
+    // implementation group: 'commons-logging', name: 'commons-logging', version: '1.2'
 
-    implementation group: 'io.sentry', name: 'sentry', version: '1.7.27'
-    implementation group: 'io.sentry', name: 'sentry-log4j2', version: '1.7.27'
+    implementation group: 'io.sentry', name: 'sentry', version: '1.7.30'
+    implementation group: 'io.sentry', name: 'sentry-log4j2', version: '1.7.30'
+    implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 
     // For PDF image extraction
-    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.16'
-    implementation group: 'org.bouncycastle', name: 'bcmail-jdk15on', version: '1.63'			    // To decrypt password/secured PDFs
-    implementation group: 'com.github.jai-imageio', name: 'jai-imageio-core', version: '1.4.0'		// For pdf image extraction, specifically for jpeg2000 (jpx) support.
-    implementation group: 'com.github.jai-imageio', name: 'jai-imageio-jpeg2000', version: '1.3.0'	// For pdf image extraction, specifically for jpeg2000 (jpx) support.
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.19'
 
-    // Image processing lib
-    implementation group: 'com.twelvemonkeys.imageio', name: 'imageio-core', version: '3.3.2'	    // https://mvnrepository.com/artifact/com.twelvemonkeys.imageio/imageio-core
-    implementation group: 'com.twelvemonkeys.imageio', name: 'imageio-jpeg', version: '3.3.2'	    // https://mvnrepository.com/artifact/com.twelvemonkeys.imageio/imageio-core
-    implementation group: 'com.twelvemonkeys.imageio', name: 'imageio-psd', version: '3.3.2'	    // https://mvnrepository.com/artifact/com.twelvemonkeys.imageio/imageio-psd
+    // To decrypt password/secured PDFs
+    implementation group: 'org.bouncycastle', name: 'bcmail-jdk15on', version: '1.64'
+
+    // For pdf image extraction, specifically for jpeg2000 (jpx) support.
+    implementation group: 'com.github.jai-imageio', name: 'jai-imageio-core', version: '1.4.0'
+    implementation group: 'com.github.jai-imageio', name: 'jai-imageio-jpeg2000', version: '1.3.0'
+
+    // Image processing lib https://github.com/haraldk/TwelveMonkeys
+    implementation group: 'com.twelvemonkeys.imageio', name: 'imageio-core', version: '3.5'
+    implementation group: 'com.twelvemonkeys.imageio', name: 'imageio-jpeg', version: '3.5'
+    implementation group: 'com.twelvemonkeys.imageio', name: 'imageio-psd', version: '3.5'
 
     // Other public libs
-    implementation group: 'commons-io', name: 'commons-io', version: '2.6'						    // https://mvnrepository.com/artifact/commons-io/commons-io
-    implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'			    		// https://mvnrepository.com/artifact/commons-cli/commons-cli
-    implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'		    	    // https://mvnrepository.com/artifact/commons-cli/commons-cli
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.5'		    		// https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+    implementation group: 'org.reflections', name: 'reflections', version: '0.9.12'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
 }
 
 task configSentryRelease(type: Copy) {
@@ -183,123 +225,12 @@ task configSentryRelease(type: Copy) {
     into("src/main/resources/")
     rename("sentry.properties.template", "sentry.properties")
     def tokens = [
-        AppVersion: "${tagVersion}",
-        Environment: "${environment}",
-        SentryDSN: "${sentryDSN}"
+            AppVersion : "${tagVersion}",
+            Environment: "${environment}",
+            SentryDSN  : "${sentryDSN}"
     ]
     expand(tokens)
     inputs.properties(tokens)
-}
-
-task uberJar(type: Jar) {
-    group = 'distribution'
-    description = 'Create uber jar for native installers'
-
-    baseName project.name + '-' + tagVersion
-
-    manifest {
-        attributes 'Implementation-Title': project.name,
-        'Implementation-Version': tagVersion,
-        'Implementation-Vendor': vendor,
-        'Git-Commit': revision,
-        'Git-Commit-SHA': revisionFull,
-        'Built-By': System.getProperty('user.name'),
-        'Built-Date': new Date(),
-        'Built-JDK': System.getProperty('java.version'),
-        'Source-Compatibility': project.sourceCompatibility,
-        'Target-Compatibility': project.targetCompatibility,
-        'Main-Class': project.mainClassName,
-        'Class-Path': configurations.compile.collect { it.getName() }.join(' ')
-    }
-
-    from {
-        configurations.compile.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
-    }
-    with jar
-    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
-}
-
-// Currently includes license files
-task copyPackageExtras(type: Copy) {
-    from('package/license/')
-    into('build/libs/')
-    include('*')
-}
-
-task prepareInnoSetup(type: Copy) {
-    from("build-resources/TokenTool.iss.template")
-    into("package/windows/")
-    rename("TokenTool.iss.template", "TokenTool.iss")
-    def tokens = [
-        AppName: "${project.name}",
-        AppVersion: "${tagVersion}",
-        Vendor: "${vendor}",
-        SetupIcon: "${project.projectDir.absolutePath}/package/windows/${project.name}.ico",
-        WizardImage: "${project.projectDir.absolutePath}/package/windows/${project.name}-setup.bmp",
-        Slash: "\\",
-    ]
-    expand(tokens)
-    inputs.properties(tokens)
-}
-
-//task deploy(dependsOn: [uberJar, copyPackageExtras, prepareInnoSetup]) {
-//    group = 'distribution'
-//    description = 'Create native installers'
-//
-//    tasks.findByName('copyPackageExtras').mustRunAfter 'uberJar'
-//
-//    doLast {
-//        println 'Deploying ' + project.name + " " + tagVersion + " by " + vendor
-//
-//        // Using the -deploy Command with Bundler Arguments
-//        // 		javapackager -deploy -native exe -BsystemWide=true -BjvmOptions=-Xmx128m -BjvmOptions=-Xms128m -outdir packages -outfile BrickBreaker -srcdir dist
-//        //		-srcfiles BrickBreaker.jar -appclass brickbreaker.Main -name BrickBreaker -title "BrickBreaker demo"
-//        // *Note: You can specify a JRE using "-Bruntime=../../../deploy-ready-jre"
-//        //		  It will bundle system/workspace JDK by default
-//        def javapackager_deploy = exec {
-//            workingDir "${project.projectDir.absolutePath}"
-//
-//            commandLine "javapackager",
-//                "-deploy", "-v",
-//                "-native", "installer",
-//                "-appclass", mainClassName,
-//                "-srcdir", "build/libs",
-//                "-outdir", "releases/release-"+tagVersion,
-//                "-outfile", project.name,
-//                "-name", project.name,
-//                "-description", project.name + " " + tagVersion + " by " + vendor,
-//                "-title", project.name,
-//                "-vendor", vendor,
-//                "-BdropinResourcesRoot=.",
-//                "-BinstalldirChooser=true",
-//                "-BsystemWide=false",
-//                "-BmenuHint=true",
-//                "-Bwin.menuGroup=" + vendor,
-//                "-BshortcutHint=true",
-//                "-BappVersion=" + tagVersion,
-//                "-Bwin.msi.productVersion=" + msiVersion,
-//                "-BlicenseFile=COPYING.AFFERO",
-//                "-BlicenseType='GNU AFFERO GENERAL PUBLIC LICENSE'",
-//                "-Bcategory=Graphics",
-//                "-Bemail=tokentool@rptools.net"
-//        }
-//    }
-//}
-
-task release() {
-    group = 'distribution'
-    description = 'Create native installers'
-}
-
-task createWrapper(type: Wrapper) {
-    gradleVersion = '5.6.2'
-}
-
-// Gradle does not support JDK 13 until Gradle 6.0
-task createWrapperFromSnapshot(type: Wrapper) {
-    gradleVersion = '6.0-20190920115514+0000'
 }
 
 // Configure current release tag in Sentry.io properties
