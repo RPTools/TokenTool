@@ -1,6 +1,6 @@
 ![Build Verification](https://github.com/JamzTheMan/TokenTool/workflows/Build%20Verification/badge.svg)
 
-# TokenTool
+# TokenTool 2.x
 A Token creation tool to create png images suitable for Virtual Table Tops.
 
 Rewritten in JavaFX to bring a modern and updated UI as well as a few new features! TokenTool 2.x now supports PSD format for 'overlays' to allow for better masking by supporting 'layers'. To create your own 'overlay' you can use any version of PhotoShop or GIMP and add your masking layer as the first (bottom) layer and your overlay image as the second (top) layer.
