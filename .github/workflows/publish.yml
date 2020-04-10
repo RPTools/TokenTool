@@ -140,5 +140,5 @@ jobs:
       with:
         upload_url: ${{ github.event.release.upload_url }}
         asset_path: releases/TokenTool.zip
-        asset_name: TokenTool-${{ github.event.release.tag_name }}.zip
+        asset_name: TokenTool-${{ github.event.release.tag_name }}.app.zip
         asset_content_type: application/octet-stream
