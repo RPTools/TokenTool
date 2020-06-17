@@ -203,7 +203,7 @@ dependencies {
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.19'
 
     // To decrypt password/secured PDFs
-    implementation group: 'org.bouncycastle', name: 'bcmail-jdk15on', version: '1.64'
+    implementation group: 'org.bouncycastle', name: 'bcmail-jdk15on', version: '1.65'
 
     // For pdf image extraction, specifically for jpeg2000 (jpx) support.
     implementation group: 'com.github.jai-imageio', name: 'jai-imageio-core', version: '1.4.0'
