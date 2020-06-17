@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/RPTools/tokentool.svg?branch=master)](https://travis-ci.org/RPTools/TokenTool)
-[![Build status](https://ci.appveyor.com/api/projects/status/f2dpp5xfnotbhgcy/branch/master?svg=true)](https://ci.appveyor.com/project/rptools-automation/tokentool/branch/master)
+[![Build Status](https://travis-ci.org/RPTools/tokentool.svg?branch=main)](https://travis-ci.org/RPTools/TokenTool)
+[![Build status](https://ci.appveyor.com/api/projects/status/f2dpp5xfnotbhgcy/branch/main?svg=true)](https://ci.appveyor.com/project/rptools-automation/tokentool/branch/main)
 
 # TokenTool 2.1
 A Token creation tool to create png images suitable for Virtual Table Tops.
