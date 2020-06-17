@@ -108,7 +108,7 @@ public class AppPreferences {
   }
 
   public static void savePreferences(TokenTool_Controller tokentool_Controller) {
-    log.info("Saving preferences to " + prefs.toString());
+    log.debug("Saving preferences to " + prefs.toString());
 
     // Save Overlay details
     prefs.putBoolean(OVERLAY_ASPECT, tokentool_Controller.getOverlayAspect());
@@ -256,7 +256,7 @@ public class AppPreferences {
         prefs.get(
             WINDOW_MAIN_PREFERENCES,
             new Window_Preferences(AppConstants.WINDOW_WIDTH, AppConstants.WINDOW_HEIGHT).toJson());
-    tokentool_Controller.setWindoFrom_Preferences(windowMain_Preferences);
+    tokentool_Controller.setWindowFrom_Preferences(windowMain_Preferences);
 
     // Restore location of save
     FileSaveUtil.setLastFile(prefs.get(LAST_TOKEN_SAVE_LOCATION, null));

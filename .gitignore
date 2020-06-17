@@ -21,6 +21,7 @@ out/
 *.log
 *~
 \${sys:appHome}/
+/.pairs
 
 
 # Automatically Generated

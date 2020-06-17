@@ -17,34 +17,32 @@ package net.rptools.tokentool.client;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.util.ResourceBundle;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.AppPreferences;
-import net.rptools.tokentool.controller.TokenTool_Controller;
 import net.rptools.tokentool.model.Window_Preferences;
 import net.rptools.tokentool.util.I18N;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Credits {
+
   private static final Logger log = LogManager.getLogger(Credits.class);
 
   private Stage stage;
 
-  public Credits(TokenTool_Controller tokenTool_Controller) {
+  public Credits() {
     try {
       FXMLLoader fxmlLoader =
           new FXMLLoader(
               getClass().getResource(AppConstants.CREDITS_FXML),
               ResourceBundle.getBundle(AppConstants.TOKEN_TOOL_BUNDLE));
-      Parent root = (Parent) fxmlLoader.load();
+      Parent root = fxmlLoader.load();
 
       stage = new Stage();
       Scene scene = new Scene(root);
@@ -56,14 +54,10 @@ public class Credits {
       stage.setScene(scene);
 
       stage.setOnCloseRequest(
-          new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-              AppPreferences.setPreference(
-                  AppPreferences.WINDOW_CREDITS_PREFERENCES,
-                  new Window_Preferences(stage).toJson());
-              stage.hide();
-            }
+          event -> {
+            AppPreferences.setPreference(
+                AppPreferences.WINDOW_CREDITS_PREFERENCES, new Window_Preferences(stage).toJson());
+            stage.hide();
           });
 
       String preferencesJson =

@@ -14,7 +14,6 @@
  */
 package net.rptools.tokentool.controller;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -44,7 +43,7 @@ public class Credits_Controller {
   }
 
   @FXML
-  void rptoolsHyperlink_onAction(ActionEvent event) {
+  void rptoolsHyperlink_onAction() {
     log.info("Launching browser for URL " + AppConstants.RPTOOLS_URL);
     TokenTool.getInstance().getHostServices().showDocument(AppConstants.RPTOOLS_URL);
   }

@@ -23,12 +23,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
-import javafx.stage.*;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.controller.SplashScreen_Controller;
 
 public class SplashScreenLoader extends Preloader {
+
   private Stage stage;
   private StackPane root;
   private SplashScreen_Controller controller;
@@ -41,8 +43,8 @@ public class SplashScreenLoader extends Preloader {
         new FXMLLoader(
             getClass().getResource(AppConstants.SPLASH_SCREEN_FXML),
             ResourceBundle.getBundle(AppConstants.TOKEN_TOOL_BUNDLE));
-    root = (StackPane) fxmlLoader.load();
-    controller = (SplashScreen_Controller) fxmlLoader.getController();
+    root = fxmlLoader.load();
+    controller = fxmlLoader.getController();
     controller.setVersionLabel(TokenTool.getVersion());
 
     Scene scene = new Scene(root);
@@ -63,12 +65,7 @@ public class SplashScreenLoader extends Preloader {
         ft.setFromValue(1.0);
         ft.setToValue(0.0);
         final Stage s = stage;
-        EventHandler<ActionEvent> eh =
-            new EventHandler<ActionEvent>() {
-              public void handle(ActionEvent t) {
-                s.hide();
-              }
-            };
+        EventHandler<ActionEvent> eh = t -> s.hide();
         ft.setOnFinished(eh);
         ft.play();
       } else {

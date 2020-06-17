@@ -15,7 +15,6 @@
 package net.rptools.tokentool.util;
 
 import com.twelvemonkeys.imageio.plugins.psd.PSDImageReader;
-import com.twelvemonkeys.imageio.plugins.psd.PSDMetadata;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -52,8 +51,49 @@ import org.apache.logging.log4j.Logger;
 import org.w3c.dom.NodeList;
 
 public class ImageUtil {
-  private static final Logger log = LogManager.getLogger(ImageUtil.class);
 
+  /*
+   * These are the file types supported by TokenTool
+   */
+  public static final String[] SUPPORTED_FILE_FILTER_ARRAY =
+      new String[] {".psd", ".png", ".gif", ".jpg", ".jpeg", ".bmp"};
+  public static final IOFileFilter SUPPORTED_FILE_FILTER =
+      new SuffixFileFilter(SUPPORTED_FILE_FILTER_ARRAY);
+  public static final ExtensionFilter SUPPORTED_PDF_EXTENSION_FILTER =
+      new ExtensionFilter("PDF Files", "*.pdf");
+  /*
+   * These are the supported image types used in the new Image class
+   */
+  public static final FilenameFilter SUPPORTED_IMAGE_FILE_FILTER =
+      (dir, name) -> {
+        name = name.toLowerCase();
+
+        return name.endsWith(".png")
+            || name.endsWith(".gif")
+            || name.endsWith(".jpg")
+            || name.endsWith(".jpeg")
+            || name.endsWith(".bmp");
+      };
+  /*
+   * PSD Support using com.twelvemonkeys.imageio
+   */
+  public static final FilenameFilter PSD_FILE_FILTER =
+      (dir, name) -> name.toLowerCase().endsWith(".psd");
+  /*
+   * These are the supported types used in the new Image class
+   */
+  public static final FilenameFilter SUPPORTED_FILENAME_FILTER =
+      (dir, name) -> {
+        name = name.toLowerCase();
+
+        return name.endsWith(".psd")
+            || name.endsWith(".png")
+            || name.endsWith(".gif")
+            || name.endsWith(".jpg")
+            || name.endsWith(".jpeg")
+            || name.endsWith(".bmp");
+      };
+  private static final Logger log = LogManager.getLogger(ImageUtil.class);
   private static final int THUMB_SIZE = 100;
   private static final int COLOR_THRESHOLD = 1;
 
@@ -91,7 +131,9 @@ public class ImageUtil {
 
       // Mask layer should always be layer 1 and overlay image on layer 2. Note, layer 0 will be a
       // combined layer composite
-      if (overlayWanted) imageIndex = 2;
+      if (overlayWanted) {
+        imageIndex = 2;
+      }
 
       File file = filePath.toFile();
 
@@ -113,15 +155,17 @@ public class ImageUtil {
 
         if (thumbBI != null) {
           int layerIndex = 0;
-          if (overlayWanted) layerIndex = 1;
+          if (overlayWanted) {
+            layerIndex = 1;
+          }
 
           IIOMetadata metadata = reader.getImageMetadata(0);
           IIOMetadataNode root =
-              (IIOMetadataNode) metadata.getAsTree(PSDMetadata.NATIVE_METADATA_FORMAT_NAME);
-          NodeList layerInfos = root.getElementsByTagName("LayerInfo");
+              (IIOMetadataNode) metadata.getAsTree(metadata.getNativeMetadataFormatName());
+          NodeList layerInfoList = root.getElementsByTagName("LayerInfo");
 
           // Layer index corresponds to imageIndex - 1 in the reader
-          IIOMetadataNode layerInfo = (IIOMetadataNode) layerInfos.item(layerIndex);
+          IIOMetadataNode layerInfo = (IIOMetadataNode) layerInfoList.item(layerIndex);
 
           // Get the width & height of the Mask layer so we can create the overlay the same size
           int width = reader.getWidth(0);
@@ -165,7 +209,9 @@ public class ImageUtil {
     int sourceHeight = (int) imageSource.getHeight();
 
     // No work needed here...
-    if (sourceWidth == newWidth && sourceHeight == newHeight) return imageSource;
+    if (sourceWidth == newWidth && sourceHeight == newHeight) {
+      return imageSource;
+    }
 
     WritableImage outputImage = new WritableImage(newWidth, newHeight);
     PixelReader pixelReader = imageSource.getPixelReader();
@@ -208,8 +254,9 @@ public class ImageUtil {
       for (int readX = 0; readX < imageWidth; readX++) {
         Color pixelColor = pixelReader_Mask.getColor(readX, readY);
 
-        if (pixelColor.equals(Color.TRANSPARENT))
+        if (pixelColor.equals(Color.TRANSPARENT)) {
           pixelWriter.setColor(readX, readY, pixelReader_Source.getColor(readX, readY));
+        }
       }
     }
 
@@ -238,16 +285,26 @@ public class ImageUtil {
         Color pixelColor = pixelReader.getColor(readX, readY);
 
         if (!pixelColor.equals(Color.TRANSPARENT)) {
-          if (readX < minX) minX = readX;
-          if (readX > maxX) maxX = readX;
+          if (readX < minX) {
+            minX = readX;
+          }
+          if (readX > maxX) {
+            maxX = readX;
+          }
 
-          if (readY < minY) minY = readY;
-          if (readY > maxY) maxY = readY;
+          if (readY < minY) {
+            minY = readY;
+          }
+          if (readY > maxY) {
+            maxY = readY;
+          }
         }
       }
     }
 
-    if (maxX - minX <= 0 || maxY - minY <= 0) return new WritableImage(1, 1);
+    if (maxX - minX <= 0 || maxY - minY <= 0) {
+      return new WritableImage(1, 1);
+    }
 
     // Create a viewport to clip the image using snapshot
     Rectangle2D viewPort = new Rectangle2D(minX, minY, maxX - minX, maxY - minY);
@@ -275,11 +332,13 @@ public class ImageUtil {
     // Process layout as maskImage may have changed size if the overlay was changed
     compositeTokenPane.layout();
     SnapshotParameters parameter = new SnapshotParameters();
-    Image finalImage = null;
+    Image finalImage;
     Group blend;
 
     // check if there is a mask image
-    if (maskImageView.getFitWidth() <= 0 || maskImageView.getFitHeight() <= 0) clipImage = false;
+    if (maskImageView.getFitWidth() <= 0 || maskImageView.getFitHeight() <= 0) {
+      clipImage = false;
+    }
 
     if (clipImage) {
       // We need to clip the portrait image first then blend the overlay image over it
@@ -368,9 +427,11 @@ public class ImageUtil {
       for (int readX = 0; readX < imageWidth; readX++) {
         Color pixelColor = pixelReader.getColor(readX, readY);
 
-        if (isMagenta(pixelColor, COLOR_THRESHOLD) == overlayWanted)
+        if (isMagenta(pixelColor, COLOR_THRESHOLD) == overlayWanted) {
           pixelWriter.setColor(readX, readY, Color.TRANSPARENT);
-        else pixelWriter.setColor(readX, readY, pixelColor);
+        } else {
+          pixelWriter.setColor(readX, readY, pixelColor);
+        }
       }
     }
 
@@ -379,15 +440,21 @@ public class ImageUtil {
 
   // Using some fudge factor...
   private static boolean isMagenta(Color color, int fudge) {
-    if (color.equals(Color.MAGENTA)) return true;
+    if (color.equals(Color.MAGENTA)) {
+      return true;
+    }
 
     double r = color.getRed();
     double g = color.getGreen();
     double b = color.getBlue();
 
-    if (Math.abs(r - b) > fudge) return false;
+    if (Math.abs(r - b) > fudge) {
+      return false;
+    }
 
-    if (g > r - fudge || g > b - fudge) return false;
+    if (g > r - fudge || g > b - fudge) {
+      return false;
+    }
 
     return true;
   }
@@ -412,18 +479,8 @@ public class ImageUtil {
     return outStream.toByteArray();
   }
 
-  /*
-   * These are the file types supported by TokenTool
-   */
-  public static final String[] SUPPORTED_FILE_FILTER_ARRAY =
-      new String[] {".psd", ".png", ".gif", ".jpg", ".jpeg", ".bmp"};
-  public static final IOFileFilter SUPPORTED_FILE_FILTER =
-      new SuffixFileFilter(SUPPORTED_FILE_FILTER_ARRAY);
-  public static final ExtensionFilter SUPPORTED_PDF_EXTENSION_FILTER =
-      new ExtensionFilter("PDF Files", "*.pdf");
-
-  public static final List<ExtensionFilter> GET_EXTENSION_FILTERS() {
-    List<ExtensionFilter> extensionFilters = new ArrayList<ExtensionFilter>();
+  public static List<ExtensionFilter> GET_EXTENSION_FILTERS() {
+    List<ExtensionFilter> extensionFilters = new ArrayList<>();
     extensionFilters.add(
         new ExtensionFilter(
             I18N.getString("imageUtil.filetype.label.all_images"),
@@ -446,47 +503,4 @@ public class ImageUtil {
 
     return extensionFilters;
   }
-
-  /*
-   * These are the supported image types used in the new Image class
-   */
-  public static final FilenameFilter SUPPORTED_IMAGE_FILE_FILTER =
-      new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-          name = name.toLowerCase();
-
-          return name.endsWith(".png")
-              || name.endsWith(".gif")
-              || name.endsWith(".jpg")
-              || name.endsWith(".jpeg")
-              || name.endsWith(".bmp");
-        }
-      };
-
-  /*
-   * PSD Support using com.twelvemonkeys.imageio
-   */
-  public static final FilenameFilter PSD_FILE_FILTER =
-      new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-          return name.toLowerCase().endsWith(".psd");
-        }
-      };
-
-  /*
-   * These are the supported types used in the new Image class
-   */
-  public static final FilenameFilter SUPPORTED_FILENAME_FILTER =
-      new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-          name = name.toLowerCase();
-
-          return name.endsWith(".psd")
-              || name.endsWith(".png")
-              || name.endsWith(".gif")
-              || name.endsWith(".jpg")
-              || name.endsWith(".jpeg")
-              || name.endsWith(".bmp");
-        }
-      };
 }

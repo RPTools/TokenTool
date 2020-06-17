@@ -35,6 +35,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class RegionSelector {
+
   private static final Logger log = LogManager.getLogger(RegionSelector.class);
 
   private RegionSelector_Controller regionSelector_Controller;
@@ -46,15 +47,14 @@ public class RegionSelector {
           new FXMLLoader(
               getClass().getResource(AppConstants.REGION_SELECTOR_FXML),
               ResourceBundle.getBundle(AppConstants.TOKEN_TOOL_BUNDLE));
-      Parent root = (Parent) fxmlLoader.load();
-      regionSelector_Controller = (RegionSelector_Controller) fxmlLoader.getController();
+      Parent root = fxmlLoader.load();
+      regionSelector_Controller = fxmlLoader.getController();
       regionSelector_Controller.setController(tokenTool_Controller);
 
       stage = new Stage();
       Scene scene = new Scene(root);
 
       scene.setFill(Color.TRANSPARENT);
-      // scene.setFill(new Color(0, 0, 0, 0.0));
       stage.initOwner(TokenTool.getInstance().getStage());
       stage.initStyle(StageStyle.TRANSPARENT);
       stage.initModality(Modality.APPLICATION_MODAL);

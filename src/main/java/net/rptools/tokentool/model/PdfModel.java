@@ -36,6 +36,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
 public class PdfModel {
+
   private static final Logger log = LogManager.getLogger(PdfModel.class);
 
   private PDDocument document;
@@ -48,9 +49,9 @@ public class PdfModel {
   // resolution...
   private double DPI = Math.max(Toolkit.getDefaultToolkit().getScreenResolution() * 1.5, 100);
 
-  private Map<Integer, Image> pageCache = new HashMap<Integer, Image>();
+  private Map<Integer, Image> pageCache = new HashMap<>();
 
-  public PdfModel(File pdfFile, TokenTool_Controller tokenTool_Controller) throws IOException {
+  public PdfModel(File pdfFile, TokenTool_Controller tokenTool_Controller) {
     try {
       // document = PDDocument.load(pdfFile, MemoryUsageSetting.setupTempFileOnly());
       document = PDDocument.load(pdfFile);
@@ -71,7 +72,9 @@ public class PdfModel {
   }
 
   public Image getImage(int pageNumber) {
-    if (pageCache.containsKey(pageNumber)) return pageCache.get(pageNumber);
+    if (pageCache.containsKey(pageNumber)) {
+      return pageCache.get(pageNumber);
+    }
 
     Image pageImage = new WritableImage(1, 1);
 

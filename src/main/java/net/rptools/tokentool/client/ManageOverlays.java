@@ -17,14 +17,12 @@ package net.rptools.tokentool.client;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.util.ResourceBundle;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.AppPreferences;
 import net.rptools.tokentool.controller.TokenTool_Controller;
@@ -34,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ManageOverlays {
+
   private static final Logger log = LogManager.getLogger(ManageOverlays.class);
 
   private Stage stage;
@@ -44,7 +43,7 @@ public class ManageOverlays {
           new FXMLLoader(
               getClass().getResource(AppConstants.MANAGE_OVERLAYS_FXML),
               ResourceBundle.getBundle(AppConstants.TOKEN_TOOL_BUNDLE));
-      Parent root = (Parent) fxmlLoader.load();
+      Parent root = fxmlLoader.load();
 
       stage = new Stage();
       Scene scene = new Scene(root);
@@ -55,15 +54,12 @@ public class ManageOverlays {
       stage.setScene(scene);
 
       stage.setOnCloseRequest(
-          new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-              AppPreferences.setPreference(
-                  AppPreferences.WINDOW_MANAGE_OVERLAYS_PREFERENCES,
-                  new Window_Preferences(stage).toJson());
-              stage.hide();
-              tokenTool_Controller.refreshCache();
-            }
+          event -> {
+            AppPreferences.setPreference(
+                AppPreferences.WINDOW_MANAGE_OVERLAYS_PREFERENCES,
+                new Window_Preferences(stage).toJson());
+            stage.hide();
+            tokenTool_Controller.refreshCache();
           });
 
       String preferencesJson =
