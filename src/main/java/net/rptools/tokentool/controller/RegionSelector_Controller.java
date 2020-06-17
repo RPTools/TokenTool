@@ -33,6 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class RegionSelector_Controller {
+
   private static final Logger log = LogManager.getLogger(RegionSelector_Controller.class);
   private TokenTool_Controller tokenTool_Controller;
 
@@ -63,13 +64,10 @@ public class RegionSelector_Controller {
     stage.hide();
     log.debug("Rect: " + new Rectangle(x, y, sceneWidth, sceneHeight));
 
-    // Test to see if this works better on Linux. Linux would still capture this stage in the
-    // image...
+    // Test to see if this works better on Linux. Linux would still capture this stage in the image
     Platform.runLater(
         () -> {
           try {
-            // Robot robot = new
-            // Robot(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
             BufferedImage bi =
                 new Robot().createScreenCapture(new Rectangle(x, y, sceneWidth, sceneHeight));
             tokenTool_Controller.updateImage(SwingFXUtils.toFXImage(bi, null));

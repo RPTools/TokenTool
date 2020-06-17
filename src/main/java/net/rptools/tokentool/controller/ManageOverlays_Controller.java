@@ -26,7 +26,6 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -44,12 +43,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.AppSetup;
@@ -64,6 +61,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ManageOverlays_Controller {
+
   private static final Logger log = LogManager.getLogger(ManageOverlays_Controller.class);
   private static Thread loadOverlaysThread = new Thread();
   private static ExecutorService executorService;
@@ -164,7 +162,7 @@ public class ManageOverlays_Controller {
 
     overlayTreeView.setCellFactory(
         treeView ->
-            new TreeCell<Path>() {
+            new TreeCell<>() {
               @Override
               public void updateItem(Path path, boolean empty) {
                 super.updateItem(path, empty);
@@ -179,7 +177,9 @@ public class ManageOverlays_Controller {
 
   private void loadImages(TreeItem<Path> treeItem) {
     overlayViewFlowPane.getChildren().clear();
-    if (treeItem != null) loadImages(treeItem.getValue().toFile());
+    if (treeItem != null) {
+      loadImages(treeItem.getValue().toFile());
+    }
   }
 
   private void loadImages(File dir) {
@@ -190,7 +190,7 @@ public class ManageOverlays_Controller {
     File[] files = dir.listFiles(ImageUtil.SUPPORTED_FILENAME_FILTER);
 
     Task<Void> task =
-        new Task<Void>() {
+        new Task<>() {
           @Override
           public Void call() {
             for (File file : files) {
@@ -232,25 +232,21 @@ public class ManageOverlays_Controller {
                     });
 
                 overlayButton.setOnMouseClicked(
-                    new EventHandler<MouseEvent>() {
-                      @Override
-                      public void handle(MouseEvent event) {
-                        // Allow multiple selections if shortcutKey+left_mouse is pressed
-                        if (event.getButton().equals(MouseButton.PRIMARY)
-                            && event.isShortcutDown()) {
-                          // Update the Details panel with the last selected overlay
-                          File overlayFile = (File) overlayButton.getUserData();
-                          updateDetails(overlayFile, (ImageView) overlayButton.getGraphic(), true);
+                    event -> {
+                      // Allow multiple selections if shortcutKey+left_mouse is pressed
+                      if (event.getButton().equals(MouseButton.PRIMARY) && event.isShortcutDown()) {
+                        // Update the Details panel with the last selected overlay
+                        File overlayFile = (File) overlayButton.getUserData();
+                        updateDetails(overlayFile, (ImageView) overlayButton.getGraphic(), true);
 
-                          // Remove the toggle group to allow multiple toggle button selection
-                          overlayButton.setToggleGroup(null);
+                        // Remove the toggle group to allow multiple toggle button selection
+                        overlayButton.setToggleGroup(null);
 
-                          // Select the button
-                          overlayButton.setSelected(true);
+                        // Select the button
+                        overlayButton.setSelected(true);
 
-                          // Consume the event, no more logic needed
-                          event.consume();
-                        }
+                        // Consume the event, no more logic needed
+                        event.consume();
                       }
                     });
 
@@ -277,7 +273,6 @@ public class ManageOverlays_Controller {
       overlayDescription.setText(ImageUtil.getFileType(overlayFile));
       overlayDimensions.setText(w + " x " + h);
       overlayLayerImage.setImage(overlayImage.getImage());
-      ;
 
       try {
         overlayLayerMask = ImageUtil.getMaskImage(overlayLayerMask, overlayFile.toPath());
@@ -300,15 +295,18 @@ public class ManageOverlays_Controller {
   private void resetToggleGroup() {
     for (Node overlay : overlayViewFlowPane.getChildren()) {
       ToggleButton overlayButton = (ToggleButton) overlay;
-      if (overlayButton.getToggleGroup() == null) overlayButton.setToggleGroup(overlayToggleGroup);
+      if (overlayButton.getToggleGroup() == null) {
+        overlayButton.setToggleGroup(overlayToggleGroup);
+      }
     }
   }
 
   private boolean confirmDelete(LinkedList<File> overlayFiles) {
     String confirmationText = I18N.getString("ManageOverlays.dialog.delete.confirmation");
 
-    if (overlayFiles.isEmpty()) return false;
-    else if (overlayFiles.size() == 1) {
+    if (overlayFiles.isEmpty()) {
+      return false;
+    } else if (overlayFiles.size() == 1) {
       confirmationText += overlayFiles.get(0).getName() + "?";
     } else {
       confirmationText +=
@@ -324,11 +322,7 @@ public class ManageOverlays_Controller {
 
     Optional<ButtonType> result = alert.showAndWait();
 
-    if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
-      return true;
-    }
-
-    return false;
+    return (result.isPresent()) && (result.get() == ButtonType.OK);
   }
 
   private boolean confirmDelete(File dir) {
@@ -354,20 +348,18 @@ public class ManageOverlays_Controller {
 
     Optional<ButtonType> result = alert.showAndWait();
 
-    if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
-      return true;
-    }
-
-    return false;
+    return (result.isPresent()) && (result.get() == ButtonType.OK);
   }
 
   @FXML
-  void deleteOverlayButton_onAction(ActionEvent event) {
-    LinkedList<File> overlayFiles = new LinkedList<File>();
+  void deleteOverlayButton_onAction() {
+    LinkedList<File> overlayFiles = new LinkedList<>();
 
     for (Node overlay : overlayViewFlowPane.getChildren()) {
       ToggleButton overlayButton = (ToggleButton) overlay;
-      if (overlayButton.isSelected()) overlayFiles.add((File) overlayButton.getUserData());
+      if (overlayButton.isSelected()) {
+        overlayFiles.add((File) overlayButton.getUserData());
+      }
     }
 
     if (confirmDelete(overlayFiles)) {
@@ -381,8 +373,10 @@ public class ManageOverlays_Controller {
   }
 
   @FXML
-  void deleteFolderButton_onAction(ActionEvent event) {
-    if (currentDirectory.equals(AppConstants.OVERLAY_DIR)) return;
+  void deleteFolderButton_onAction() {
+    if (currentDirectory.equals(AppConstants.OVERLAY_DIR)) {
+      return;
+    }
 
     if (confirmDelete(currentDirectory)) {
       try {
@@ -396,15 +390,17 @@ public class ManageOverlays_Controller {
   }
 
   @FXML
-  void addOverlayButton_onAction(ActionEvent event) {
+  void addOverlayButton_onAction() {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle(I18N.getString("ManageOverlays.filechooser.overlay.title"));
     fileChooser.getExtensionFilters().addAll(ImageUtil.GET_EXTENSION_FILTERS());
 
-    if (lastSelectedDirectory != null) fileChooser.setInitialDirectory(lastSelectedDirectory);
+    if (lastSelectedDirectory != null) {
+      fileChooser.setInitialDirectory(lastSelectedDirectory);
+    }
 
     List<File> selectedFiles =
-        fileChooser.showOpenMultipleDialog((Stage) addOverlayButton.getScene().getWindow());
+        fileChooser.showOpenMultipleDialog(addOverlayButton.getScene().getWindow());
 
     if (selectedFiles != null) {
       for (File selectedFile : selectedFiles) {
@@ -417,7 +413,7 @@ public class ManageOverlays_Controller {
   }
 
   @FXML
-  void addFolderButton_onAction(ActionEvent event) {
+  void addFolderButton_onAction() {
     TextInputDialog dialog = new TextInputDialog();
     dialog.setHeaderText(I18N.getString("TokenTool.dialog.confirmation.header"));
     dialog.setTitle(I18N.getString("ManageOverlays.filechooser.folder.title"));
@@ -429,12 +425,11 @@ public class ManageOverlays_Controller {
           if (FileSaveUtil.makeDir(name, currentDirectory)) {
             displayTreeView();
           }
-          ;
         });
   }
 
   @FXML
-  void restoreButton_onAction(ActionEvent event) {
+  void restoreButton_onAction() {
     Alert alert = new Alert(AlertType.CONFIRMATION);
     alert.setHeaderText(I18N.getString("TokenTool.dialog.confirmation.header"));
     alert.setTitle(I18N.getString("ManageOverlays.dialog.restore.overlays.title"));
@@ -455,7 +450,7 @@ public class ManageOverlays_Controller {
   }
 
   @FXML
-  void overlayViewFlowPane_DragDone(DragEvent event) {
+  void overlayViewFlowPane_DragDone() {
     loadImages(overlayTreeView.getSelectionModel().getSelectedItem());
   }
 
@@ -474,11 +469,7 @@ public class ManageOverlays_Controller {
       loadImages(overlayTreeView.getSelectionModel().getSelectedItem());
       event.setDropCompleted(true);
     } else if (db.hasFiles()) {
-      db.getFiles()
-          .forEach(
-              file -> {
-                FileSaveUtil.copyFile(file, currentDirectory);
-              });
+      db.getFiles().forEach(file -> FileSaveUtil.copyFile(file, currentDirectory));
       loadImages(overlayTreeView.getSelectionModel().getSelectedItem());
       event.setDropCompleted(true);
     } else if (db.hasUrl()) {

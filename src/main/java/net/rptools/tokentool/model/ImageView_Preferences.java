@@ -27,11 +27,12 @@ import org.apache.logging.log4j.Logger;
  * Store and return needed ImageView attributes as a JSON for easy storage in user preferences
  */
 public class ImageView_Preferences {
+
   private static final Logger log = LogManager.getLogger(ImageView_Preferences.class);
 
-  double translateX, translateY, rotation, scale;
-  String filePath;
-  Color backgroundColor; // We'll save the background color with the background imageview...
+  private String filePath;
+  private double translateX, translateY, rotation, scale;
+  private double backgroundColor_r, backgroundColor_g, backgroundColor_b, backgroundColor_o;
 
   public ImageView_Preferences(ImageView imageView, String filePath) {
     setRotation(imageView.getRotate());
@@ -92,20 +93,14 @@ public class ImageView_Preferences {
   }
 
   public Color getBackgroundColor() {
-    // stupid error even though it tests as an instanceof Color!? wtf...
-    // com.google.gson.internal.LinkedTreeMap cannot be cast to
-    // javafx.graphics@10.0.1/com.sun.prism.paint.Paint
-    // return backgroundColor;
-
-    return new Color(
-        backgroundColor.getRed(),
-        backgroundColor.getGreen(),
-        backgroundColor.getBlue(),
-        backgroundColor.getOpacity());
+    return new Color(backgroundColor_r, backgroundColor_g, backgroundColor_b, backgroundColor_o);
   }
 
   public void setBackgroundColor(Color backgroundColor) {
-    this.backgroundColor = backgroundColor;
+    this.backgroundColor_r = backgroundColor.getRed();
+    this.backgroundColor_g = backgroundColor.getGreen();
+    this.backgroundColor_b = backgroundColor.getBlue();
+    this.backgroundColor_o = backgroundColor.getOpacity();
   }
 
   public ImageView toImageView(ImageView imageView) {
@@ -131,7 +126,7 @@ public class ImageView_Preferences {
   }
 
   public String toJson() {
-    String json = new Gson().toJson(this).toString();
+    String json = new Gson().toJson(this);
     log.debug("JSON output: " + json);
     return json;
   }

@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
  * Store and return needed Stage (window) attributes as a JSON for easy storage in user preferences
  */
 public class Window_Preferences {
+
   private static final Logger log = LogManager.getLogger(Window_Preferences.class);
 
   double windowX = 0, windowY = 0;
@@ -43,8 +44,12 @@ public class Window_Preferences {
   public void setWindow(Stage stage) {
     stage.setX(windowX);
     stage.setY(windowY);
-    if (windowWidth > 10) stage.setWidth(windowWidth);
-    if (windowHeight > 10) stage.setHeight(windowHeight);
+    if (windowWidth > 10) {
+      stage.setWidth(windowWidth);
+    }
+    if (windowHeight > 10) {
+      stage.setHeight(windowHeight);
+    }
   }
 
   public double getWindowX() {
@@ -80,7 +85,7 @@ public class Window_Preferences {
   }
 
   public String toJson() {
-    String json = new Gson().toJson(this).toString();
+    String json = new Gson().toJson(this);
     log.debug("JSON output: " + json);
     return json;
   }

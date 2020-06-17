@@ -16,7 +16,7 @@ package net.rptools.tokentool;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Set;
@@ -37,11 +37,11 @@ import org.reflections.scanners.ResourcesScanner;
 
 /** Executes only the first time the application is run. */
 public class AppSetup {
-  private static Logger
-      log; // Don't instantiate until install gets and sets user_home/logs directory
 
   private static final String DEFAULT_OVERLAYS = "net/rptools/tokentool/overlays/";
   private static final String USER_HOME;
+  private static Logger
+      log; // Don't instantiate until install gets and sets user_home/logs directory
 
   static {
     USER_HOME = System.getProperty("user.home");
@@ -98,7 +98,9 @@ public class AppSetup {
   }
 
   private static void confirmInstallOverlays(int overlaysInstalled) {
-    if (overlaysInstalled <= 0) return;
+    if (overlaysInstalled <= 0) {
+      return;
+    }
 
     Platform.runLater(
         () -> {
@@ -121,8 +123,11 @@ public class AppSetup {
   }
 
   /*
-   * OK so here will will only install any overlays that are in a directory with a newer version than what is installed. So, if a user skips versions and goes from 2 to 2.3 any overlays in 2.1, 2.2,
-   * and 2.3 will get installed. I'm doing it this way in cause a user reorganizes his directory structure or deletes overlays he doesn't want, we don't reinstall them and annoy the user!
+   * OK so here will will only install any overlays that are in a directory with a newer version
+   * than what is installed. So, if a user skips versions and goes from 2 to 2.3 any overlays
+   * in 2.1, 2.2, and 2.3 will get installed. I'm doing it this way in case a user reorganizes his
+   * directory structure or deletes overlays he doesn't want, we don't reinstall them and annoy
+   * the user!
    */
   public static int installNewOverlays(String currentVersion) throws IOException {
     // Create the overlay directory if it doesn't already exist
@@ -131,29 +136,25 @@ public class AppSetup {
     int overlaysInstalled = 0;
 
     // Copy default overlays from resources
-    // https://dzone.com/articles/get-all-classes-within-package
     Reflections reflections = new Reflections(DEFAULT_OVERLAYS, new ResourcesScanner());
     Set<String> resourcePathSet = reflections.getResources(Pattern.compile(".*"));
 
     for (String resourcePath : resourcePathSet) {
-      URL inputUrl = AppSetup.class.getClassLoader().getResource(resourcePath);
       String resourceName = resourcePath.substring(DEFAULT_OVERLAYS.length());
+      InputStream resourceAsStream = AppSetup.class.getResourceAsStream("/" + resourcePath);
 
       int verIndex = resourceName.indexOf("/");
-      String resourceVerion = resourceName.substring(1, verIndex).replace("_", ".");
+      String resourceVersion = resourceName.substring(1, verIndex).replace("_", ".");
 
-      if (isNewerVersion(resourceVerion, currentVersion)) {
+      if (isNewerVersion(resourceVersion, currentVersion)) {
         File resourceFile =
-            new File(
-                overlayDir,
-                resourceName.substring(resourceVerion.length() + 1, resourceName.length()));
+            new File(overlayDir, resourceName.substring(resourceVersion.length() + 1));
         log.info("Installing overlay: " + resourceFile);
 
         try {
-          FileUtils.copyURLToFile(inputUrl, resourceFile);
+          FileUtils.copyInputStreamToFile(resourceAsStream, resourceFile);
           overlaysInstalled++;
-        } catch (IOException e) {
-          log.error("ERROR copying " + inputUrl + " to " + resourceFile, e);
+        } catch (IOException ignored) {
         }
       }
     }
@@ -168,7 +169,9 @@ public class AppSetup {
 
     String vendor = "";
 
-    if (!TokenTool.getVendor().isEmpty()) vendor += "-" + TokenTool.getVendor();
+    if (!TokenTool.getVendor().isEmpty()) {
+      vendor += "-" + TokenTool.getVendor();
+    }
 
     File home = new File(USER_HOME + "/." + (AppConstants.APP_NAME + vendor).toLowerCase());
     home.mkdirs();
@@ -195,14 +198,16 @@ public class AppSetup {
    * A convenience method to break up the version number string into it's component version
    * identifiers and test if version is newer than existing version
    *
+   * @param version
+   * @param installedVersion
+   * @return true if valid version format
    * @author Jamz
    * @since 2.0
-   * @param installed version
-   * @param running version
-   * @return true if valid version format
    */
   private static boolean isNewerVersion(String version, String installedVersion) {
-    if (version.equals("DEVELOPMENT") || installedVersion.equals("DEVELOPMENT")) return false;
+    if (version.equals("DEVELOPMENT") || installedVersion.equals("DEVELOPMENT")) {
+      return false;
+    }
 
     String[] versions = version.indexOf(".") > 0 ? version.split("\\.") : new String[] {version};
     String[] installedVersions =
@@ -216,7 +221,9 @@ public class AppSetup {
         int v = Integer.parseInt(ver);
         int iv = 0;
 
-        if (installedVersions.length > i) iv = Integer.parseInt(installedVersions[i]);
+        if (installedVersions.length > i) {
+          iv = Integer.parseInt(installedVersions[i]);
+        }
 
         if (v > iv) {
           return true;

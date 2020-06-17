@@ -19,14 +19,12 @@ import com.google.gson.reflect.TypeToken;
 import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.AppPreferences;
 import net.rptools.tokentool.controller.PdfViewer_Controller;
@@ -36,6 +34,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class PdfViewer {
+
   private static final Logger log = LogManager.getLogger(PdfViewer.class);
   private Stage stage;
 
@@ -53,7 +52,7 @@ public class PdfViewer {
       return;
     }
 
-    PdfViewer_Controller pdfViewerController = fxmlLoader.<PdfViewer_Controller>getController();
+    PdfViewer_Controller pdfViewerController = fxmlLoader.getController();
 
     stage = new Stage();
     Scene scene = new Scene(root);
@@ -64,15 +63,12 @@ public class PdfViewer {
     stage.setScene(scene);
 
     stage.setOnCloseRequest(
-        new EventHandler<WindowEvent>() {
-          @Override
-          public void handle(WindowEvent event) {
-            log.debug("Shutting down PDF Viewer...");
-            AppPreferences.setPreference(
-                AppPreferences.WINDOW_PDF_PREFERENCES, new Window_Preferences(stage).toJson());
-            stage.hide();
-            pdfViewerController.close();
-          }
+        event -> {
+          log.debug("Shutting down PDF Viewer...");
+          AppPreferences.setPreference(
+              AppPreferences.WINDOW_PDF_PREFERENCES, new Window_Preferences(stage).toJson());
+          stage.hide();
+          pdfViewerController.close();
         });
 
     String preferencesJson =

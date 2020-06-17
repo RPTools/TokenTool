@@ -15,7 +15,6 @@
 package net.rptools.tokentool.controller;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -27,10 +26,8 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
@@ -39,13 +36,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import javafx.util.Duration;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.model.PdfModel;
@@ -53,8 +48,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class PdfViewer_Controller implements Initializable {
-  private static final Logger log = LogManager.getLogger(PdfViewer_Controller.class);
 
+  private static final Logger log = LogManager.getLogger(PdfViewer_Controller.class);
+  private static ExecutorService renderPdfPageService;
+  private static ExecutorService extractImagesService;
   @FXML private AnchorPane pdfAnchorPane;
   @FXML private Pagination pdfViewPagination;
   @FXML private TextField pageNumberTextField;
@@ -64,12 +61,8 @@ public class PdfViewer_Controller implements Initializable {
   @FXML private ProgressIndicator extractProgressIndicator;
   @FXML private Pane viewPortPane;
   @FXML private ScrollPane imageTileScrollpane;
-
   private PdfModel pdfModel;
   private ImageView pdfImageView = new ImageView();
-
-  private static ExecutorService renderPdfPageService;
-  private static ExecutorService extractImagesService;
   private AtomicInteger workerThreads = new AtomicInteger(0);
   private AtomicInteger extractThreads = new AtomicInteger(0);
 
@@ -121,11 +114,7 @@ public class PdfViewer_Controller implements Initializable {
   }
 
   public void loadPDF(File pdfFile, TokenTool_Controller tokenTool_Controller, Stage stage) {
-    try {
-      pdfModel = new PdfModel(pdfFile, tokenTool_Controller);
-    } catch (IOException e) {
-      log.error("Error loading PDF " + pdfFile.getAbsolutePath(), e);
-    }
+    pdfModel = new PdfModel(pdfFile, tokenTool_Controller);
 
     pdfViewPagination.setPageCount(pdfModel.numPages());
 
@@ -142,24 +131,65 @@ public class PdfViewer_Controller implements Initializable {
         .bind(Bindings.subtract(stage.widthProperty(), imageTileScrollpane.getWidth() + 30));
 
     pdfViewPagination.setPageFactory(
-        new Callback<Integer, Node>() {
-          public Node call(final Integer pageIndex) {
-            workerThreads.incrementAndGet();
-            imageTilePane.getChildren().clear();
+        pageIndex -> {
+          workerThreads.incrementAndGet();
+          imageTilePane.getChildren().clear();
 
-            // First, blank the page out
-            pdfImageView.setImage(null);
+          // First, blank the page out
+          pdfImageView.setImage(null);
 
-            // Execute the render off the UI thread...
-            RenderPdfPageTask renderPdfPageTask = new RenderPdfPageTask(pageIndex);
-            renderPdfPageService.execute(renderPdfPageTask);
+          // Execute the render off the UI thread...
+          RenderPdfPageTask renderPdfPageTask = new RenderPdfPageTask(pageIndex);
+          renderPdfPageService.execute(renderPdfPageTask);
 
-            return pdfImageView;
-          }
+          return pdfImageView;
         });
   }
 
+  public void close() {
+    pdfModel.close();
+  }
+
+  @FXML
+  void pdfViewPagination_OnScroll(ScrollEvent event) {
+    int delta = 1;
+    if (event.getDeltaX() > 1 || event.getDeltaY() > 1) {
+      delta = -1;
+    }
+
+    pdfViewPagination.setCurrentPageIndex(pdfViewPagination.getCurrentPageIndex() + delta);
+  }
+
+  @FXML
+  void pdfViewPagination_onMouseClick() {
+    pdfViewPagination.setCurrentPageIndex(pdfViewPagination.getCurrentPageIndex());
+  }
+
+  @FXML
+  void pageNumberTextField_onMouseClicked() {
+    pageNumberTextField.setOpacity(1);
+    pageNumberTextField.selectAll();
+  }
+
+  @FXML
+  void pageNumberTextField_onAction() {
+    int pageNumber = Integer.parseInt(pageNumberTextField.getText());
+
+    if (pageNumber > pdfViewPagination.getPageCount()) {
+      pageNumber = pdfViewPagination.getPageCount();
+    }
+
+    if (pageNumber > 0) {
+      pdfViewPagination.setCurrentPageIndex(pageNumber - 1);
+    }
+
+    pageNumberTextField.setText(pdfViewPagination.getCurrentPageIndex() + 1 + "");
+    pdfViewPagination.requestFocus();
+    pageNumberTextField.setOpacity(0);
+  }
+
   private class RenderPdfPageTask extends Task<Void> {
+
     Integer pageIndex;
 
     RenderPdfPageTask(Integer pageIndex) {
@@ -167,7 +197,7 @@ public class PdfViewer_Controller implements Initializable {
     }
 
     @Override
-    protected Void call() throws Exception {
+    protected Void call() {
       // For debugging and tracking the thread...
       Thread.currentThread().setName("RenderPdfPageTask-Page-" + (pageIndex + 1));
 
@@ -222,15 +252,16 @@ public class PdfViewer_Controller implements Initializable {
   }
 
   private class ExtractPdfImages extends Task<Void> {
+
     Integer pageIndex;
-    ArrayList<ToggleButton> imageButtons = new ArrayList<ToggleButton>();
+    ArrayList<ToggleButton> imageButtons = new ArrayList<>();
 
     ExtractPdfImages(Integer pageIndex) {
       this.pageIndex = pageIndex;
     }
 
     @Override
-    protected Void call() throws Exception {
+    protected Void call() {
       // For debugging and tracking the thread...
       Thread.currentThread().setName("ExtractPdfPageTask-Page-" + (pageIndex + 1));
 
@@ -276,72 +307,14 @@ public class PdfViewer_Controller implements Initializable {
           () -> {
             if (extractThreads.decrementAndGet() == 0) {
               log.info("Adding " + imageButtons.size());
-              // log.info("imageTilePane.getChildren() " + imageTilePane.getChildren().size());
               try {
                 imageTilePane.getChildren().clear();
                 imageTilePane.getChildren().addAll(imageButtons);
               } catch (IllegalArgumentException e) {
                 log.error("Error adding tiled image buttons.", e);
               }
-              // log.info("Done...");
             }
           });
     }
-  }
-
-  class getPageImageView extends Task<Node> {
-    Integer pageIndex;
-
-    getPageImageView(Integer pageIndex) {
-      this.pageIndex = pageIndex;
-    }
-
-    @Override
-    protected Node call() throws Exception {
-
-      return null;
-    }
-  }
-
-  // private void extractImages() {
-  // imageTilePane.getChildren().clear();
-  // pdfModel.extractImages(imageTilePane, pdfViewPagination.getCurrentPageIndex());
-  // }
-
-  public void close() {
-    pdfModel.close();
-  }
-
-  @FXML
-  void pdfViewPagination_OnScroll(ScrollEvent event) {
-    int delta = 1;
-    if (event.getDeltaX() > 1 || event.getDeltaY() > 1) delta = -1;
-
-    pdfViewPagination.setCurrentPageIndex(pdfViewPagination.getCurrentPageIndex() + delta);
-  }
-
-  @FXML
-  void pdfViewPagination_onMouseClick(MouseEvent event) {
-    pdfViewPagination.setCurrentPageIndex(pdfViewPagination.getCurrentPageIndex());
-  }
-
-  @FXML
-  void pageNumberTextField_onMouseClicked(MouseEvent event) {
-    pageNumberTextField.setOpacity(1);
-    pageNumberTextField.selectAll();
-  }
-
-  @FXML
-  void pageNumberTextField_onAction(ActionEvent event) {
-    int pageNumber = Integer.parseInt(pageNumberTextField.getText());
-
-    if (pageNumber > pdfViewPagination.getPageCount())
-      pageNumber = pdfViewPagination.getPageCount();
-
-    if (pageNumber > 0) pdfViewPagination.setCurrentPageIndex(pageNumber - 1);
-
-    pageNumberTextField.setText(pdfViewPagination.getCurrentPageIndex() + 1 + "");
-    pdfViewPagination.requestFocus();
-    pageNumberTextField.setOpacity(0);
   }
 }

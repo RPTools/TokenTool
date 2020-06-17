@@ -60,7 +60,16 @@ public class AppConstants {
   public static final boolean DEFAULT_OVERLAY_CLIP_PORTRAIT = true;
   public static final boolean DEFAULT_USE_FILE_NUMBERING = false;
   public static final int DEFAULT_OVERLAY_SIZE = 256;
-
+  public static final double WINDOW_WIDTH = 825;
+  public static final double WINDOW_HEIGHT = 825;
+  public static final File OVERLAY_DIR = AppSetup.getAppHome("overlays");
+  public static final File CACHE_DIR = AppSetup.getAppHome("cache");
+  public static final ExtensionFilter IMAGE_EXTENSION_FILTER =
+      new ExtensionFilter(DEFAULT_IMAGE_EXTENSION_DESCRIPTION, "*" + DEFAULT_IMAGE_EXTENSION);
+  public static final double DEFAULT_PORTRAIT_TRANSPARENCY = 1;
+  public static final double DEFAULT_PORTRAIT_BLUR = 0;
+  public static final double DEFAULT_PORTRAIT_GLOW = 0;
+  public static final double DEFAULT_OVERLAY_TRANSPARENCY = 1;
   // Set by controller using defaults set in FXML
   public static Image DEFAULT_PORTRAIT_IMAGE;
   public static ImageView DEFAULT_BACKGROUND_IMAGE_VIEW;
@@ -70,21 +79,6 @@ public class AppConstants {
   public static double DEFAULT_PORTRAIT_IMAGE_Y;
   public static double DEFAULT_PORTRAIT_IMAGE_SCALE;
   public static double DEFAULT_PORTRAIT_IMAGE_ROTATE;
-  public static final double WINDOW_WIDTH = 825;
-  public static final double WINDOW_HEIGHT = 825;
-
-  public static final File OVERLAY_DIR = AppSetup.getAppHome("overlays");
-  public static final File CACHE_DIR = AppSetup.getAppHome("cache");
-
-  public static final ExtensionFilter IMAGE_EXTENSION_FILTER =
-      new ExtensionFilter(DEFAULT_IMAGE_EXTENSION_DESCRIPTION, "*" + DEFAULT_IMAGE_EXTENSION);
-
-  public static final double DEFAULT_PORTRAIT_TRANSPARENCY = 1;
-  public static final double DEFAULT_PORTRAIT_BLUR = 0;
-  public static final double DEFAULT_PORTRAIT_GLOW = 0;
-
-  public static final double DEFAULT_OVERLAY_TRANSPARENCY = 1;
-
   public static boolean DEFAULT_SAVE_PORTRAIT_ON_DRAG;
   public static boolean DEFAULT_USE_BACKGROUND_ON_DRAG;
   public static String DEFAULT_PORTRAIT_NAME_TEXT_FIELD;

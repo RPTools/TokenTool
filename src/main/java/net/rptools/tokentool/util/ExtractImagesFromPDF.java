@@ -55,17 +55,14 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAppearanceEntry;
  * @author Jamz
  */
 public final class ExtractImagesFromPDF {
+
   private static final Logger log = LogManager.getLogger(ExtractImagesFromPDF.class);
-
-  private final PDDocument document;
-
-  private final Set<COSStream> imageTracker = new HashSet<COSStream>();
-
   private static final int imageViewSize = 175;
   private static final int imageButtonSize = 200;
-
+  private final PDDocument document;
+  private final Set<COSStream> imageTracker = new HashSet<>();
   private TokenTool_Controller tokenTool_Controller;
-  private ArrayList<ToggleButton> imageButtons = new ArrayList<ToggleButton>();
+  private ArrayList<ToggleButton> imageButtons = new ArrayList<>();
   private int currentPageNumber;
   private String pdfName;
 
@@ -109,7 +106,9 @@ public final class ExtractImagesFromPDF {
     Collections.reverse(xObjectNamesReversed);
 
     for (COSName xObjectName : xObjectNamesReversed) {
-      if (interrupt) return;
+      if (interrupt) {
+        return;
+      }
 
       PDXObject xObject = resources.getXObject(xObjectName);
 
@@ -146,7 +145,9 @@ public final class ExtractImagesFromPDF {
   private void extractAnnotationImages(PDAnnotation annotation) throws IOException {
     PDAppearanceDictionary appearance = annotation.getAppearance();
 
-    if (appearance == null) return;
+    if (appearance == null) {
+      return;
+    }
 
     extractAnnotationImages(appearance.getDownAppearance());
     extractAnnotationImages(appearance.getNormalAppearance());
@@ -154,28 +155,40 @@ public final class ExtractImagesFromPDF {
   }
 
   private void extractAnnotationImages(PDAppearanceEntry appearance) throws IOException {
-    if (interrupt) return;
+    if (interrupt) {
+      return;
+    }
 
     PDResources resources = appearance.getAppearanceStream().getResources();
-    if (resources == null) return;
+    if (resources == null) {
+      return;
+    }
 
     for (COSName cosname : resources.getXObjectNames()) {
       PDXObject xObject = resources.getXObject(cosname);
 
-      if (xObject instanceof PDFormXObject) extractAnnotationImages((PDFormXObject) xObject);
-      else if (xObject instanceof PDImageXObject) extractAnnotationImages((PDImageXObject) xObject);
+      if (xObject instanceof PDFormXObject) {
+        extractAnnotationImages((PDFormXObject) xObject);
+      } else if (xObject instanceof PDImageXObject) {
+        extractAnnotationImages((PDImageXObject) xObject);
+      }
     }
   }
 
   private void extractAnnotationImages(PDFormXObject form) throws IOException {
     PDResources resources = form.getResources();
-    if (resources == null) return;
+    if (resources == null) {
+      return;
+    }
 
     for (COSName cosname : resources.getXObjectNames()) {
       PDXObject xObject = resources.getXObject(cosname);
 
-      if (xObject instanceof PDFormXObject) extractAnnotationImages((PDFormXObject) xObject);
-      else if (xObject instanceof PDImageXObject) extractAnnotationImages((PDImageXObject) xObject);
+      if (xObject instanceof PDFormXObject) {
+        extractAnnotationImages((PDFormXObject) xObject);
+      } else if (xObject instanceof PDImageXObject) {
+        extractAnnotationImages((PDImageXObject) xObject);
+      }
     }
   }
 
@@ -248,15 +261,18 @@ public final class ExtractImagesFromPDF {
           event.consume();
         });
 
-    if (interrupt) log.info("I REALLY SHOULD STOP!");
-    else log.info("Free to go...");
+    if (interrupt) {
+      log.debug("I REALLY SHOULD STOP!");
+    } else {
+      log.debug("Free to go...");
+    }
 
     imageButtons.add(imageButton);
   }
 
   public void interrupt() {
-    log.info("isRunning? " + isRunning);
-
-    if (isRunning) interrupt = true;
+    if (isRunning) {
+      interrupt = true;
+    }
   }
 }

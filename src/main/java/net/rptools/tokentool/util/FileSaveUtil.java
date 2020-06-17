@@ -16,8 +16,8 @@ package net.rptools.tokentool.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.scene.control.TextField;
@@ -28,8 +28,88 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class FileSaveUtil {
+
   private static final Logger log = LogManager.getLogger(FileSaveUtil.class);
   private static File lastFile = null;
+
+  public static String cleanFileName(String fileName) {
+    String decodedFileName = fileName;
+
+    try {
+      decodedFileName = URLDecoder.decode(decodedFileName, StandardCharsets.UTF_8);
+    } finally {
+      decodedFileName =
+          decodedFileName.replaceAll(
+              AppConstants.VALID_FILE_NAME_REPLACEMENT_PATTERN,
+              AppConstants.VALID_FILE_NAME_REPLACEMENT_CHARACTER);
+    }
+
+    return decodedFileName;
+  }
+
+  /*
+   * Attempt to find filename buried inside the URL
+   * e.g. https://vignette.wikia.nocookie.net/glass-cannon/images/b/bd/Barron.jpg/revision/latest/scale-to-width-down/552?cb=20170511190014
+   */
+  public static String searchURL(String urlString) {
+    StringBuilder imageTypes = new StringBuilder();
+
+    for (String type : ImageUtil.SUPPORTED_FILE_FILTER_ARRAY) {
+      if (imageTypes.length() == 0) {
+        imageTypes = new StringBuilder(type);
+      } else {
+        imageTypes.append("|").append(type);
+      }
+    }
+
+    Pattern p = Pattern.compile("([\\w-]+)\\.(?i:" + imageTypes.toString().replace(".", "") + ")");
+    Matcher m = p.matcher(urlString);
+
+    if (m.find()) {
+      return m.group(1);
+    } else {
+      return FilenameUtils.getBaseName(urlString);
+    }
+  }
+
+  public static File getLastFile() {
+    return lastFile;
+  }
+
+  public static void setLastFile(File file) {
+    lastFile = file;
+  }
+
+  public static void setLastFile(String filePath) {
+    if (filePath != null) {
+      lastFile = new File(filePath);
+    }
+  }
+
+  public static void copyFile(File srcFile, File destDir) {
+    try {
+      FileUtils.copyFile(srcFile, new File(destDir, srcFile.getName()));
+    } catch (Exception e) {
+      log.error("Could not copy " + srcFile, e);
+    }
+  }
+
+  public static boolean makeDir(String dirName, File destDir) {
+    if (dirName.isEmpty()) {
+      return false;
+    }
+
+    File newDir;
+    newDir = new File(destDir, dirName);
+    if (newDir.mkdir()) {
+      log.info("Created directory: " + newDir.getAbsolutePath());
+      return true;
+    } else {
+      log.error("Could not create directory: " + newDir.getAbsolutePath());
+    }
+
+    return false;
+  }
 
   public File getTempFileName(
       boolean asToken, boolean useNumbering, String tempFileName, TextField fileNameSuffix)
@@ -53,7 +133,9 @@ public class FileSaveUtil {
   public File getTempFileName(String tempFileName) throws IOException {
     final String _extension = AppConstants.DEFAULT_IMAGE_EXTENSION;
 
-    if (!tempFileName.endsWith(_extension)) tempFileName += _extension;
+    if (!tempFileName.endsWith(_extension)) {
+      tempFileName += _extension;
+    }
 
     return new File(System.getProperty("java.io.tmpdir"), tempFileName);
   }
@@ -77,10 +159,13 @@ public class FileSaveUtil {
 
       String leadingZeroes = "%0" + fileNameSuffix.getLength() + "d";
 
-      if (advanceFileNameSuffix)
+      if (advanceFileNameSuffix) {
         fileNameSuffix.setText(String.format(leadingZeroes, dragCounter + 1));
+      }
 
-      if (tempFileName.isEmpty()) tempFileName = AppConstants.DEFAULT_TOKEN_NAME;
+      if (tempFileName.isEmpty()) {
+        tempFileName = AppConstants.DEFAULT_TOKEN_NAME;
+      }
 
       if (lastFile != null) {
         return new File(
@@ -91,84 +176,23 @@ public class FileSaveUtil {
             String.format("%s_" + leadingZeroes + _extension, tempFileName, dragCounter));
       }
     } else {
-      if (lastFile != null)
-        if (tempFileName.isEmpty()) tempFileName = AppConstants.DEFAULT_TOKEN_NAME + _extension;
+      if (lastFile != null) {
+        if (tempFileName.isEmpty()) {
+          tempFileName = AppConstants.DEFAULT_TOKEN_NAME + _extension;
+        }
+      }
 
-      if (!tempFileName.endsWith(_extension)) tempFileName += _extension;
+      if (!tempFileName.endsWith(_extension)) {
+        tempFileName += _extension;
+      }
 
-      if (lastFile != null) lastFile = new File(lastFile.getParent(), tempFileName);
-      else lastFile = new File(tempFileName);
+      if (lastFile != null) {
+        lastFile = new File(lastFile.getParent(), tempFileName);
+      } else {
+        lastFile = new File(tempFileName);
+      }
 
       return lastFile;
     }
-  }
-
-  public static String cleanFileName(String fileName) {
-    String decodedFileName = fileName;
-
-    try {
-      decodedFileName = URLDecoder.decode(decodedFileName, "UTF-8").toString();
-    } catch (UnsupportedEncodingException e) {
-      log.error("Issue decoding file name: " + fileName, e);
-    } finally {
-      decodedFileName =
-          decodedFileName.replaceAll(
-              AppConstants.VALID_FILE_NAME_REPLACEMENT_PATTERN,
-              AppConstants.VALID_FILE_NAME_REPLACEMENT_CHARACTER);
-    }
-
-    return decodedFileName;
-  }
-
-  /*
-   * Attempt to find filename buried inside the URL e.g. https://vignette.wikia.nocookie.net/glass-cannon/images/b/bd/Barron.jpg/revision/latest/scale-to-width-down/552?cb=20170511190014
-   */
-  public static String searchURL(String urlString) {
-    String imageTypes = "";
-
-    for (String type : ImageUtil.SUPPORTED_FILE_FILTER_ARRAY) {
-      if (imageTypes.isEmpty()) imageTypes = type;
-      else imageTypes += "|" + type;
-    }
-    Pattern p = Pattern.compile("([\\w-]+)\\.(?i:" + imageTypes.replace(".", "") + ")");
-    Matcher m = p.matcher(urlString);
-
-    if (m.find()) return m.group(1);
-    else return FilenameUtils.getBaseName(urlString);
-  }
-
-  public static File getLastFile() {
-    return lastFile;
-  }
-
-  public static void setLastFile(File file) {
-    lastFile = file;
-  }
-
-  public static void setLastFile(String filePath) {
-    if (filePath != null) lastFile = new File(filePath);
-  }
-
-  public static void copyFile(File srcFile, File destDir) {
-    try {
-      FileUtils.copyFile(srcFile, new File(destDir, srcFile.getName()));
-    } catch (Exception e) {
-      log.error("Could not copy " + srcFile, e);
-    }
-  }
-
-  public static boolean makeDir(String dirName, File destDir) {
-    if (dirName.isEmpty()) return false;
-
-    File newDir;
-    newDir = new File(destDir, dirName);
-    if (newDir.mkdir()) {
-      log.info("Created directory: " + newDir.getAbsolutePath());
-      return true;
-    } else {
-      log.error("Could not create directory: " + newDir.getAbsolutePath());
-    }
-
-    return false;
   }
 }
