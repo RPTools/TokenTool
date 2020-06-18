@@ -185,7 +185,7 @@ repositories {
 
 dependencies {
     // Logging
-    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.1'
+    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.3'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.1'
 
     // Note: log4j-1.2-api versions 2.12.1+ breaks logging
