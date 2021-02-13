@@ -17,8 +17,8 @@ apply plugin: 'com.diffplug.gradle.spotless'
 
 // Definitions
 defaultTasks "clean", "build"
-sourceCompatibility = 14
-targetCompatibility = 14
+sourceCompatibility = 15
+targetCompatibility = 15
 
 // Used by gradle assemble & run tasks
 mainClassName = "net.rptools.tokentool/net.rptools.tokentool.client.TokenTool"
