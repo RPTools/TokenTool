@@ -44,9 +44,9 @@ import org.apache.logging.log4j.ThreadContext;
 
 /**
  * @author Jamz
- *     <p>To see splashscreen during testing, use JVM arg:
- *     -Djavafx.preloader=net.rptools.tokentool.client.SplashScreenLoader Otherwise splashscreen
- *     will only show when defined as JavaFX-Preloader-Class in the JAR manifest.
+ * <p>To see splashscreen during testing, use JVM arg:
+ * -Djavafx.preloader=net.rptools.tokentool.client.SplashScreenLoader Otherwise splashscreen will
+ * only show when defined as JavaFX-Preloader-Class in the JAR manifest.
  */
 public class TokenTool extends Application {
 
@@ -56,6 +56,8 @@ public class TokenTool extends Application {
   private static TokenTool_Controller tokentool_Controller;
   private static String VERSION = "";
   private static String VENDOR = "";
+  private static String ENVIRONMENT = "";
+  private static String SENTRY_DSN = "";
   private static int overlayCount = 0;
   private static int loadCount = 1;
 
@@ -74,7 +76,7 @@ public class TokenTool extends Application {
   }
 
   public static String getVersion() {
-    if (!VERSION.isEmpty()) {
+    if (!VERSION.isBlank()) {
       return VERSION;
     }
 
@@ -99,6 +101,30 @@ public class TokenTool extends Application {
     return VENDOR;
   }
 
+  public static String getEnvironment() {
+    if (!ENVIRONMENT.isEmpty()) {
+      return ENVIRONMENT;
+    }
+
+    ENVIRONMENT = System.getProperty("sentry.environment");
+
+    if (ENVIRONMENT.isBlank()) {
+      ENVIRONMENT = "development";
+    }
+
+    return ENVIRONMENT;
+  }
+
+  public static String getSentryDsn() {
+    if (!SENTRY_DSN.isEmpty()) {
+      return SENTRY_DSN;
+    }
+
+    SENTRY_DSN = System.getProperty("sentry.dsn");
+
+    return SENTRY_DSN;
+  }
+
   //  public static String getLoggerFileName() {
   //    Logger loggerImpl = log;
   //    Appender appender = loggerImpl.getAppenders().get("LogFile");
@@ -120,19 +146,29 @@ public class TokenTool extends Application {
     registry.registerServiceProvider(new com.github.jaiimageio.jpeg2000.impl.J2KImageReaderSpi());
 
     appInstance = this;
-    VERSION = getVersion();
+    getVersion();
+    getEnvironment();
+    getSentryDsn();
 
     // Lets install/update the overlays if newer version
     AppSetup.install(VERSION);
     log = LogManager.getLogger(TokenTool.class);
 
+    Sentry.init(options -> {
+      options.setDsn(SENTRY_DSN);
+      options.setEnvironment(ENVIRONMENT);
+      options.setRelease("tokentool@" + VERSION);
+    });
+
     // Log some basic info
-    log.info("Environment: " + Sentry.getStoredClient().getEnvironment());
-    if (!Sentry.getStoredClient().getEnvironment().toLowerCase().equals("production")) {
+    log.info("Environment: {}", ENVIRONMENT);
+    log.info("Sentry DSN: {}", SENTRY_DSN);
+
+    if (!Sentry.isEnabled()) {
       log.info("Not in Production mode and thus will not log any events to Sentry.io");
     }
 
-    log.info("Release: " + Sentry.getStoredClient().getRelease());
+    log.info("Release: " + VERSION);
     log.info("OS: " + ThreadContext.get("OS"));
     log.info("3D Hardware Available? " + Platform.isSupported(ConditionalFeature.SCENE3D));
 
@@ -203,9 +239,9 @@ public class TokenTool extends Application {
    * @throws IOException
    * @author Jamz
    * @since 2.0
-   *     <p>This method loads and processes all the overlays found in user.home/overlays and it can
-   *     take a minute to load as it creates thumbnail versions for the comboBox so we call this
-   *     during the init and display progress in the preLoader (splash screen).
+   * <p>This method loads and processes all the overlays found in user.home/overlays and it can
+   * take a minute to load as it creates thumbnail versions for the comboBox so we call this during
+   * the init and display progress in the preLoader (splash screen).
    */
   private TreeItem<Path> cacheOverlays(File dir, TreeItem<Path> parent) throws IOException {
     TreeItem<Path> root = new TreeItem<>(dir.toPath());
@@ -255,9 +291,9 @@ public class TokenTool extends Application {
    * Legacy, it simply launches the FX Application which calls init() then start(). Also sets/calls
    * the preloader class
    *
+   * @param args the command line arguments
    * @author Jamz
    * @since 2.0
-   * @param args the command line arguments
    */
   public static void main(String[] args) {
     System.setProperty("javafx.preloader", "net.rptools.tokentool.client.SplashScreenLoader");

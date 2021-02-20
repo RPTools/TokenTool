@@ -37,8 +37,7 @@ semver {
 version = semver.info
 
 val vendor: String by project
-val sentry_development_dsn: String by project
-val sentry_production_dsn: String by project
+val sentry_dsn: String by project
 
 // Custom properties
 ext {
@@ -47,20 +46,20 @@ ext {
     val revisionFull = semver.info.commit
 
 //    val vendor = project.property("vendor")
-    var environment = "Development"
-    var sentryDSN = sentry_development_dsn
 
-    if (!semver.info.dirty) {
-        environment = "Production"
-        sentryDSN = sentry_production_dsn
+    if (semver.info.dirty) {
+        set("sentryDSN", "")
+        set("environment", "Development")
+    } else {
+        set("sentryDSN", sentry_dsn)
+        set("environment", "Production")
     }
-
 
     // Unable to use non-semver tagging because of .msi restrictions
     var releaseDir = file("/releases/")
 
     // vendor, tagVersion, msiVersion, and DSNs defaults are set in gradle.properties
-    println("OS Detected: " + osdetector.os)
+//    println("OS Detected: " + osdetector.os)
     println("Configuring for " + project.name)
     println("version: $versionInfo")
     println("vendor: $vendor")
@@ -72,7 +71,7 @@ ext {
 
 application {
     mainClass.set("net.rptools.tokentool/net.rptools.tokentool.client.TokenTool")
-    applicationDefaultJvmArgs = listOf("-Dsentry.environment=Development", "-Dfile.encoding=UTF-8")
+    applicationDefaultJvmArgs = listOf("-Dsentry.environment=${project.rootProject.ext["environment"]}", "-Dsentry.dsn=${project.rootProject.ext["sentryDSN"]}", "-Dfile.encoding=UTF-8")
 }
 
 java {
@@ -83,7 +82,7 @@ java {
 
 javafx {
     version = "15"
-    modules = listOf("javafx.base", "javafx.controls", "javafx.fxml", "javafx.swing", "javafx.graphics")
+    modules("javafx.base", "javafx.controls", "javafx.fxml", "javafx.swing", "javafx.graphics")
 }
 
 // Default parameters for gradle run command
@@ -130,8 +129,8 @@ dependencies {
     implementation(group = "org.slf4j", name = "slf4j-simple", version = "1.7.30")
     // implementation(group = "commons-logging", name = "commons-logging", version = "1.2")
 
-    implementation(group = "io.sentry", name = "sentry", version = "1.7.30")
-    implementation(group = "io.sentry", name = "sentry-log4j2", version = "1.7.30")
+    implementation(group = "io.sentry", name = "sentry", version = "4.1.0")
+    implementation(group = "io.sentry", name = "sentry-log4j2", version = "4.1.0")
     implementation(group = "javax.servlet", name = "javax.servlet-api", version = "4.0.1")
 
     // For PDF image extraction
@@ -143,6 +142,7 @@ dependencies {
     // For pdf image extraction, specifically for jpeg2000 (jpx) support.
     implementation(group = "com.github.jai-imageio", name = "jai-imageio-core", version = "1.4.0")
     implementation(group = "com.github.jai-imageio", name = "jai-imageio-jpeg2000", version = "1.3.0")
+    implementation(group = "org.sejda.imageio", name = "webp-imageio", version = "0.1.6")
 
     // Image processing lib https://github.com/haraldk/TwelveMonkeys
     implementation(group = "com.twelvemonkeys.imageio", name = "imageio-core", version = "3.5")
