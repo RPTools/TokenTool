@@ -81,7 +81,7 @@ java {
 }
 
 javafx {
-    version = "15"
+    version = "15.0.1"
     modules("javafx.base", "javafx.controls", "javafx.fxml", "javafx.swing", "javafx.graphics")
 }
 
