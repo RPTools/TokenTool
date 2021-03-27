@@ -37,6 +37,7 @@ public class PdfViewer {
 
   private static final Logger log = LogManager.getLogger(PdfViewer.class);
   private Stage stage;
+  private PdfViewer_Controller pdfViewerController;
 
   public PdfViewer(File selectedPDF, TokenTool_Controller tokenTool_Controller) {
     Parent root;
@@ -52,11 +53,12 @@ public class PdfViewer {
       return;
     }
 
-    PdfViewer_Controller pdfViewerController = fxmlLoader.getController();
+    pdfViewerController = fxmlLoader.getController();
 
     stage = new Stage();
     Scene scene = new Scene(root);
 
+    stage.setOnCloseRequest(e -> pdfViewerController.exitApplication());
     stage.getIcons().add(new Image(getClass().getResourceAsStream(AppConstants.TOKEN_TOOL_ICON)));
     stage.initModality(Modality.WINDOW_MODAL);
     stage.setTitle(selectedPDF.getName());
@@ -81,5 +83,9 @@ public class PdfViewer {
 
     stage.show();
     pdfViewerController.loadPDF(selectedPDF, tokenTool_Controller, stage);
+  }
+
+  public PdfViewer_Controller getPdfViewerController() {
+    return pdfViewerController;
   }
 }

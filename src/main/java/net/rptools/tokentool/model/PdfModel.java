@@ -24,7 +24,9 @@ import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
@@ -99,6 +101,14 @@ public class PdfModel {
     }
   }
 
+  public boolean isClosed() {
+    return document.getDocument().isClosed();
+  }
+
+  public int getPdfPageCount() {
+    return document.getNumberOfPages();
+  }
+
   public ArrayList<ToggleButton> extractImages(int currentPageIndex) {
     try {
       // imageExtractor.interrupt();
@@ -107,6 +117,23 @@ public class PdfModel {
       log.error("Error extracting images from PDF...", e);
       return null;
     }
+  }
+
+  public void extractAllImagesFromPage(String filePath, String imageFormat, int page,
+      double imageMinDimension) {
+    try {
+      if (!document.getDocument().isClosed()) {
+        imageExtractor.extractAllImagesFromPage(filePath, imageFormat, page, imageMinDimension);
+      }
+    } catch (IOException e) {
+      log.error("Error extracting images from PDF...", e);
+      interrupt();
+      close();
+    }
+  }
+
+  public void resetImageHashTracker() {
+    imageExtractor.resetImageHashTracker();
   }
 
   public void interrupt() {

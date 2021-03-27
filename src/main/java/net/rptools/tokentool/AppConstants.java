@@ -15,6 +15,8 @@
 package net.rptools.tokentool;
 
 import java.io.File;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -41,10 +43,13 @@ public class AppConstants {
 
   public static final String RPTOOLS_URL = "http://www.rptools.net";
 
-  public static final String DEFAULT_IMAGE_EXTENSION = ".png";
-  public static final String DEFAULT_IMAGE_EXTENSION_DESCRIPTION = "PNG Image";
+  public static final ObservableList VALID_IMAGE_EXTENSIONS = FXCollections
+      .observableArrayList("webp", "png", "jpg", "gif", "tif");
+  public static final String DEFAULT_IMAGE_EXTENSION = "webp";
+  public static final String DEFAULT_IMAGE_EXTENSION_DESCRIPTION = "WebP Image";
   public static final String DEFAULT_TOKEN_NAME = "token";
   public static final String DEFAULT_FILE_NAME_SUFFIX = "0001";
+  public static final String DEFAULT_PDF_IMAGE_MIN_EXPORT_SIZE = "";
 
   public static final String VALID_FILE_NAME_PATTERN = "[a-zA-Z0-9._ `~!@#$%^&()\\-=+\\[\\]{}',]*";
   public static final String VALID_FILE_NAME_REPLACEMENT_PATTERN =
@@ -65,7 +70,7 @@ public class AppConstants {
   public static final File OVERLAY_DIR = AppSetup.getAppHome("overlays");
   public static final File CACHE_DIR = AppSetup.getAppHome("cache");
   public static final ExtensionFilter IMAGE_EXTENSION_FILTER =
-      new ExtensionFilter(DEFAULT_IMAGE_EXTENSION_DESCRIPTION, "*" + DEFAULT_IMAGE_EXTENSION);
+      new ExtensionFilter(DEFAULT_IMAGE_EXTENSION_DESCRIPTION, "*." + DEFAULT_IMAGE_EXTENSION);
   public static final double DEFAULT_PORTRAIT_TRANSPARENCY = 1;
   public static final double DEFAULT_PORTRAIT_BLUR = 0;
   public static final double DEFAULT_PORTRAIT_GLOW = 0;

@@ -50,6 +50,7 @@ import org.apache.logging.log4j.ThreadContext;
  */
 public class TokenTool extends Application {
 
+  private static final boolean DEV_MODE_FAST_LOAD = false;  // Skip overlay cache load if true
   private static TokenTool appInstance;
   private static Logger log; // Don't instantiate until we set user_home/logs directory in AppSetup
   private static BorderPane root;
@@ -246,6 +247,9 @@ public class TokenTool extends Application {
   private TreeItem<Path> cacheOverlays(File dir, TreeItem<Path> parent) throws IOException {
     TreeItem<Path> root = new TreeItem<>(dir.toPath());
     root.setExpanded(false);
+
+    if(DEV_MODE_FAST_LOAD)
+      return root;
 
     log.debug("caching " + dir.getAbsolutePath());
 
