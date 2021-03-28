@@ -17,8 +17,10 @@ package net.rptools.tokentool.client;
 import io.sentry.Sentry;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import javafx.application.Application;
 import javafx.application.ConditionalFeature;
@@ -55,75 +57,47 @@ public class TokenTool extends Application {
   private static Logger log; // Don't instantiate until we set user_home/logs directory in AppSetup
   private static BorderPane root;
   private static TokenTool_Controller tokentool_Controller;
-  private static String VERSION = "";
-  private static String VENDOR = "";
-  private static String ENVIRONMENT = "";
-  private static String SENTRY_DSN = "";
   private static int overlayCount = 0;
   private static int loadCount = 1;
 
   private static TreeItem<Path> overlayTreeItems;
   private static Stage stage;
 
+  private static final Properties buildProperties = new Properties();
+
   static {
     // This will inject additional data tags in log4j2 which will be picked up by Sentry.io
     System.setProperty("log4j2.isThreadContextMapInheritable", "true");
     ThreadContext.put(
         "OS", System.getProperty("os.name")); // Added to the JavaFX Application Thread thread...
+
+    InputStream inputStream = ClassLoader.getSystemResourceAsStream("build.properties");
+    try {
+      buildProperties.load(inputStream);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
+
 
   public static TokenTool getInstance() {
     return appInstance;
   }
 
   public static String getVersion() {
-    if (!VERSION.isBlank()) {
-      return VERSION;
-    }
-
-    VERSION = "DEVELOPMENT";
-
-    if (TokenTool.class.getPackage().getImplementationVersion() != null) {
-      VERSION = TokenTool.class.getPackage().getImplementationVersion().trim();
-    }
-
-    return VERSION;
+    return buildProperties.getProperty("version", "DEVELOPMENT");
   }
 
   public static String getVendor() {
-    if (!VENDOR.isEmpty()) {
-      return VENDOR;
-    }
-
-    if (TokenTool.class.getPackage().getImplementationVendor() != null) {
-      VENDOR = TokenTool.class.getPackage().getImplementationVendor().trim();
-    }
-
-    return VENDOR;
+    return buildProperties.getProperty("vendor", "RPTools");
   }
 
   public static String getEnvironment() {
-    if (!ENVIRONMENT.isEmpty()) {
-      return ENVIRONMENT;
-    }
-
-    ENVIRONMENT = System.getProperty("sentry.environment");
-
-    if (ENVIRONMENT.isBlank()) {
-      ENVIRONMENT = "development";
-    }
-
-    return ENVIRONMENT;
+    return buildProperties.getProperty("environment", "development");
   }
 
   public static String getSentryDsn() {
-    if (!SENTRY_DSN.isEmpty()) {
-      return SENTRY_DSN;
-    }
-
-    SENTRY_DSN = System.getProperty("sentry.dsn");
-
-    return SENTRY_DSN;
+    return buildProperties.getProperty("sentryDSN", "");
   }
 
   //  public static String getLoggerFileName() {
@@ -147,29 +121,27 @@ public class TokenTool extends Application {
     registry.registerServiceProvider(new com.github.jaiimageio.jpeg2000.impl.J2KImageReaderSpi());
 
     appInstance = this;
-    getVersion();
-    getEnvironment();
-    getSentryDsn();
 
     // Lets install/update the overlays if newer version
-    AppSetup.install(VERSION);
+    AppSetup.install(getVersion());
     log = LogManager.getLogger(TokenTool.class);
 
     Sentry.init(options -> {
-      options.setDsn(SENTRY_DSN);
-      options.setEnvironment(ENVIRONMENT);
-      options.setRelease("tokentool@" + VERSION);
+      options.setDsn(getSentryDsn());
+      options.setEnvironment(getEnvironment());
+      options.setRelease("tokentool@" + getVersion());
     });
 
     // Log some basic info
-    log.info("Environment: {}", ENVIRONMENT);
-    log.info("Sentry DSN: {}", SENTRY_DSN);
+    log.info("Environment: {}", getEnvironment());
+    log.info("Sentry DSN: {}", getSentryDsn());
 
     if (!Sentry.isEnabled()) {
       log.info("Not in Production mode and thus will not log any events to Sentry.io");
     }
 
-    log.info("Release: " + VERSION);
+    log.info("Vendor: " + getVendor());
+    log.info("Release: " + getVersion());
     log.info("OS: " + ThreadContext.get("OS"));
     log.info("3D Hardware Available? " + Platform.isSupported(ConditionalFeature.SCENE3D));
 
@@ -248,8 +220,7 @@ public class TokenTool extends Application {
     TreeItem<Path> root = new TreeItem<>(dir.toPath());
     root.setExpanded(false);
 
-    if(DEV_MODE_FAST_LOAD)
-      return root;
+    if (DEV_MODE_FAST_LOAD) { return root; }
 
     log.debug("caching " + dir.getAbsolutePath());
 
