@@ -975,6 +975,11 @@ public class TokenTool_Controller {
       return;
     }
 
+    double fineAdjustment = 1;
+    if (event.isControlDown()) {
+      fineAdjustment = 0.1;
+    }
+
     if (event.isShiftDown()) {
       // Note: OK, this is stupid but on Windows shift + mousewheel returns X delta but on Ubuntu it
       // returns Y delta...
@@ -982,6 +987,8 @@ public class TokenTool_Controller {
       if (delta == 0) {
         delta = event.getDeltaX();
       }
+
+      delta = delta * fineAdjustment;
 
       double r = getCurrentLayer().getRotate() + delta / 20;
 
@@ -991,7 +998,8 @@ public class TokenTool_Controller {
 
       getCurrentLayer().setRotate(r);
     } else {
-      double scale = getCurrentLayer().getScaleY() * Math.pow(1.001, event.getDeltaY());
+      double scale =
+          getCurrentLayer().getScaleY() * Math.pow(1.001, (event.getDeltaY() * fineAdjustment));
 
       getCurrentLayer().setScaleX(scale);
       getCurrentLayer().setScaleY(scale);
