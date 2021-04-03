@@ -9,12 +9,6 @@ plugins {
     id("io.wusa.semver-git-plugin") version "2.3.7"
 }
 
-// Apply the java plugin to add support for Java
-//apply(plugin = "base")
-//apply(plugin = "application")
-//apply(plugin = "java")
-//apply(plugin = "com.diffplug.spotless")
-
 // Used by gradle assemble & run tasks
 val mainClassName = "net.rptools.tokentool.client.TokenTool"
 
@@ -32,7 +26,6 @@ semver {
     }
 }
 
-//version = semver.info
 project.version = semver.info
 
 val vendor: String by project
@@ -189,12 +182,11 @@ jlink {
 
     launcher {
         name = "TokenTool"
-        args = listOf("-v=2.2.2", "-vendor=$vendor")
+        args = listOf("-v=${semver.info}", "-vendor=$vendor")
         jvmArgs = listOf("-Dfile.encoding=UTF-8")
     }
 
     moduleName.set("net.rptools.tokentool")
-//    application.mainModule.set("net.rptools.tokentool")
 
     jpackage {
         val os = org.gradle.internal.os.OperatingSystem.current()
@@ -213,7 +205,7 @@ jlink {
                 "--description", project.description,
                 "--copyright", "Copyright 2000-2020 RPTools.net",
                 "--license-file", "package/license/COPYING.AFFERO",
-                "--app-version", "2.2.2",
+                "--app-version", "${semver.info}",
                 "--vendor", vendor
         )
 
@@ -244,7 +236,7 @@ jlink {
 
             if (installerType == "deb") {
                 installerOptions.addAll(listOf(
-                        "--linux-deb-maintainer", "admin@rptools.ne"
+                        "--linux-deb-maintainer", "admin@rptools.net"
                 ))
             }
 
