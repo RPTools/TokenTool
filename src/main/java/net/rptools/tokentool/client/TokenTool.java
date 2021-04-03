@@ -46,13 +46,13 @@ import org.apache.logging.log4j.ThreadContext;
 
 /**
  * @author Jamz
- * <p>To see splashscreen during testing, use JVM arg:
- * -Djavafx.preloader=net.rptools.tokentool.client.SplashScreenLoader Otherwise splashscreen will
- * only show when defined as JavaFX-Preloader-Class in the JAR manifest.
+ *     <p>To see splashscreen during testing, use JVM arg:
+ *     -Djavafx.preloader=net.rptools.tokentool.client.SplashScreenLoader Otherwise splashscreen
+ *     will only show when defined as JavaFX-Preloader-Class in the JAR manifest.
  */
 public class TokenTool extends Application {
 
-  private static final boolean DEV_MODE_FAST_LOAD = false;  // Skip overlay cache load if true
+  private static final boolean DEV_MODE_FAST_LOAD = false; // Skip overlay cache load if true
   private static TokenTool appInstance;
   private static Logger log; // Don't instantiate until we set user_home/logs directory in AppSetup
   private static BorderPane root;
@@ -78,7 +78,6 @@ public class TokenTool extends Application {
       e.printStackTrace();
     }
   }
-
 
   public static TokenTool getInstance() {
     return appInstance;
@@ -126,11 +125,12 @@ public class TokenTool extends Application {
     AppSetup.install(getVersion());
     log = LogManager.getLogger(TokenTool.class);
 
-    Sentry.init(options -> {
-      options.setDsn(getSentryDsn());
-      options.setEnvironment(getEnvironment());
-      options.setRelease("tokentool@" + getVersion());
-    });
+    Sentry.init(
+        options -> {
+          options.setDsn(getSentryDsn());
+          options.setEnvironment(getEnvironment());
+          options.setRelease("tokentool@" + getVersion());
+        });
 
     // Log some basic info
     log.info("Environment: {}", getEnvironment());
@@ -212,15 +212,17 @@ public class TokenTool extends Application {
    * @throws IOException
    * @author Jamz
    * @since 2.0
-   * <p>This method loads and processes all the overlays found in user.home/overlays and it can
-   * take a minute to load as it creates thumbnail versions for the comboBox so we call this during
-   * the init and display progress in the preLoader (splash screen).
+   *     <p>This method loads and processes all the overlays found in user.home/overlays and it can
+   *     take a minute to load as it creates thumbnail versions for the comboBox so we call this
+   *     during the init and display progress in the preLoader (splash screen).
    */
   private TreeItem<Path> cacheOverlays(File dir, TreeItem<Path> parent) throws IOException {
     TreeItem<Path> root = new TreeItem<>(dir.toPath());
     root.setExpanded(false);
 
-    if (DEV_MODE_FAST_LOAD) { return root; }
+    if (DEV_MODE_FAST_LOAD) {
+      return root;
+    }
 
     log.debug("caching " + dir.getAbsolutePath());
 

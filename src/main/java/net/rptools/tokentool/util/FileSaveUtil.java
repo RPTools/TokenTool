@@ -113,9 +113,14 @@ public class FileSaveUtil {
   }
 
   public File getTempFileName(
-      boolean asToken, boolean useNumbering, String tempFileName, String imageExtension, TextField fileNameSuffix)
+      boolean asToken,
+      boolean useNumbering,
+      String tempFileName,
+      String imageExtension,
+      TextField fileNameSuffix)
       throws IOException {
-    return getTempFileName(asToken, useNumbering, tempFileName, imageExtension, fileNameSuffix, true);
+    return getTempFileName(
+        asToken, useNumbering, tempFileName, imageExtension, fileNameSuffix, true);
   }
 
   public File getTempFileName(
@@ -128,7 +133,13 @@ public class FileSaveUtil {
       throws IOException {
     return new File(
         System.getProperty("java.io.tmpdir"),
-        getFileName(asToken, useNumbering, tempFileName, imageExtension, fileNameSuffix, advanceFileNameSuffix)
+        getFileName(
+                asToken,
+                useNumbering,
+                tempFileName,
+                imageExtension,
+                fileNameSuffix,
+                advanceFileNameSuffix)
             .getName());
   }
 
@@ -150,9 +161,8 @@ public class FileSaveUtil {
       TextField fileNameSuffix,
       boolean advanceFileNameSuffix)
       throws IOException {
-//    final String _extension = AppConstants.DEFAULT_IMAGE_EXTENSION;
 
-    if(!imageExtension.startsWith(".")) {
+    if (!imageExtension.startsWith(".")) {
       imageExtension = "." + imageExtension;
     } else {
       imageExtension = "." + imageExtension;

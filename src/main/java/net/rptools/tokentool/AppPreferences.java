@@ -135,16 +135,20 @@ public class AppPreferences {
     prefs.putBoolean(SAVE_PORTRAIT_ON_DRAG, tokentool_Controller.getSavePortraitOnDragCheckbox());
     prefs.putBoolean(USE_BACKGROUND_ON_DRAG, tokentool_Controller.getUseBackgroundOnDragCheckbox());
     prefs.put(TOKEN_IMAGE_SAVE_FORMAT, tokentool_Controller.getFileSaveFormatChoiceboxSelection());
-    prefs.put(PORTRAIT_IMAGE_SAVE_FORMAT,
-        tokentool_Controller.getPortraitSaveFormatChoiceboxSelection());
+    prefs.put(
+        PORTRAIT_IMAGE_SAVE_FORMAT, tokentool_Controller.getPortraitSaveFormatChoiceboxSelection());
 
     if (tokentool_Controller.getPdfViewer() != null) {
-      prefs.put(PDF_IMAGE_SAVE_FORMAT,
-          tokentool_Controller.getPdfViewer()
+      prefs.put(
+          PDF_IMAGE_SAVE_FORMAT,
+          tokentool_Controller
+              .getPdfViewer()
               .getPdfViewerController()
               .getPdfSaveFormatChoiceBoxSelection());
-      prefs.put(PDF_IMAGE_MIN_EXPORT_SIZE,
-          tokentool_Controller.getPdfViewer()
+      prefs.put(
+          PDF_IMAGE_MIN_EXPORT_SIZE,
+          tokentool_Controller
+              .getPdfViewer()
               .getPdfViewerController()
               .getPdfMinDimensionTextFieldText());
     }
@@ -156,7 +160,9 @@ public class AppPreferences {
 
     log.debug("...saving recent overlays");
     int i = 1;
-    for (Path path : recentOverlays.keySet()) { prefs.put(RECENT_OVERLAY + i++, path.toString()); }
+    for (Path path : recentOverlays.keySet()) {
+      prefs.put(RECENT_OVERLAY + i++, path.toString());
+    }
 
     // Save location of save
     log.debug("...saving last file save location");

@@ -15,11 +15,7 @@ plugins {
 //apply(plugin = "java")
 //apply(plugin = "com.diffplug.spotless")
 
-// Definitions
-//defaultTasks "clean", "build"
-
 // Used by gradle assemble & run tasks
-//val mainClassName = "net.rptools.tokentool/net.rptools.tokentool.client.TokenTool"
 val mainClassName = "net.rptools.tokentool.client.TokenTool"
 
 semver {
@@ -37,7 +33,6 @@ semver {
 }
 
 //version = semver.info
-//version = "2.2.3"
 project.version = semver.info
 
 val vendor: String by project
@@ -61,10 +56,6 @@ ext {
         set("environment", "Production")
     }
 
-    // Unable to use non-semver tagging because of .msi restrictions
-    var releaseDir = file("/releases/")
-
-    // vendor, tagVersion, msiVersion, and DSNs defaults are set in gradle.properties
     println("OS Detected: $os")
     println("Configuring for ${project.name}")
     println("version: $versionInfo")
@@ -77,8 +68,7 @@ ext {
 
 application {
     mainClass.set("net.rptools.tokentool.client.TokenTool")
-//    applicationDefaultJvmArgs = listOf("-Dsentry.environment=${project.rootProject.ext["environment"]}", "-Dsentry.dsn=${project.rootProject.ext["sentryDSN"]}", "-Dfile.encoding=UTF-8")
-    applicationDefaultJvmArgs = listOf("-Dsentry.environment=$environment", "-Dsentry.dsn=$sentryDSN", "-Dfile.encoding=UTF-8", "-Dversion=${semver.info}", "-Dvendor=$vendor")
+    applicationDefaultJvmArgs = listOf("-Dfile.encoding=UTF-8")
 
 }
 
@@ -93,31 +83,21 @@ javafx {
     modules = listOf("javafx.base", "javafx.controls", "javafx.fxml", "javafx.swing", "javafx.graphics")
 }
 
-// Default parameters for gradle run command
-//run {
-//    args = listOf("-v=2.2.5", "-vendor=" + vendor)
-//    applicationDefaultJvmArgs = listOf("-Dsentry.environment=Development", "-Dfile.encoding=UTF-8")
-//
-//    if (System.getProperty("exec.args") != null) {
-//        args System . getProperty ("exec.args").split()
-//    }
-//}
+spotless {
+    java {
+        licenseHeaderFile("${projectDir}/spotless.license.java")
+        googleJavaFormat()
+    }
 
-//spotless {
-//    java {
-//        licenseHeaderFile "spotless.license.java"
-//        googleJavaFormat()
-//    }
-//
-//    format "misc", {
-//    target "**/*.gradle", "**/.gitignore"
-//
-//    // spotless has built-in rules for most basic formatting tasks
-//    trimTrailingWhitespace()
-//    // or spaces. Takes an integer argument if you don"t like 4
-//    indentWithSpaces(4)
-//}
-//}
+    format("misc") {
+        target("**/*.gradle", "**/.gitignore")
+
+        // spotless has built-in rules for most basic formatting tasks
+        trimTrailingWhitespace()
+        // or spaces. Takes an integer argument if you don"t like 4
+        indentWithSpaces(4)
+    }
+}
 
 
 // In this section you declare where to find the dependencies of your project

@@ -20,7 +20,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import javafx.embed.swing.SwingFXUtils;
@@ -79,7 +78,6 @@ public final class ExtractImagesFromPDF {
   private boolean isRunning;
   private boolean interrupt;
 
-
   public ExtractImagesFromPDF(
       PDDocument document, String pdfName, TokenTool_Controller tokenTool_Controller) {
     this.tokenTool_Controller = tokenTool_Controller;
@@ -101,8 +99,8 @@ public final class ExtractImagesFromPDF {
     return imageButtons;
   }
 
-  public void extractAllImagesFromPage(String filePath, String imageFormat, int pageNumber,
-      double imageMinDimension)
+  public void extractAllImagesFromPage(
+      String filePath, String imageFormat, int pageNumber, double imageMinDimension)
       throws IOException {
     this.fileSavePath = filePath;
     this.imageFormat = imageFormat;
@@ -176,9 +174,12 @@ public final class ExtractImagesFromPDF {
             } catch (NoSuchAlgorithmException e) {
               e.printStackTrace();
             } finally {
-              if (!skipImage && image.getWidth() > imageMinDimension
+              if (!skipImage
+                  && image.getWidth() > imageMinDimension
                   && image.getHeight() > imageMinDimension) {
-                ImageIO.write(SwingFXUtils.fromFXImage(image, null), imageFormat,
+                ImageIO.write(
+                    SwingFXUtils.fromFXImage(image, null),
+                    imageFormat,
                     new File(fileSavePath, name + "." + imageFormat));
               }
             }
@@ -269,7 +270,9 @@ public final class ExtractImagesFromPDF {
       WritableImage image = SwingFXUtils.toFXImage(xObject.getImage(), null);
       if (extractOnly) {
         if (image.getWidth() > imageMinDimension && image.getHeight() > imageMinDimension) {
-          ImageIO.write(SwingFXUtils.fromFXImage(image, null), imageFormat,
+          ImageIO.write(
+              SwingFXUtils.fromFXImage(image, null),
+              imageFormat,
               new File(fileSavePath, name + "." + imageFormat));
         }
       } else {
@@ -291,11 +294,14 @@ public final class ExtractImagesFromPDF {
     imageButton.setGraphic(imageViewNode);
     imageButton.setId(imageName);
 
-//    double imagePixels = buttonImage.getWidth() * buttonImage.getHeight();
-//    imageButton.setText(buttonImage.getWidth() + "x" + buttonImage.getHeight());
+    //    double imagePixels = buttonImage.getWidth() * buttonImage.getHeight();
+    //    imageButton.setText(buttonImage.getWidth() + "x" + buttonImage.getHeight());
 
-    String imageFormat = tokenTool_Controller.getPdfViewer().getPdfViewerController()
-        .getPdfSaveFormatChoiceBoxSelection();
+    String imageFormat =
+        tokenTool_Controller
+            .getPdfViewer()
+            .getPdfViewerController()
+            .getPdfSaveFormatChoiceBoxSelection();
 
     // Can also drag image to TokenTool pane OR any other place, like MapTool!
     imageButton.setOnDragDetected(

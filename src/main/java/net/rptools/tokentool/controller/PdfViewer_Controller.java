@@ -65,36 +65,21 @@ public class PdfViewer_Controller implements Initializable {
   private static final Logger log = LogManager.getLogger(PdfViewer_Controller.class);
   private static ExecutorService renderPdfPageService;
   private static ExecutorService extractImagesService;
-  @FXML
-  private AnchorPane pdfAnchorPane;
-  @FXML
-  private Pagination pdfViewPagination;
-  @FXML
-  private StackPane pdfSideStackPane;
-  @FXML
-  private TextField pageNumberTextField;
-  @FXML
-  private TilePane imageTilePane;
-  @FXML
-  private ProgressIndicator pdfProgressIndicator;
-  @FXML
-  private ProgressIndicator extractProgressIndicator;
-  @FXML
-  private ProgressBar extractAllImagesProgressBar;
-  @FXML
-  private Label extractAllImagesLabel;
-  @FXML
-  private Pane viewPortPane;
-  @FXML
-  private ScrollPane imageTileScrollpane;
-  @FXML
-  private ChoiceBox<String> pdfSaveFormatChoicebox;
-  @FXML
-  private TextField pdfMinDimensionTextField;
-  @FXML
-  private Button savePageButton;
-  @FXML
-  private Button saveAllButton;
+  @FXML private AnchorPane pdfAnchorPane;
+  @FXML private Pagination pdfViewPagination;
+  @FXML private StackPane pdfSideStackPane;
+  @FXML private TextField pageNumberTextField;
+  @FXML private TilePane imageTilePane;
+  @FXML private ProgressIndicator pdfProgressIndicator;
+  @FXML private ProgressIndicator extractProgressIndicator;
+  @FXML private ProgressBar extractAllImagesProgressBar;
+  @FXML private Label extractAllImagesLabel;
+  @FXML private Pane viewPortPane;
+  @FXML private ScrollPane imageTileScrollpane;
+  @FXML private ChoiceBox<String> pdfSaveFormatChoicebox;
+  @FXML private TextField pdfMinDimensionTextField;
+  @FXML private Button savePageButton;
+  @FXML private Button saveAllButton;
 
   private PdfModel pdfModel;
   private final ImageView pdfImageView = new ImageView();
@@ -105,60 +90,60 @@ public class PdfViewer_Controller implements Initializable {
   public void initialize(URL url, ResourceBundle rb) {
     assert pdfAnchorPane != null
         : "fx:id=\"pdfAnchorPane\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
     assert pdfViewPagination != null
         : "fx:id=\"pdfViewPagination\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
     assert pdfSideStackPane != null
         : "fx:id=\"pdfSideStackPane\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
     assert pageNumberTextField != null
         : "fx:id=\"pageNumberTextField\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
     assert imageTilePane != null
         : "fx:id=\"imageFlowPane\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
     assert pdfProgressIndicator != null
         : "fx:id=\"pdfProgressIndicator\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
     assert extractProgressIndicator != null
         : "fx:id=\"extractProgressIndicator\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
     assert extractAllImagesProgressBar != null
         : "fx:id=\"extractAllImagesProgressBar\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
     assert extractAllImagesLabel != null
         : "fx:id=\"extractAllImagesLabel\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
     assert viewPortPane != null
         : "fx:id=\"viewPortPane\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
     assert imageTileScrollpane != null
         : "fx:id=\"imageTileScrollpane\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
     assert pdfSaveFormatChoicebox != null
         : "fx:id=\"pdfSaveFormatChoicebox\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
     assert savePageButton != null
         : "fx:id=\"savePageButton\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
     assert saveAllButton != null
         : "fx:id=\"saveAllButton\" was not injected: check your FXML file '"
-        + AppConstants.PDF_VIEW_FXML
-        + "'.";
+            + AppConstants.PDF_VIEW_FXML
+            + "'.";
 
     pdfProgressIndicator.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
     extractProgressIndicator.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
@@ -168,11 +153,14 @@ public class PdfViewer_Controller implements Initializable {
 
     pdfMinDimensionTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter()));
 
-    pdfMinDimensionTextField.focusedProperty().addListener((ov, oldV, newV) -> {
-      if (!newV) {
-        pdfMinDimensionTextField_onAction();
-      }
-    });
+    pdfMinDimensionTextField
+        .focusedProperty()
+        .addListener(
+            (ov, oldV, newV) -> {
+              if (!newV) {
+                pdfMinDimensionTextField_onAction();
+              }
+            });
 
     renderPdfPageService = Executors.newWorkStealingPool();
     extractImagesService = Executors.newSingleThreadExecutor();
@@ -195,11 +183,15 @@ public class PdfViewer_Controller implements Initializable {
         .fitWidthProperty()
         .bind(Bindings.subtract(stage.widthProperty(), imageTileScrollpane.getWidth() + 30));
 
-    pdfSaveFormatChoicebox.getSelectionModel().select(AppPreferences
-        .getPreference(AppPreferences.PDF_IMAGE_SAVE_FORMAT, AppConstants.DEFAULT_IMAGE_EXTENSION));
+    pdfSaveFormatChoicebox
+        .getSelectionModel()
+        .select(
+            AppPreferences.getPreference(
+                AppPreferences.PDF_IMAGE_SAVE_FORMAT, AppConstants.DEFAULT_IMAGE_EXTENSION));
 
-    pdfMinDimensionTextField.setText(AppPreferences
-        .getPreference(AppPreferences.PDF_IMAGE_MIN_EXPORT_SIZE,
+    pdfMinDimensionTextField.setText(
+        AppPreferences.getPreference(
+            AppPreferences.PDF_IMAGE_MIN_EXPORT_SIZE,
             AppConstants.DEFAULT_PDF_IMAGE_MIN_EXPORT_SIZE));
 
     pdfViewPagination.setPageFactory(
@@ -274,7 +266,9 @@ public class PdfViewer_Controller implements Initializable {
   void pdfMinDimensionTextField_onAction() {
     int currentPage = pdfViewPagination.getCurrentPageIndex();
     int otherPage = 0;
-    if (currentPage == 0) { otherPage = pdfViewPagination.getPageCount(); }
+    if (currentPage == 0) {
+      otherPage = pdfViewPagination.getPageCount();
+    }
 
     pdfViewPagination.setCurrentPageIndex(otherPage);
     pdfViewPagination.setCurrentPageIndex(currentPage);
@@ -288,8 +282,8 @@ public class PdfViewer_Controller implements Initializable {
 
     String imageFormat = getPdfSaveFormatChoiceBoxSelection();
     DirectoryChooser directoryChooser = new DirectoryChooser();
-    File lastDirectory = new File(
-        AppPreferences.getPreference(AppPreferences.LAST_PDF_EXPORT_LOCATION, ""));
+    File lastDirectory =
+        new File(AppPreferences.getPreference(AppPreferences.LAST_PDF_EXPORT_LOCATION, ""));
 
     if (lastDirectory.exists()) {
       directoryChooser.setInitialDirectory(lastDirectory);
@@ -298,30 +292,30 @@ public class PdfViewer_Controller implements Initializable {
     File selectedDirectory = directoryChooser.showDialog(pdfAnchorPane.getScene().getWindow());
 
     if (selectedDirectory != null) {
-      AppPreferences
-          .setPreference(AppPreferences.LAST_PDF_EXPORT_LOCATION, selectedDirectory.getPath());
+      AppPreferences.setPreference(
+          AppPreferences.LAST_PDF_EXPORT_LOCATION, selectedDirectory.getPath());
 
-      imageTilePane.getChildren()
-          .stream()
+      imageTilePane.getChildren().stream()
           .filter(node -> node instanceof ToggleButton)
           .map(node -> (ToggleButton) node)
-          .forEach(toggleButton -> {
-            String imageName = toggleButton.getId();
-            log.info("Button image name is: {}", imageName);
-            Image buttonImage = ((ImageView) toggleButton.getGraphic()).getImage();
+          .forEach(
+              toggleButton -> {
+                String imageName = toggleButton.getId();
+                log.info("Button image name is: {}", imageName);
+                Image buttonImage = ((ImageView) toggleButton.getGraphic()).getImage();
 
-            try {
-              File tempImageFile;
-              tempImageFile = new File(selectedDirectory, imageName + "." + imageFormat);
+                try {
+                  File tempImageFile;
+                  tempImageFile = new File(selectedDirectory, imageName + "." + imageFormat);
 
-              ImageIO
-                  .write(SwingFXUtils.fromFXImage(buttonImage, null), imageFormat, tempImageFile);
-            } catch (IOException e) {
-              log.error("Unable to write token to file: " + imageName, e);
-            } catch (Exception e) {
-              log.error(e);
-            }
-          });
+                  ImageIO.write(
+                      SwingFXUtils.fromFXImage(buttonImage, null), imageFormat, tempImageFile);
+                } catch (IOException e) {
+                  log.error("Unable to write token to file: " + imageName, e);
+                } catch (Exception e) {
+                  log.error(e);
+                }
+              });
     }
   }
 
@@ -331,8 +325,8 @@ public class PdfViewer_Controller implements Initializable {
 
     String imageFormat = getPdfSaveFormatChoiceBoxSelection();
     DirectoryChooser directoryChooser = new DirectoryChooser();
-    File lastDirectory = new File(
-        AppPreferences.getPreference(AppPreferences.LAST_PDF_EXPORT_LOCATION, ""));
+    File lastDirectory =
+        new File(AppPreferences.getPreference(AppPreferences.LAST_PDF_EXPORT_LOCATION, ""));
 
     if (lastDirectory.exists()) {
       directoryChooser.setInitialDirectory(lastDirectory);
@@ -341,55 +335,53 @@ public class PdfViewer_Controller implements Initializable {
     File selectedDirectory = directoryChooser.showDialog(pdfAnchorPane.getScene().getWindow());
 
     if (selectedDirectory != null) {
-      AppPreferences
-          .setPreference(AppPreferences.LAST_PDF_EXPORT_LOCATION, selectedDirectory.getPath());
+      AppPreferences.setPreference(
+          AppPreferences.LAST_PDF_EXPORT_LOCATION, selectedDirectory.getPath());
 
       pdfViewPagination.setOpacity(0.2);
       pdfViewPagination.setDisable(true);
       pdfSideStackPane.setOpacity(0.2);
       pdfSideStackPane.setDisable(true);
 
-      Task task = new Task<Void>() {
-        @Override
-        public Void call() {
-          final int pageCount = pdfModel.getPdfPageCount();
+      Task task =
+          new Task<Void>() {
+            @Override
+            public Void call() {
+              final int pageCount = pdfModel.getPdfPageCount();
 
-          double imageMinDimension = 0;
-          if (!pdfMinDimensionTextField.getText().isBlank()) {
-            imageMinDimension = Double.parseDouble(pdfMinDimensionTextField.getText());
-          }
+              double imageMinDimension = 0;
+              if (!pdfMinDimensionTextField.getText().isBlank()) {
+                imageMinDimension = Double.parseDouble(pdfMinDimensionTextField.getText());
+              }
 
-          updateProgress(0, pageCount);
-          extractAllImagesProgressBar.setVisible(true);
-          extractAllImagesLabel.setVisible(true);
+              updateProgress(0, pageCount);
+              extractAllImagesProgressBar.setVisible(true);
+              extractAllImagesLabel.setVisible(true);
 
-          for (int page = 0; page < pageCount; page++) {
-            pdfModel.extractAllImagesFromPage(
-                selectedDirectory.getPath(),
-                imageFormat,
-                page,
-                imageMinDimension);
-            updateProgress(page, pageCount);
-            updateMessage("Extracting page " + page + " of " + pageCount);
+              for (int page = 0; page < pageCount; page++) {
+                pdfModel.extractAllImagesFromPage(
+                    selectedDirectory.getPath(), imageFormat, page, imageMinDimension);
+                updateProgress(page, pageCount);
+                updateMessage("Extracting page " + page + " of " + pageCount);
 
-            if(pdfModel.isClosed()) {
-              break;
+                if (pdfModel.isClosed()) {
+                  break;
+                }
+              }
+
+              pdfModel.resetImageHashTracker();
+
+              extractAllImagesProgressBar.setVisible(false);
+              extractAllImagesLabel.setVisible(false);
+
+              pdfViewPagination.setDisable(false);
+              pdfViewPagination.setOpacity(1.0);
+              pdfSideStackPane.setDisable(false);
+              pdfSideStackPane.setOpacity(1.0);
+
+              return null;
             }
-          }
-
-          pdfModel.resetImageHashTracker();
-
-          extractAllImagesProgressBar.setVisible(false);
-          extractAllImagesLabel.setVisible(false);
-
-          pdfViewPagination.setDisable(false);
-          pdfViewPagination.setOpacity(1.0);
-          pdfSideStackPane.setDisable(false);
-          pdfSideStackPane.setOpacity(1.0);
-
-          return null;
-        }
-      };
+          };
 
       extractAllImagesProgressBar.progressProperty().bind(task.progressProperty());
       extractAllImagesLabel.textProperty().bind(task.messageProperty());
@@ -436,13 +428,14 @@ public class PdfViewer_Controller implements Initializable {
       } else {
         pdfProgressIndicator.setVisible(true);
 
-        Platform.runLater(() -> {
-          FadeTransition fadeTransition =
-              new FadeTransition(Duration.millis(500), pdfProgressIndicator);
-          fadeTransition.setFromValue(1.0);
-          fadeTransition.setToValue(0.0);
-          fadeTransition.play();
-        });
+        Platform.runLater(
+            () -> {
+              FadeTransition fadeTransition =
+                  new FadeTransition(Duration.millis(500), pdfProgressIndicator);
+              fadeTransition.setFromValue(1.0);
+              fadeTransition.setToValue(0.0);
+              fadeTransition.play();
+            });
       }
 
       return null;
@@ -501,13 +494,14 @@ public class PdfViewer_Controller implements Initializable {
         extractProgressIndicator.setVisible(false);
       } else {
         extractProgressIndicator.setVisible(true);
-        Platform.runLater(() -> {
-          FadeTransition fadeTransition =
-              new FadeTransition(Duration.millis(500), extractProgressIndicator);
-          fadeTransition.setFromValue(1.0);
-          fadeTransition.setToValue(0.0);
-          fadeTransition.play();
-        });
+        Platform.runLater(
+            () -> {
+              FadeTransition fadeTransition =
+                  new FadeTransition(Duration.millis(500), extractProgressIndicator);
+              fadeTransition.setFromValue(1.0);
+              fadeTransition.setToValue(0.0);
+              fadeTransition.play();
+            });
       }
 
       return null;
@@ -533,11 +527,11 @@ public class PdfViewer_Controller implements Initializable {
                 final double minSize = pdfMinDimension;
                 // Filter out small images
                 imageButtons.removeIf(
-                    toggleButton -> ((ImageView) toggleButton.getGraphic()).getImage().getWidth()
-                        < minSize);
+                    toggleButton ->
+                        ((ImageView) toggleButton.getGraphic()).getImage().getWidth() < minSize);
                 imageButtons.removeIf(
-                    toggleButton -> ((ImageView) toggleButton.getGraphic()).getImage().getHeight()
-                        < minSize);
+                    toggleButton ->
+                        ((ImageView) toggleButton.getGraphic()).getImage().getHeight() < minSize);
 
                 imageTilePane.getChildren().addAll(imageButtons);
               } catch (IllegalArgumentException e) {
@@ -553,11 +547,11 @@ public class PdfViewer_Controller implements Initializable {
     @Override
     public int compare(ToggleButton tb1, ToggleButton tb2) {
       Double d1 =
-          ((ImageView) tb1.getGraphic()).getImage().getWidth() * ((ImageView) tb1.getGraphic())
-              .getImage().getHeight();
+          ((ImageView) tb1.getGraphic()).getImage().getWidth()
+              * ((ImageView) tb1.getGraphic()).getImage().getHeight();
       Double d2 =
-          ((ImageView) tb2.getGraphic()).getImage().getWidth() * ((ImageView) tb2.getGraphic())
-              .getImage().getHeight();
+          ((ImageView) tb2.getGraphic()).getImage().getWidth()
+              * ((ImageView) tb2.getGraphic()).getImage().getHeight();
       return Double.compare(d1, d2);
     }
   }

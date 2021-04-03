@@ -135,114 +135,60 @@ public class TokenTool_Controller {
       };
   private static Point dragStart = new Point();
   private static Point currentImageOffset = new Point();
-  @FXML
-  private MenuItem fileOpenPDF_Menu;
-  @FXML
-  private MenuItem fileManageOverlaysMenu;
-  @FXML
-  private MenuItem fileSaveAsMenu;
-  @FXML
-  private MenuItem fileExitMenu;
-  @FXML
-  private MenuItem editCaptureScreenMenu;
-  @FXML
-  private MenuItem editCopyImageMenu;
-  @FXML
-  private MenuItem editPasteImageMenu;
-  @FXML
-  private MenuItem helpAboutMenu;
-  @FXML
-  private TitledPane saveOptionsPane;
-  @FXML
-  private TitledPane overlayOptionsPane;
-  @FXML
-  private TitledPane backgroundOptionsPane;
-  @FXML
-  private TitledPane zoomOptionsPane;
-  @FXML
-  private StackPane compositeTokenPane;
-  @FXML
-  private BorderPane tokenPreviewPane;
-  @FXML
-  private ScrollPane portraitScrollPane;
-  @FXML
-  private Group compositeGroup;
-  @FXML
-  private Pane dndHighlights;
-  @FXML
-  private TreeView<Path> overlayTreeView;
-  @FXML
-  private StackPane imagesStackPane;
-  @FXML
-  private ImageView backgroundImageView; // The background image layer
-  @FXML
-  private ImageView portraitImageView; // The bottom "Portrait" layer
-  @FXML
-  private ImageView maskImageView; // The mask layer used to crop the Portrait layer
-  @FXML
-  private ImageView overlayImageView; // The overlay layer to apply on top of everything
-  @FXML
-  private ImageView tokenImageView; // The final token image created
-  @FXML
-  private CheckBox useFileNumberingCheckbox;
-  @FXML
-  private CheckBox useTokenNameCheckbox;
-  @FXML
-  private CheckBox savePortraitOnDragCheckbox;
-  @FXML
-  private CheckBox useBackgroundOnDragCheckbox;
-  @FXML
-  private CheckBox overlayUseAsBaseCheckbox;
-  @FXML
-  private CheckBox clipPortraitCheckbox;
-  @FXML
-  private TextField fileNameTextField;
-  @FXML
-  private Label fileNameSuffixLabel;
-  @FXML
-  private TextField fileNameSuffixTextField;
-  @FXML
-  private ChoiceBox<String> fileSaveFormatChoicebox;
-  @FXML
-  private TextField portraitNameTextField;
-  @FXML
-  private Label portraitNameSuffixLabel;
-  @FXML
-  private TextField portraitNameSuffixTextField;
-  @FXML
-  private ChoiceBox<String> portraitSaveFormatChoicebox;
-  @FXML
-  private Label overlayNameLabel;
-  @FXML
-  private Label overlayInfoLabel;
-  @FXML
-  private ColorPicker backgroundColorPicker;
-  @FXML
-  private ToggleButton overlayAspectToggleButton;
-  @FXML
-  private Slider portraitTransparencySlider;
-  @FXML
-  private Slider portraitBlurSlider;
-  @FXML
-  private Slider portraitGlowSlider;
-  @FXML
-  private Slider overlayTransparencySlider;
-  @FXML
-  private Spinner<Integer> overlayWidthSpinner;
-  @FXML
-  private Spinner<Integer> overlayHeightSpinner;
-  @FXML
-  private ProgressBar overlayTreeProgressBar;
-  @FXML
-  private Label progressBarLabel;
-  @FXML
-  private MenuButton layerMenuButton;
-  @FXML
-  private RadioMenuItem backgroundMenuItem;
-  @FXML
-  private RadioMenuItem portraitMenuItem;
-  @FXML
-  private RadioMenuItem overlayMenuItem;
+  @FXML private MenuItem fileOpenPDF_Menu;
+  @FXML private MenuItem fileManageOverlaysMenu;
+  @FXML private MenuItem fileSaveAsMenu;
+  @FXML private MenuItem fileExitMenu;
+  @FXML private MenuItem editCaptureScreenMenu;
+  @FXML private MenuItem editCopyImageMenu;
+  @FXML private MenuItem editPasteImageMenu;
+  @FXML private MenuItem helpAboutMenu;
+  @FXML private TitledPane saveOptionsPane;
+  @FXML private TitledPane overlayOptionsPane;
+  @FXML private TitledPane backgroundOptionsPane;
+  @FXML private TitledPane zoomOptionsPane;
+  @FXML private StackPane compositeTokenPane;
+  @FXML private BorderPane tokenPreviewPane;
+  @FXML private ScrollPane portraitScrollPane;
+  @FXML private Group compositeGroup;
+  @FXML private Pane dndHighlights;
+  @FXML private TreeView<Path> overlayTreeView;
+  @FXML private StackPane imagesStackPane;
+  @FXML private ImageView backgroundImageView; // The background image layer
+  @FXML private ImageView portraitImageView; // The bottom "Portrait" layer
+  @FXML private ImageView maskImageView; // The mask layer used to crop the Portrait layer
+  @FXML private ImageView overlayImageView; // The overlay layer to apply on top of everything
+  @FXML private ImageView tokenImageView; // The final token image created
+  @FXML private CheckBox useFileNumberingCheckbox;
+  @FXML private CheckBox useTokenNameCheckbox;
+  @FXML private CheckBox savePortraitOnDragCheckbox;
+  @FXML private CheckBox useBackgroundOnDragCheckbox;
+  @FXML private CheckBox overlayUseAsBaseCheckbox;
+  @FXML private CheckBox clipPortraitCheckbox;
+  @FXML private TextField fileNameTextField;
+  @FXML private Label fileNameSuffixLabel;
+  @FXML private TextField fileNameSuffixTextField;
+  @FXML private ChoiceBox<String> fileSaveFormatChoicebox;
+  @FXML private TextField portraitNameTextField;
+  @FXML private Label portraitNameSuffixLabel;
+  @FXML private TextField portraitNameSuffixTextField;
+  @FXML private ChoiceBox<String> portraitSaveFormatChoicebox;
+  @FXML private Label overlayNameLabel;
+  @FXML private Label overlayInfoLabel;
+  @FXML private ColorPicker backgroundColorPicker;
+  @FXML private ToggleButton overlayAspectToggleButton;
+  @FXML private Slider portraitTransparencySlider;
+  @FXML private Slider portraitBlurSlider;
+  @FXML private Slider portraitGlowSlider;
+  @FXML private Slider overlayTransparencySlider;
+  @FXML private Spinner<Integer> overlayWidthSpinner;
+  @FXML private Spinner<Integer> overlayHeightSpinner;
+  @FXML private ProgressBar overlayTreeProgressBar;
+  @FXML private Label progressBarLabel;
+  @FXML private MenuButton layerMenuButton;
+  @FXML private RadioMenuItem backgroundMenuItem;
+  @FXML private RadioMenuItem portraitMenuItem;
+  @FXML private RadioMenuItem overlayMenuItem;
   private FileSaveUtil fileSaveUtil = new FileSaveUtil();
 
   // A custom set of Width/Height sizes to use for Overlays
@@ -680,15 +626,16 @@ public class TokenTool_Controller {
 
   private void loadPDF(File selectedPDF) {
     if (selectedPDF != null) {
-      Platform.runLater(() -> {
-        try {
-          pdfViewer = new PdfViewer(selectedPDF, this);
-          AppPreferences.setPreference(
-              AppPreferences.LAST_PDF_FILE, selectedPDF.getParentFile().getCanonicalPath());
-        } catch (IOException e) {
-          log.error("Error loading PDF " + selectedPDF.getAbsolutePath());
-        }
-      });
+      Platform.runLater(
+          () -> {
+            try {
+              pdfViewer = new PdfViewer(selectedPDF, this);
+              AppPreferences.setPreference(
+                  AppPreferences.LAST_PDF_FILE, selectedPDF.getParentFile().getCanonicalPath());
+            } catch (IOException e) {
+              log.error("Error loading PDF " + selectedPDF.getAbsolutePath());
+            }
+          });
     }
   }
 
@@ -953,16 +900,13 @@ public class TokenTool_Controller {
   }
 
   @FXML
-  void compositeTokenPane_MouseDragExited(MouseDragEvent event) {
-  }
+  void compositeTokenPane_MouseDragExited(MouseDragEvent event) {}
 
   @FXML
-  void compositeTokenPane_MouseExited(MouseEvent event) {
-  }
+  void compositeTokenPane_MouseExited(MouseEvent event) {}
 
   @FXML
-  void compositeTokenPane_MouseMoved(MouseEvent event) {
-  }
+  void compositeTokenPane_MouseMoved(MouseEvent event) {}
 
   @FXML
   void compositeTokenPane_OnScroll(ScrollEvent event) {
@@ -1376,8 +1320,7 @@ public class TokenTool_Controller {
       BufferedImage imageRGB = SwingFXUtils.fromFXImage(tokenImage, null);
 
       log.debug("Writing token image as: " + imageType);
-      boolean writeSuccessful = ImageIO
-          .write(imageRGB, imageType, tokenFile);
+      boolean writeSuccessful = ImageIO.write(imageRGB, imageType, tokenFile);
 
       if (!writeSuccessful) {
         // Remove alpha-channel from buffered image
@@ -1421,10 +1364,10 @@ public class TokenTool_Controller {
             tokenImage =
                 ImageUtil.autoCropImage(tokenImage, getBackgroundColor(), getBackgroundImage());
           } else {
-//            ImageUtil.autoCropImage(tokenImage, Color.BLACK, null);
+            //            ImageUtil.autoCropImage(tokenImage, Color.BLACK, null);
           }
         } else {
-//          ImageUtil.autoCropImage(tokenImage, Color.BLACK, null);
+          //          ImageUtil.autoCropImage(tokenImage, Color.BLACK, null);
         }
 
         String newFileName =
@@ -1654,31 +1597,32 @@ public class TokenTool_Controller {
     overlayTreeProgressBar.setStyle("-fx-accent: forestgreen;");
     progressBarLabel.setVisible(false);
 
-    Platform.runLater(() -> {
-      FadeTransition progressBarFadeOut = new FadeTransition(Duration.millis(2000));
-      progressBarFadeOut.setNode(overlayTreeProgressBar);
-      progressBarFadeOut.setFromValue(1.0);
-      progressBarFadeOut.setToValue(0.0);
-      progressBarFadeOut.setCycleCount(1);
-      progressBarFadeOut.setAutoReverse(false);
-      progressBarFadeOut.playFromStart();
+    Platform.runLater(
+        () -> {
+          FadeTransition progressBarFadeOut = new FadeTransition(Duration.millis(2000));
+          progressBarFadeOut.setNode(overlayTreeProgressBar);
+          progressBarFadeOut.setFromValue(1.0);
+          progressBarFadeOut.setToValue(0.0);
+          progressBarFadeOut.setCycleCount(1);
+          progressBarFadeOut.setAutoReverse(false);
+          progressBarFadeOut.playFromStart();
 
-      FadeTransition nameFadeIn = new FadeTransition(Duration.millis(4000));
-      nameFadeIn.setNode(overlayNameLabel);
-      nameFadeIn.setFromValue(0.0);
-      nameFadeIn.setToValue(1.0);
-      nameFadeIn.setCycleCount(1);
-      nameFadeIn.setAutoReverse(false);
-      nameFadeIn.playFromStart();
+          FadeTransition nameFadeIn = new FadeTransition(Duration.millis(4000));
+          nameFadeIn.setNode(overlayNameLabel);
+          nameFadeIn.setFromValue(0.0);
+          nameFadeIn.setToValue(1.0);
+          nameFadeIn.setCycleCount(1);
+          nameFadeIn.setAutoReverse(false);
+          nameFadeIn.playFromStart();
 
-      FadeTransition infoFadeIn = new FadeTransition(Duration.millis(4000));
-      infoFadeIn.setNode(overlayInfoLabel);
-      infoFadeIn.setFromValue(0.0);
-      infoFadeIn.setToValue(1.0);
-      infoFadeIn.setCycleCount(1);
-      infoFadeIn.setAutoReverse(false);
-      infoFadeIn.playFromStart();
-    });
+          FadeTransition infoFadeIn = new FadeTransition(Duration.millis(4000));
+          infoFadeIn.setNode(overlayInfoLabel);
+          infoFadeIn.setFromValue(0.0);
+          infoFadeIn.setToValue(1.0);
+          infoFadeIn.setCycleCount(1);
+          infoFadeIn.setAutoReverse(false);
+          infoFadeIn.playFromStart();
+        });
   }
 
   private TreeItem<Path> cacheOverlays(File dir, TreeItem<Path> parent) throws IOException {
@@ -1953,8 +1897,7 @@ public class TokenTool_Controller {
   public void setWindowFrom_Preferences(String preferencesJson) {
     if (preferencesJson != null) {
       Window_Preferences window_Preferences =
-          new Gson().fromJson(preferencesJson, new TypeToken<Window_Preferences>() {
-          }.getType());
+          new Gson().fromJson(preferencesJson, new TypeToken<Window_Preferences>() {}.getType());
       window_Preferences.setWindow(TokenTool.getInstance().getStage());
     }
   }
@@ -1970,8 +1913,7 @@ public class TokenTool_Controller {
   public void setPortraitFrom_Preferences(String preferencesJson) {
     if (preferencesJson != null) {
       ImageView_Preferences imageView_Preferences =
-          new Gson().fromJson(preferencesJson, new TypeToken<ImageView_Preferences>() {
-          }.getType());
+          new Gson().fromJson(preferencesJson, new TypeToken<ImageView_Preferences>() {}.getType());
       portraitImageView = imageView_Preferences.toImageView(portraitImageView);
     } else {
       log.debug("No Preferences currently saved.");
@@ -1989,8 +1931,7 @@ public class TokenTool_Controller {
   public void setBackgroundFrom_Preferences(String preferencesJson) {
     if (preferencesJson != null) {
       ImageView_Preferences imageView_Preferences =
-          new Gson().fromJson(preferencesJson, new TypeToken<ImageView_Preferences>() {
-          }.getType());
+          new Gson().fromJson(preferencesJson, new TypeToken<ImageView_Preferences>() {}.getType());
       backgroundImageView = imageView_Preferences.toImageView(backgroundImageView);
 
       setBackgroundColor(imageView_Preferences.getBackgroundColor());

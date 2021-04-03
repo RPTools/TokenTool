@@ -18,7 +18,6 @@ import java.io.File;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 public class AppConstants {
@@ -43,8 +42,8 @@ public class AppConstants {
 
   public static final String RPTOOLS_URL = "http://www.rptools.net";
 
-  public static final ObservableList VALID_IMAGE_EXTENSIONS = FXCollections
-      .observableArrayList("webp", "png", "jpg", "gif", "tif");
+  public static final ObservableList VALID_IMAGE_EXTENSIONS =
+      FXCollections.observableArrayList("webp", "png", "jpg", "gif", "tif");
   public static final String DEFAULT_IMAGE_EXTENSION = "webp";
   public static final String DEFAULT_IMAGE_EXTENSION_DESCRIPTION = "WebP Image";
   public static final String DEFAULT_TOKEN_NAME = "token";
