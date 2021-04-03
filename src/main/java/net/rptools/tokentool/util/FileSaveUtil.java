@@ -33,18 +33,19 @@ public class FileSaveUtil {
   private static File lastFile = null;
 
   public static String cleanFileName(String fileName) {
-    String decodedFileName = fileName;
+    fileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
 
     try {
-      decodedFileName = URLDecoder.decode(decodedFileName, StandardCharsets.UTF_8);
-    } finally {
-      decodedFileName =
-          decodedFileName.replaceAll(
+      new File(fileName).getCanonicalPath();
+    } catch (IOException e) {
+      // If canonical path fails, lets scrub characters for safer file name...
+      fileName =
+          fileName.replaceAll(
               AppConstants.VALID_FILE_NAME_REPLACEMENT_PATTERN,
               AppConstants.VALID_FILE_NAME_REPLACEMENT_CHARACTER);
     }
 
-    return decodedFileName;
+    return fileName;
   }
 
   /*

@@ -432,11 +432,7 @@ public class TokenTool_Controller {
     // Set filters and bindings for file name inputs
     UnaryOperator<Change> filter =
         change -> {
-          String text = change.getText();
-
-          if (!text.matches(AppConstants.VALID_FILE_NAME_PATTERN)) {
-            change.setText(FileSaveUtil.cleanFileName(text));
-          }
+          change.setText(FileSaveUtil.cleanFileName(change.getText()));
           return change;
         };
 
