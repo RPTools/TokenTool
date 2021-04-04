@@ -198,6 +198,7 @@ jlink {
         // installerOutputDir = file("releases")
         // imageOutputDir = file("$buildDir/my-packaging-image")
         outputDir = "../releases"
+        application.mainModule.set("net.rptools.tokentool")
 
         imageOptions = mutableListOf()
         imageName = "TokenTool"
