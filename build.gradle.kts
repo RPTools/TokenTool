@@ -15,11 +15,11 @@ val mainClassName = "net.rptools.tokentool.client.TokenTool"
 semver {
     snapshotSuffix = "SNAPSHOT" // (default) appended if the commit is without a release tag
     dirtyMarker = "dirty" // (default) appended if the are uncommitted changes
-    initialVersion = "2.2.0" // (default) initial version in semantic versioning
+    initialVersion = "2.0.0" // (default) initial version in semantic versioning
 
     branches { // list of branch configurations
         branch {
-            incrementer = "PATCH_INCREMENTER" // NO_VERSION_INCREMENTER, PATCH_INCREMENTER, MINOR_INCREMENTER, MAJOR_INCREMENTER, CONVENTIONAL_COMMITS_INCREMENTER
+            incrementer = "CONVENTIONAL_COMMITS_INCREMENTER" // NO_VERSION_INCREMENTER, PATCH_INCREMENTER, MINOR_INCREMENTER, MAJOR_INCREMENTER, CONVENTIONAL_COMMITS_INCREMENTER
             formatter = Transformer<Any, io.wusa.Info> { info: io.wusa.Info -> "${info.version.major}.${info.version.minor}.${info.version.patch}" }
             regex = ".+" // regex for the branch you want to configure, put this one last
         }
@@ -177,7 +177,11 @@ tasks.register<Jar>("uberJar") {
 }
 
 jlink {
-//    options = listOf("--strip-debug", "--strip-native-commands", "--compress", "2", "--no-header-files", "--no-man-pages")
+    val appVersion =  "${semver.info.version.major}.${semver.info.version.minor}.${semver.info.version.patch}"
+
+    options.set(listOf("--strip-debug", "--strip-native-commands", "--compress", "2", "--no-header-files", "--no-man-pages"))
+    moduleName.set("net.rptools.tokentool")
+
     forceMerge("log4j-api", "gson")
 
     launcher {
@@ -186,7 +190,6 @@ jlink {
         jvmArgs = listOf("-Dfile.encoding=UTF-8")
     }
 
-    moduleName.set("net.rptools.tokentool")
 
     jpackage {
         val os = org.gradle.internal.os.OperatingSystem.current()
