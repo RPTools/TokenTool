@@ -70,6 +70,11 @@ jobs:
       #    / /___ / // / / // /_/ /_>  <  
       #   /_____//_//_/ /_/ \__,_//_/|_|  
       #
+    - name: Rename release
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        mv releases/tokentool-*-x86_64.rpm releases/tokentool-${{ github.event.release.tag_name }}-x86_64.rpm
+        mv releases/tokentool-*_amd64.deb releases/tokentool-${{ github.event.release.tag_name }}_amd64.deb
     - name: Upload Linux RPM Release Asset
       id: upload-release-asset-rpm
       uses: actions/upload-release-asset@v1
@@ -78,7 +83,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: releases/tokentool-${{ github.event.release.tag_name }}-1.x86_64.rpm
+        asset_path: releases/tokentool-${{ github.event.release.tag_name }}-x86_64.rpm
         asset_name: tokentool-${{ github.event.release.tag_name }}-x86_64.rpm
         asset_content_type: application/octet-stream
     - name: Upload Linux DEB Release Asset
@@ -89,8 +94,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: releases/tokentool_${{ github.event.release.tag_name }}-1_amd64.deb
-        asset_name: tokentool_${{ github.event.release.tag_name }}-amd64.deb
+        asset_path: releases/tokentool_${{ github.event.release.tag_name }}_amd64.deb
+        asset_name: tokentool_${{ github.event.release.tag_name }}_amd64.deb
         asset_content_type: application/octet-stream
       #                               ____  _____
       #      ____ ___   ____ _ _____ / __ \/ ___/
@@ -98,6 +103,11 @@ jobs:
       #    / / / / / // /_/ // /__ / /_/ /___/ / 
       #   /_/ /_/ /_/ \__,_/ \___/ \____//____/  
       #
+    - name: Rename release
+      if: matrix.os == 'macOS-latest'
+      run: |
+        mv releases/TokenTool-*.dmg releases/TokenTool-${{ github.event.release.tag_name }}.dmg
+        mv releases/TokenTool-*.pkg releases/TokenTool-${{ github.event.release.tag_name }}.pkg
     - name: Upload Mac DMG Release Asset
       id: upload-release-asset-dmg
       uses: actions/upload-release-asset@v1
