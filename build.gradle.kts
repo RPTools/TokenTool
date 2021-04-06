@@ -196,7 +196,7 @@ jlink {
         imageOptions = mutableListOf()
         imageName = "TokenTool"
 
-        installerName = "TokenTool-Test"
+        installerName = "TokenTool"
         installerOptions = mutableListOf(
                 "--verbose",
                 "--description", project.description,
