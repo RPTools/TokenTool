@@ -16,10 +16,11 @@ semver {
     snapshotSuffix = "SNAPSHOT" // (default) appended if the commit is without a release tag
     dirtyMarker = "dirty" // (default) appended if the are uncommitted changes
     initialVersion = "2.0.0" // (default) initial version in semantic versioning
+    tagType = io.wusa.TagType.LIGHTWEIGHT
 
     branches { // list of branch configurations
         branch {
-            incrementer = "CONVENTIONAL_COMMITS_INCREMENTER" // NO_VERSION_INCREMENTER, PATCH_INCREMENTER, MINOR_INCREMENTER, MAJOR_INCREMENTER, CONVENTIONAL_COMMITS_INCREMENTER
+            incrementer = "NO_VERSION_INCREMENTER" // NO_VERSION_INCREMENTER, PATCH_INCREMENTER, MINOR_INCREMENTER, MAJOR_INCREMENTER, CONVENTIONAL_COMMITS_INCREMENTER
             formatter = Transformer<Any, io.wusa.Info> { info: io.wusa.Info -> "${info.version.major}.${info.version.minor}.${info.version.patch}" }
             regex = ".+" // regex for the branch you want to configure, put this one last
         }
@@ -34,12 +35,7 @@ val environment: String by project
 
 // Custom properties
 ext {
-    val versionInfo = semver.info
-    val revision = semver.info.shortCommit
-    val revisionFull = semver.info.commit
     val os = org.gradle.internal.os.OperatingSystem.current()
-
-//    val vendor = project.property("vendor")
 
     if (semver.info.dirty || semver.info.version.toString().endsWith(semver.snapshotSuffix)) {
         set("sentryDSN", "")
@@ -51,18 +47,17 @@ ext {
 
     println("OS Detected: $os")
     println("Configuring for ${project.name}")
-    println("version: $versionInfo")
+    println("version: ${semver.info}")
     println("vendor: $vendor")
-    println("revision: $revision")
-    println("revisionFull: $revisionFull")
+    println("revision: ${semver.info.shortCommit}")
+    println("revisionFull: ${semver.info.commit}")
     println("date: ${LocalDateTime.now()}")
-
 }
 
 application {
+    mainModule.set("net.rptools.tokentool")
     mainClass.set("net.rptools.tokentool.client.TokenTool")
     applicationDefaultJvmArgs = listOf("-Dfile.encoding=UTF-8")
-
 }
 
 java {
@@ -177,19 +172,18 @@ tasks.register<Jar>("uberJar") {
 }
 
 jlink {
-    val appVersion =  "${semver.info.version.major}.${semver.info.version.minor}.${semver.info.version.patch}"
+    // We need to keep the semver down to just major.minor.patch (no -alpha.1 or -rc.1, etc) otherwise jpackage fails
+    val appVersion = "${semver.info.version.major}.${semver.info.version.minor}.${semver.info.version.patch}"
+    project.version = appVersion;
 
     options.set(listOf("--strip-debug", "--strip-native-commands", "--compress", "2", "--no-header-files", "--no-man-pages"))
-    moduleName.set("net.rptools.tokentool")
 
     forceMerge("log4j-api", "gson")
 
     launcher {
         name = "TokenTool"
-        args = listOf("-v=${semver.info}", "-vendor=$vendor")
         jvmArgs = listOf("-Dfile.encoding=UTF-8")
     }
-
 
     jpackage {
         val os = org.gradle.internal.os.OperatingSystem.current()
@@ -198,18 +192,17 @@ jlink {
         // installerOutputDir = file("releases")
         // imageOutputDir = file("$buildDir/my-packaging-image")
         outputDir = "../releases"
-        application.mainModule.set("net.rptools.tokentool")
 
         imageOptions = mutableListOf()
         imageName = "TokenTool"
 
-        installerName = "TokenTool"
+        installerName = "TokenTool-Test"
         installerOptions = mutableListOf(
                 "--verbose",
                 "--description", project.description,
                 "--copyright", "Copyright 2000-2020 RPTools.net",
                 "--license-file", "package/license/COPYING.AFFERO",
-                "--app-version", "${semver.info}",
+                "--app-version", appVersion,
                 "--vendor", vendor
         )
 
