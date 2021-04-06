@@ -208,6 +208,7 @@ jlink {
 
         if (os.isWindows) {
             println("Setting Windows installer options")
+            installerType = "exe"
             imageOptions.addAll(listOf("--icon", "package/windows/TokenTool.ico"))
             installerOptions.addAll(listOf(
                     "--win-dir-chooser",
