@@ -31,12 +31,12 @@ jobs:
       with:
         java-version: ${{ matrix.java }}
     - name: Cache Gradle
-      uses: actions/cache@v1
-      # Cache only seems to work on ubuntu right now...
-      if: matrix.os == 'ubuntu-latest'
+      uses: actions/cache@v2
       with:
-        path: ~/.gradle/caches
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
     - name: Build with Gradle
@@ -61,18 +61,7 @@ jobs:
         asset_path: releases/TokenTool-${{ github.event.release.tag_name }}.exe
         asset_name: TokenTool-${{ github.event.release.tag_name }}.exe
         asset_content_type: application/octet-stream
-    - name: Upload Windows MSI Release Asset
-      id: upload-release-asset-msi
-      uses: actions/upload-release-asset@v1
-      if: matrix.os == 'windows-latest'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: releases/TokenTool-${{ github.event.release.tag_name }}.msi
-        asset_name: TokenTool-${{ github.event.release.tag_name }}.msi
-        asset_content_type: application/octet-stream
-      #       __     _                    
+      #       __     _
       #      / /    (_)____   __  __ _  __
       #     / /    / // __ \ / / / /| |/_/
       #    / /___ / // / / // /_/ /_>  <  
@@ -127,15 +116,4 @@ jobs:
         upload_url: ${{ github.event.release.upload_url }}
         asset_path: releases/TokenTool-${{ github.event.release.tag_name }}.pkg
         asset_name: TokenTool-${{ github.event.release.tag_name }}.pkg
-        asset_content_type: application/octet-stream
-    - name: Upload Mac App Release Asset
-      id: upload-release-asset-app
-      uses: actions/upload-release-asset@v1
-      if: matrix.os == 'macOS-latest'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: releases/TokenTool.zip
-        asset_name: TokenTool-${{ github.event.release.tag_name }}.app.zip
         asset_content_type: application/octet-stream
