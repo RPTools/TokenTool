@@ -50,6 +50,9 @@ jobs:
       #   | |/ |/ // // / / // /_/ // /_/ /| |/ |/ /(__  ) 
       #   |__/|__//_//_/ /_/ \__,_/ \____/ |__/|__//____/
       #                                                  
+    - name: Rename release
+      if: matrix.os == 'windows-latest'
+      run: cp releases/TokenTool-*.exe releases/TokenTool-${{ github.event.release.tag_name }}.exe
     - name: Upload Windows EXE Release Asset
       id: upload-release-asset-exe
       uses: actions/upload-release-asset@v1
