@@ -83,8 +83,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: releases/tokentool-${{ github.event.release.tag_name }}-x86_64.rpm
-        asset_name: tokentool-${{ github.event.release.tag_name }}-x86_64.rpm
+        asset_path: releases/tokentool-${{ github.event.release.tag_name }}_x86_64.rpm
+        asset_name: tokentool-${{ github.event.release.tag_name }}_x86_64.rpm
         asset_content_type: application/octet-stream
     - name: Upload Linux DEB Release Asset
       id: upload-release-asset-deb
