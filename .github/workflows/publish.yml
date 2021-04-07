@@ -52,7 +52,7 @@ jobs:
       #                                                  
     - name: Rename release
       if: matrix.os == 'windows-latest'
-      run: cp releases/TokenTool-*.exe releases/TokenTool-${{ github.event.release.tag_name }}.exe
+      run: mv releases/TokenTool-*.exe releases/TokenTool-${{ github.event.release.tag_name }}.exe
     - name: Upload Windows EXE Release Asset
       id: upload-release-asset-exe
       uses: actions/upload-release-asset@v1
@@ -73,8 +73,8 @@ jobs:
     - name: Rename release
       if: matrix.os == 'ubuntu-latest'
       run: |
-        mv releases/tokentool-*-x86_64.rpm releases/tokentool-${{ github.event.release.tag_name }}-x86_64.rpm
-        mv releases/tokentool-*_amd64.deb releases/tokentool-${{ github.event.release.tag_name }}_amd64.deb
+        mv releases/tokentool-*-1.x86_64.rpm releases/tokentool-${{ github.event.release.tag_name }}_x86_64.rpm
+        mv releases/tokentool-*-1_amd64.deb releases/tokentool-${{ github.event.release.tag_name }}_amd64.deb
     - name: Upload Linux RPM Release Asset
       id: upload-release-asset-rpm
       uses: actions/upload-release-asset@v1
