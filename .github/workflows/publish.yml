@@ -50,7 +50,7 @@ jobs:
       #   | |/ |/ // // / / // /_/ // /_/ /| |/ |/ /(__  ) 
       #   |__/|__//_//_/ /_/ \__,_/ \____/ |__/|__//____/
       #                                                  
-    - name: Rename release
+    - name: Rename windows release
       if: matrix.os == 'windows-latest'
       run: mv releases/TokenTool-*.exe releases/TokenTool-${{ github.event.release.tag_name }}.exe
     - name: Upload Windows EXE Release Asset
@@ -70,11 +70,11 @@ jobs:
       #    / /___ / // / / // /_/ /_>  <  
       #   /_____//_//_/ /_/ \__,_//_/|_|  
       #
-    - name: Rename release
+    - name: Rename Linux release
       if: matrix.os == 'ubuntu-latest'
       run: |
         mv releases/tokentool-*-1.x86_64.rpm releases/tokentool-${{ github.event.release.tag_name }}_x86_64.rpm
-        mv releases/tokentool-*-1_amd64.deb releases/tokentool-${{ github.event.release.tag_name }}_amd64.deb
+        mv releases/tokentool_*-1_amd64.deb releases/tokentool-${{ github.event.release.tag_name }}_amd64.deb
     - name: Upload Linux RPM Release Asset
       id: upload-release-asset-rpm
       uses: actions/upload-release-asset@v1
@@ -103,7 +103,7 @@ jobs:
       #    / / / / / // /_/ // /__ / /_/ /___/ / 
       #   /_/ /_/ /_/ \__,_/ \___/ \____//____/  
       #
-    - name: Rename release
+    - name: Rename Mac release
       if: matrix.os == 'macOS-latest'
       run: |
         mv releases/TokenTool-*.dmg releases/TokenTool-${{ github.event.release.tag_name }}.dmg
