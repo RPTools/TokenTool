@@ -74,7 +74,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         mv releases/tokentool-*-1.x86_64.rpm releases/tokentool-${{ github.event.release.tag_name }}_x86_64.rpm
-        mv releases/tokentool_*-1_amd64.deb releases/tokentool-${{ github.event.release.tag_name }}_amd64.deb
+        mv releases/tokentool_*-1_amd64.deb releases/tokentool_${{ github.event.release.tag_name }}_amd64.deb
     - name: Upload Linux RPM Release Asset
       id: upload-release-asset-rpm
       uses: actions/upload-release-asset@v1
