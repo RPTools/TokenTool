@@ -108,7 +108,7 @@ public class ImageView_Preferences {
       try {
         log.debug("Loading image from preferences " + filePath);
         Image image = new Image(new File(filePath).toURI().toURL().toExternalForm());
-        if(image.isError()) {
+        if (image.isError()) {
           return imageView;
         }
 
