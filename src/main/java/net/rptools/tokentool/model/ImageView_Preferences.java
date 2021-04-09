@@ -108,19 +108,23 @@ public class ImageView_Preferences {
       try {
         log.debug("Loading image from preferences " + filePath);
         Image image = new Image(new File(filePath).toURI().toURL().toExternalForm());
+        if(image.isError()) {
+          return imageView;
+        }
+
         imageView.setImage(image);
         imageView.setFitWidth(image.getWidth());
         imageView.setFitHeight(image.getHeight());
+
+        imageView.setTranslateX(getTranslateX());
+        imageView.setTranslateY(getTranslateY());
+        imageView.setRotate(getRotation());
+        imageView.setScaleX(getScale());
+        imageView.setScaleY(getScale());
       } catch (MalformedURLException e) {
         log.error("Unable to load image " + filePath, e);
       }
     }
-
-    imageView.setTranslateX(getTranslateX());
-    imageView.setTranslateY(getTranslateY());
-    imageView.setRotate(getRotation());
-    imageView.setScaleX(getScale());
-    imageView.setScaleY(getScale());
 
     return imageView;
   }
