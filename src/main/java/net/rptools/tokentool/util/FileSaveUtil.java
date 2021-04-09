@@ -33,18 +33,19 @@ public class FileSaveUtil {
   private static File lastFile = null;
 
   public static String cleanFileName(String fileName) {
-    String decodedFileName = fileName;
+    fileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
 
     try {
-      decodedFileName = URLDecoder.decode(decodedFileName, StandardCharsets.UTF_8);
-    } finally {
-      decodedFileName =
-          decodedFileName.replaceAll(
+      new File(fileName).getCanonicalPath();
+    } catch (IOException e) {
+      // If canonical path fails, lets scrub characters for safer file name...
+      fileName =
+          fileName.replaceAll(
               AppConstants.VALID_FILE_NAME_REPLACEMENT_PATTERN,
               AppConstants.VALID_FILE_NAME_REPLACEMENT_CHARACTER);
     }
 
-    return decodedFileName;
+    return fileName;
   }
 
   /*
@@ -112,26 +113,38 @@ public class FileSaveUtil {
   }
 
   public File getTempFileName(
-      boolean asToken, boolean useNumbering, String tempFileName, TextField fileNameSuffix)
+      boolean asToken,
+      boolean useNumbering,
+      String tempFileName,
+      String imageExtension,
+      TextField fileNameSuffix)
       throws IOException {
-    return getTempFileName(asToken, useNumbering, tempFileName, fileNameSuffix, true);
+    return getTempFileName(
+        asToken, useNumbering, tempFileName, imageExtension, fileNameSuffix, true);
   }
 
   public File getTempFileName(
       boolean asToken,
       boolean useNumbering,
       String tempFileName,
+      String imageExtension,
       TextField fileNameSuffix,
       boolean advanceFileNameSuffix)
       throws IOException {
     return new File(
         System.getProperty("java.io.tmpdir"),
-        getFileName(asToken, useNumbering, tempFileName, fileNameSuffix, advanceFileNameSuffix)
+        getFileName(
+                asToken,
+                useNumbering,
+                tempFileName,
+                imageExtension,
+                fileNameSuffix,
+                advanceFileNameSuffix)
             .getName());
   }
 
-  public File getTempFileName(String tempFileName) throws IOException {
-    final String _extension = AppConstants.DEFAULT_IMAGE_EXTENSION;
+  public File getTempFileName(String tempFileName, String imageExtension) throws IOException {
+    final String _extension = "." + imageExtension;
 
     if (!tempFileName.endsWith(_extension)) {
       tempFileName += _extension;
@@ -144,10 +157,16 @@ public class FileSaveUtil {
       boolean asToken,
       boolean useNumbering,
       String tempFileName,
+      String imageExtension,
       TextField fileNameSuffix,
       boolean advanceFileNameSuffix)
       throws IOException {
-    final String _extension = AppConstants.DEFAULT_IMAGE_EXTENSION;
+
+    if (!imageExtension.startsWith(".")) {
+      imageExtension = "." + imageExtension;
+    } else {
+      imageExtension = "." + imageExtension;
+    }
 
     if (useNumbering) {
       int dragCounter;
@@ -170,20 +189,20 @@ public class FileSaveUtil {
       if (lastFile != null) {
         return new File(
             lastFile.getParent(),
-            String.format("%s_" + leadingZeroes + _extension, tempFileName, dragCounter));
+            String.format("%s_" + leadingZeroes + imageExtension, tempFileName, dragCounter));
       } else {
         return new File(
-            String.format("%s_" + leadingZeroes + _extension, tempFileName, dragCounter));
+            String.format("%s_" + leadingZeroes + imageExtension, tempFileName, dragCounter));
       }
     } else {
       if (lastFile != null) {
         if (tempFileName.isEmpty()) {
-          tempFileName = AppConstants.DEFAULT_TOKEN_NAME + _extension;
+          tempFileName = AppConstants.DEFAULT_TOKEN_NAME + imageExtension;
         }
       }
 
-      if (!tempFileName.endsWith(_extension)) {
-        tempFileName += _extension;
+      if (!tempFileName.endsWith(imageExtension)) {
+        tempFileName += imageExtension;
       }
 
       if (lastFile != null) {

@@ -16,6 +16,8 @@ package net.rptools.tokentool.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,6 +27,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
@@ -59,15 +62,19 @@ public final class ExtractImagesFromPDF {
   private static final Logger log = LogManager.getLogger(ExtractImagesFromPDF.class);
   private static final int imageViewSize = 175;
   private static final int imageButtonSize = 200;
+
   private final PDDocument document;
   private final Set<COSStream> imageTracker = new HashSet<>();
+  private final Set<String> imageHashTracker = new HashSet<>();
+
   private TokenTool_Controller tokenTool_Controller;
   private ArrayList<ToggleButton> imageButtons = new ArrayList<>();
-  private int currentPageNumber;
-  private String pdfName;
-
   private FileSaveUtil fileSaveUtil = new FileSaveUtil();
-
+  private String pdfName;
+  private String fileSavePath;
+  private String imageFormat;
+  private int currentPageNumber;
+  private double imageMinDimension;
   private boolean isRunning;
   private boolean interrupt;
 
@@ -84,15 +91,38 @@ public final class ExtractImagesFromPDF {
     imageButtons.clear();
     this.currentPageNumber = pageNumber;
 
-    extractAnnotationImages(document.getPage(pageNumber));
-    getImagesFromResources(document.getPage(pageNumber).getResources());
+    extractAnnotationImages(document.getPage(pageNumber), false);
+    getImagesFromResources(document.getPage(pageNumber).getResources(), false);
 
     isRunning = false;
     interrupt = false;
     return imageButtons;
   }
 
-  private void getImagesFromResources(PDResources resources) throws IOException {
+  public void extractAllImagesFromPage(
+      String filePath, String imageFormat, int pageNumber, double imageMinDimension)
+      throws IOException {
+    this.fileSavePath = filePath;
+    this.imageFormat = imageFormat;
+    this.imageMinDimension = imageMinDimension;
+    isRunning = true;
+    imageTracker.clear();
+
+    this.currentPageNumber = pageNumber;
+
+    extractAnnotationImages(document.getPage(pageNumber), true);
+    getImagesFromResources(document.getPage(pageNumber).getResources(), true);
+
+    isRunning = false;
+    interrupt = false;
+  }
+
+  public void resetImageHashTracker() {
+    imageHashTracker.clear();
+  }
+
+  private void getImagesFromResources(PDResources resources, boolean extractOnly)
+      throws IOException {
     // Testing various Pathfinder PDF's, various page elements like borders and backgrounds
     // generally come first...
     // ...so lets sort them to the bottom and get the images we really want to the top of the
@@ -113,14 +143,49 @@ public final class ExtractImagesFromPDF {
       PDXObject xObject = resources.getXObject(xObjectName);
 
       if (xObject instanceof PDFormXObject) {
-        getImagesFromResources(((PDFormXObject) xObject).getResources());
+        getImagesFromResources(((PDFormXObject) xObject).getResources(), extractOnly);
       } else if (xObject instanceof PDImageXObject) {
+
         if (!imageTracker.contains(xObject.getCOSObject())) {
           imageTracker.add(xObject.getCOSObject());
-          String name = pdfName + " - pg " + currentPageNumber + " - " + xObjectName.getName();
+
+          String name =
+              pdfName + " - pg " + (currentPageNumber + 1) + " - img " + imageTracker.size();
+
           log.debug("Extracting image... " + name);
 
-          addTileButton(SwingFXUtils.toFXImage(((PDImageXObject) xObject).getImage(), null), name);
+          WritableImage image = SwingFXUtils.toFXImage(((PDImageXObject) xObject).getImage(), null);
+
+          if (extractOnly) {
+            boolean skipImage = false;
+
+            try {
+              MessageDigest md = MessageDigest.getInstance("MD5");
+              md.update(xObject.getStream().toByteArray());
+              String hash = bytesToHex(md.digest());
+              log.debug("MD5 Checksum is {}", hash);
+
+              if (!imageHashTracker.contains(hash)) {
+                imageHashTracker.add(hash);
+              } else {
+                skipImage = true;
+                log.debug("MD5 Checksum {} already exists, skipping!", hash);
+              }
+            } catch (NoSuchAlgorithmException e) {
+              e.printStackTrace();
+            } finally {
+              if (!skipImage
+                  && image.getWidth() > imageMinDimension
+                  && image.getHeight() > imageMinDimension) {
+                ImageIO.write(
+                    SwingFXUtils.fromFXImage(image, null),
+                    imageFormat,
+                    new File(fileSavePath, name + "." + imageFormat));
+              }
+            }
+          } else {
+            addTileButton(image, name);
+          }
         }
       }
     }
@@ -136,25 +201,27 @@ public final class ExtractImagesFromPDF {
    * This is the REAL beauty of this function as currently no other tools outside of Full Acrobat extracts these raw images!
    *
    */
-  private void extractAnnotationImages(PDPage page) throws IOException {
+  private void extractAnnotationImages(PDPage page, boolean extractOnly) throws IOException {
     for (PDAnnotation annotation : page.getAnnotations()) {
-      extractAnnotationImages(annotation);
+      extractAnnotationImages(annotation, extractOnly);
     }
   }
 
-  private void extractAnnotationImages(PDAnnotation annotation) throws IOException {
+  private void extractAnnotationImages(PDAnnotation annotation, boolean extractOnly)
+      throws IOException {
     PDAppearanceDictionary appearance = annotation.getAppearance();
 
     if (appearance == null) {
       return;
     }
 
-    extractAnnotationImages(appearance.getDownAppearance());
-    extractAnnotationImages(appearance.getNormalAppearance());
-    extractAnnotationImages(appearance.getRolloverAppearance());
+    extractAnnotationImages(appearance.getDownAppearance(), extractOnly);
+    extractAnnotationImages(appearance.getNormalAppearance(), extractOnly);
+    extractAnnotationImages(appearance.getRolloverAppearance(), extractOnly);
   }
 
-  private void extractAnnotationImages(PDAppearanceEntry appearance) throws IOException {
+  private void extractAnnotationImages(PDAppearanceEntry appearance, boolean extractOnly)
+      throws IOException {
     if (interrupt) {
       return;
     }
@@ -168,14 +235,14 @@ public final class ExtractImagesFromPDF {
       PDXObject xObject = resources.getXObject(cosname);
 
       if (xObject instanceof PDFormXObject) {
-        extractAnnotationImages((PDFormXObject) xObject);
+        extractAnnotationImages((PDFormXObject) xObject, extractOnly);
       } else if (xObject instanceof PDImageXObject) {
-        extractAnnotationImages((PDImageXObject) xObject);
+        extractAnnotationImages((PDImageXObject) xObject, extractOnly);
       }
     }
   }
 
-  private void extractAnnotationImages(PDFormXObject form) throws IOException {
+  private void extractAnnotationImages(PDFormXObject form, boolean extractOnly) throws IOException {
     PDResources resources = form.getResources();
     if (resources == null) {
       return;
@@ -185,22 +252,32 @@ public final class ExtractImagesFromPDF {
       PDXObject xObject = resources.getXObject(cosname);
 
       if (xObject instanceof PDFormXObject) {
-        extractAnnotationImages((PDFormXObject) xObject);
+        extractAnnotationImages((PDFormXObject) xObject, extractOnly);
       } else if (xObject instanceof PDImageXObject) {
-        extractAnnotationImages((PDImageXObject) xObject);
+        extractAnnotationImages((PDImageXObject) xObject, extractOnly);
       }
     }
   }
 
-  private void extractAnnotationImages(PDImageXObject xObject) throws IOException {
+  private void extractAnnotationImages(PDImageXObject xObject, boolean extractOnly)
+      throws IOException {
     if (!imageTracker.contains(xObject.getCOSObject())) {
+      imageTracker.add(xObject.getCOSObject());
 
-      String name = pdfName + " - pg " + currentPageNumber + " - img " + imageTracker.size();
-
+      String name = pdfName + " - pg " + (currentPageNumber + 1) + " - img " + imageTracker.size();
       log.debug("Extracting Annotation, eg button image... " + name);
 
-      imageTracker.add(xObject.getCOSObject());
-      addTileButton(SwingFXUtils.toFXImage(xObject.getImage(), null), name);
+      WritableImage image = SwingFXUtils.toFXImage(xObject.getImage(), null);
+      if (extractOnly) {
+        if (image.getWidth() > imageMinDimension && image.getHeight() > imageMinDimension) {
+          ImageIO.write(
+              SwingFXUtils.fromFXImage(image, null),
+              imageFormat,
+              new File(fileSavePath, name + "." + imageFormat));
+        }
+      } else {
+        addTileButton(image, name);
+      }
     }
   }
 
@@ -215,6 +292,16 @@ public final class ExtractImagesFromPDF {
 
     imageButton.getStyleClass().add("overlay-toggle-button");
     imageButton.setGraphic(imageViewNode);
+    imageButton.setId(imageName);
+
+    //    double imagePixels = buttonImage.getWidth() * buttonImage.getHeight();
+    //    imageButton.setText(buttonImage.getWidth() + "x" + buttonImage.getHeight());
+
+    String imageFormat =
+        tokenTool_Controller
+            .getPdfViewer()
+            .getPdfViewerController()
+            .getPdfSaveFormatChoiceBoxSelection();
 
     // Can also drag image to TokenTool pane OR any other place, like MapTool!
     imageButton.setOnDragDetected(
@@ -224,9 +311,9 @@ public final class ExtractImagesFromPDF {
 
           try {
             File tempImageFile;
-            tempImageFile = fileSaveUtil.getTempFileName(imageName);
+            tempImageFile = fileSaveUtil.getTempFileName(imageName, imageFormat);
 
-            ImageIO.write(SwingFXUtils.fromFXImage(buttonImage, null), "png", tempImageFile);
+            ImageIO.write(SwingFXUtils.fromFXImage(buttonImage, null), imageFormat, tempImageFile);
             content.putFiles(java.util.Collections.singletonList(tempImageFile));
             tempImageFile.deleteOnExit();
           } catch (IOException e) {
@@ -268,6 +355,14 @@ public final class ExtractImagesFromPDF {
     }
 
     imageButtons.add(imageButton);
+  }
+
+  private static String bytesToHex(byte[] bytes) {
+    StringBuilder sb = new StringBuilder();
+    for (byte b : bytes) {
+      sb.append(String.format("%02x", b));
+    }
+    return sb.toString();
   }
 
   public void interrupt() {

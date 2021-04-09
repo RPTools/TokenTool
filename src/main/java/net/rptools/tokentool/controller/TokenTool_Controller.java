@@ -21,6 +21,7 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
@@ -166,9 +168,11 @@ public class TokenTool_Controller {
   @FXML private TextField fileNameTextField;
   @FXML private Label fileNameSuffixLabel;
   @FXML private TextField fileNameSuffixTextField;
+  @FXML private ChoiceBox<String> fileSaveFormatChoicebox;
   @FXML private TextField portraitNameTextField;
   @FXML private Label portraitNameSuffixLabel;
   @FXML private TextField portraitNameSuffixTextField;
+  @FXML private ChoiceBox<String> portraitSaveFormatChoicebox;
   @FXML private Label overlayNameLabel;
   @FXML private Label overlayInfoLabel;
   @FXML private ColorPicker backgroundColorPicker;
@@ -192,6 +196,8 @@ public class TokenTool_Controller {
       new TreeSet<>(
           Arrays.asList(
               50, 100, 128, 150, 200, 256, 300, 400, 500, 512, 600, 700, 750, 800, 900, 1000));
+
+  private PdfViewer pdfViewer;
 
   @FXML
   void initialize() {
@@ -270,12 +276,16 @@ public class TokenTool_Controller {
         : "fx:id=\"fileNameSuffixLabel\" was not injected: check your FXML file 'TokenTool.fxml'.";
     assert fileNameSuffixTextField != null
         : "fx:id=\"fileNameSuffixTextField\" was not injected: check your FXML file 'TokenTool.fxml'.";
+    assert fileSaveFormatChoicebox != null
+        : "fx:id=\"fileSaveFormatChoicebox\" was not injected: check your FXML file 'TokenTool.fxml'.";
     assert portraitNameTextField != null
         : "fx:id=\"portraitNameTextField\" was not injected: check your FXML file 'TokenTool.fxml'.";
     assert portraitNameSuffixLabel != null
         : "fx:id=\"portraitNameSuffixLabel\" was not injected: check your FXML file 'TokenTool.fxml'.";
     assert portraitNameSuffixTextField != null
         : "fx:id=\"portraitNameSuffixTextField\" was not injected: check your FXML file 'TokenTool.fxml'.";
+    assert portraitSaveFormatChoicebox != null
+        : "fx:id=\"portraitSaveFormatChoicebox\" was not injected: check your FXML file 'TokenTool.fxml'.";
 
     assert overlayNameLabel != null
         : "fx:id=\"overlayNameLabel\" was not injected: check your FXML file 'TokenTool.fxml'.";
@@ -368,15 +378,12 @@ public class TokenTool_Controller {
     // Set filters and bindings for file name inputs
     UnaryOperator<Change> filter =
         change -> {
-          String text = change.getText();
-
-          if (!text.matches(AppConstants.VALID_FILE_NAME_PATTERN)) {
-            change.setText(FileSaveUtil.cleanFileName(text));
-          }
+          change.setText(FileSaveUtil.cleanFileName(change.getText()));
           return change;
         };
 
     fileNameTextField.setTextFormatter(new TextFormatter<>(filter));
+
     portraitNameTextField.setTextFormatter(new TextFormatter<>(filter));
     portraitNameTextField
         .textProperty()
@@ -388,6 +395,10 @@ public class TokenTool_Controller {
     portraitNameSuffixTextField
         .disableProperty()
         .bind(useTokenNameCheckbox.selectedProperty().not());
+
+    // Get valid image file type formats and populate choice boxes
+    fileSaveFormatChoicebox.setItems(AppConstants.VALID_IMAGE_EXTENSIONS);
+    portraitSaveFormatChoicebox.setItems(AppConstants.VALID_IMAGE_EXTENSIONS);
 
     // Bind the use background on drag to save portrait on drag checkbox
     useBackgroundOnDragCheckbox
@@ -610,14 +621,21 @@ public class TokenTool_Controller {
 
     File selectedPDF = fileChooser.showOpenDialog(compositeGroup.getScene().getWindow());
 
+    loadPDF(selectedPDF);
+  }
+
+  private void loadPDF(File selectedPDF) {
     if (selectedPDF != null) {
-      try {
-        new PdfViewer(selectedPDF, this);
-        AppPreferences.setPreference(
-            AppPreferences.LAST_PDF_FILE, selectedPDF.getParentFile().getCanonicalPath());
-      } catch (IOException e) {
-        log.error("Error loading PDF " + selectedPDF.getAbsolutePath());
-      }
+      Platform.runLater(
+          () -> {
+            try {
+              pdfViewer = new PdfViewer(selectedPDF, this);
+              AppPreferences.setPreference(
+                  AppPreferences.LAST_PDF_FILE, selectedPDF.getParentFile().getCanonicalPath());
+            } catch (IOException e) {
+              log.error("Error loading PDF " + selectedPDF.getAbsolutePath());
+            }
+          });
     }
   }
 
@@ -653,6 +671,7 @@ public class TokenTool_Controller {
               false,
               useFileNumberingCheckbox.isSelected(),
               fileNameTextField.getText(),
+              getFileSaveFormatChoiceboxSelection(),
               fileNameSuffixTextField);
 
       writeTokenImage(tempTokenFile);
@@ -684,12 +703,18 @@ public class TokenTool_Controller {
           .forEach(
               file -> {
                 try {
-                  Image cbImage = new Image(file.toURI().toURL().toExternalForm());
+                  String fileName = FilenameUtils.getName(file.toURI().toURL().toExternalForm());
 
-                  updateImage(
-                      cbImage, FilenameUtils.getBaseName(file.toURI().toURL().toExternalForm()));
+                  if (FilenameUtils.isExtension(fileName.toLowerCase(), "pdf")) {
+                    loadPDF(file);
+                  } else {
+                    // Be sure to use ImageIO.read so we can use external libs for other image types
+                    updateImage(
+                        SwingFXUtils.toFXImage(ImageIO.read(file), null),
+                        FilenameUtils.getBaseName(fileName));
+                  }
                 } catch (Exception e) {
-                  log.error("Could not load image " + file);
+                  log.error("Could not load image from clipboard " + file);
                   e.printStackTrace();
                 }
               });
@@ -705,17 +730,19 @@ public class TokenTool_Controller {
       }
     } else if (clipboard.hasUrl()) {
       try {
-        Image cbImage = new Image(clipboard.getUrl());
-        updateImage(cbImage, FileSaveUtil.searchURL(clipboard.getUrl()));
-      } catch (IllegalArgumentException e) {
-        log.info(e);
+        updateImage(
+            SwingFXUtils.toFXImage(ImageIO.read(new URL(clipboard.getUrl())), null),
+            FileSaveUtil.searchURL(clipboard.getUrl()));
+      } catch (IOException e) {
+        log.warn(e);
       }
     } else if (clipboard.hasString()) {
       try {
-        Image cbImage = new Image(clipboard.getString());
-        updateImage(cbImage, FileSaveUtil.searchURL(clipboard.getString()));
-      } catch (IllegalArgumentException e) {
-        log.info(e);
+        updateImage(
+            SwingFXUtils.toFXImage(ImageIO.read(new URL(clipboard.getString())), null),
+            FileSaveUtil.searchURL(clipboard.getString()));
+      } catch (IOException e) {
+        log.warn(e);
       }
     }
   }
@@ -888,6 +915,11 @@ public class TokenTool_Controller {
       return;
     }
 
+    double fineAdjustment = 1;
+    if (event.isControlDown()) {
+      fineAdjustment = 0.1;
+    }
+
     if (event.isShiftDown()) {
       // Note: OK, this is stupid but on Windows shift + mousewheel returns X delta but on Ubuntu it
       // returns Y delta...
@@ -895,6 +927,8 @@ public class TokenTool_Controller {
       if (delta == 0) {
         delta = event.getDeltaX();
       }
+
+      delta = delta * fineAdjustment;
 
       double r = getCurrentLayer().getRotate() + delta / 20;
 
@@ -904,7 +938,8 @@ public class TokenTool_Controller {
 
       getCurrentLayer().setRotate(r);
     } else {
-      double scale = getCurrentLayer().getScaleY() * Math.pow(1.001, event.getDeltaY());
+      double scale =
+          getCurrentLayer().getScaleY() * Math.pow(1.001, (event.getDeltaY() * fineAdjustment));
 
       getCurrentLayer().setScaleX(scale);
       getCurrentLayer().setScaleY(scale);
@@ -952,14 +987,15 @@ public class TokenTool_Controller {
                   String fileName = FilenameUtils.getName(file.toURI().toURL().toExternalForm());
 
                   if (FilenameUtils.isExtension(fileName.toLowerCase(), "pdf")) {
-                    Platform.runLater(() -> new PdfViewer(file, this));
+                    loadPDF(file);
                   } else {
+                    // Be sure to use ImageIO.read so we can use external libs for other image types
                     updateImage(
-                        new Image(file.toURI().toURL().toExternalForm()),
+                        SwingFXUtils.toFXImage(ImageIO.read(file), null),
                         FilenameUtils.getBaseName(fileName));
                   }
                 } catch (Exception e) {
-                  log.error("Could not load image " + file, e);
+                  log.error("Could not load image drom drag-n-drop " + file, e);
                 }
               });
       event.setDropCompleted(true);
@@ -967,7 +1003,13 @@ public class TokenTool_Controller {
       updateImage(db.getImage());
       event.setDropCompleted(true);
     } else if (db.hasUrl()) {
-      updateImage(new Image(db.getUrl()), FileSaveUtil.searchURL(db.getUrl()));
+      try {
+        updateImage(
+            SwingFXUtils.toFXImage(ImageIO.read(new URL(db.getUrl())), null),
+            FileSaveUtil.searchURL(db.getUrl()));
+      } catch (IOException e) {
+        log.warn(e);
+      }
       event.setDropCompleted(true);
     }
   }
@@ -1033,6 +1075,7 @@ public class TokenTool_Controller {
               saveAsToken,
               useFileNumberingCheckbox.isSelected(),
               getFileNameTextField(),
+              getFileSaveFormatChoiceboxSelection(),
               fileNameSuffixTextField,
               false);
       writeTokenImage(tempTokenFile);
@@ -1043,6 +1086,7 @@ public class TokenTool_Controller {
               saveAsToken,
               useFileNumberingCheckbox.isSelected(),
               getPortraitNameTextField(),
+              getPortraitSaveFormatChoiceboxSelection(),
               fileNameSuffixTextField,
               true);
       if (savePortraitOnDragCheckbox.isSelected()) {
@@ -1221,7 +1265,9 @@ public class TokenTool_Controller {
   }
 
   private void saveToken() {
+    String fileExtension = getFileSaveFormatChoiceboxSelection();
     FileChooser fileChooser = new FileChooser();
+    log.info("***** Saving Token as a {}", fileExtension);
 
     try {
       File tokenFile =
@@ -1229,6 +1275,7 @@ public class TokenTool_Controller {
               false,
               useFileNumberingCheckbox.isSelected(),
               fileNameTextField.getText(),
+              getFileSaveFormatChoiceboxSelection(),
               fileNameSuffixTextField,
               true);
       fileChooser.setInitialFileName(tokenFile.getName());
@@ -1260,6 +1307,7 @@ public class TokenTool_Controller {
 
   private boolean writeTokenImage(File tokenFile) {
     try {
+      String imageType = getFileSaveFormatChoiceboxSelection();
       Image tokenImage;
       if (clipPortraitCheckbox.isSelected()) {
         tokenImage =
@@ -1269,7 +1317,24 @@ public class TokenTool_Controller {
         tokenImage = tokenImageView.getImage();
       }
 
-      return ImageIO.write(SwingFXUtils.fromFXImage(tokenImage, null), "png", tokenFile);
+      BufferedImage imageRGB = SwingFXUtils.fromFXImage(tokenImage, null);
+
+      log.debug("Writing token image as: " + imageType);
+      boolean writeSuccessful = ImageIO.write(imageRGB, imageType, tokenFile);
+
+      if (!writeSuccessful) {
+        // Remove alpha-channel from buffered image
+        BufferedImage image = SwingFXUtils.fromFXImage(tokenImage, null);
+        imageRGB = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.OPAQUE);
+        Graphics2D graphics = imageRGB.createGraphics();
+        graphics.drawImage(image, 0, 0, null);
+        graphics.dispose();
+
+        log.debug("Writing token image as:" + imageType);
+        writeSuccessful = ImageIO.write(imageRGB, imageType, tokenFile);
+      }
+
+      return writeSuccessful;
     } catch (IOException e) {
       log.error("Unable to write token to file: " + tokenFile.getAbsolutePath(), e);
     } catch (IndexOutOfBoundsException e) {
@@ -1281,36 +1346,46 @@ public class TokenTool_Controller {
   }
 
   private File writePortraitImage(File tokenFile) {
+    boolean writeSuccessful = false;
+
     try {
-      String imageType = "png";
+      String imageType = getPortraitSaveFormatChoiceboxSelection();
       Image tokenImage;
       tokenImage = getPortraitImage();
       BufferedImage imageRGB = SwingFXUtils.fromFXImage(tokenImage, null);
 
-      if (useBackgroundOnDragCheckbox.isSelected()) {
-        if (getBackgroundColor() != Color.TRANSPARENT || getBackgroundImage() != null) {
-          tokenImage =
-              ImageUtil.autoCropImage(tokenImage, getBackgroundColor(), getBackgroundImage());
-          imageType = "jpg";
+      if (!useBackgroundOnDragCheckbox.isSelected()) {
+        writeSuccessful = ImageIO.write(imageRGB, imageType, tokenFile);
+      }
 
-          String newFileName =
-              FilenameUtils.removeExtension(tokenFile.getAbsolutePath()) + "." + imageType;
-          tokenFile = new File(newFileName);
-
-          // Remove alpha-channel from buffered image
-          BufferedImage image = SwingFXUtils.fromFXImage(tokenImage, null);
-          imageRGB = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.OPAQUE);
-          Graphics2D graphics = imageRGB.createGraphics();
-          graphics.drawImage(image, 0, 0, null);
-          graphics.dispose();
-
-          ImageIO.write(imageRGB, imageType, tokenFile);
+      if (!writeSuccessful) {
+        if (useBackgroundOnDragCheckbox.isSelected()) {
+          if (getBackgroundColor() != Color.TRANSPARENT || getBackgroundImage() != null) {
+            tokenImage =
+                ImageUtil.autoCropImage(tokenImage, getBackgroundColor(), getBackgroundImage());
+          } else {
+            //            ImageUtil.autoCropImage(tokenImage, Color.BLACK, null);
+          }
+        } else {
+          //          ImageUtil.autoCropImage(tokenImage, Color.BLACK, null);
         }
+
+        String newFileName =
+            FilenameUtils.removeExtension(tokenFile.getAbsolutePath()) + "." + imageType;
+        tokenFile = new File(newFileName);
+
+        // Remove alpha-channel from buffered image
+        BufferedImage image = SwingFXUtils.fromFXImage(tokenImage, null);
+        imageRGB = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.OPAQUE);
+        Graphics2D graphics = imageRGB.createGraphics();
+        graphics.drawImage(image, 0, 0, null);
+        graphics.dispose();
+
+        log.debug("Writing token image as:" + imageType);
+        writeSuccessful = ImageIO.write(imageRGB, imageType, tokenFile);
       }
 
-      if (ImageIO.write(imageRGB, imageType, tokenFile)) {
-        return tokenFile;
-      }
+      return tokenFile;
 
     } catch (IOException e) {
       log.error("Unable to write token to file: " + tokenFile.getAbsolutePath(), e);
@@ -1319,7 +1394,11 @@ public class TokenTool_Controller {
           "Image width/height out of bounds: " + getOverlayWidth() + " x " + getOverlayHeight(), e);
     }
 
-    return null;
+    if (writeSuccessful) {
+      return tokenFile;
+    } else {
+      return null;
+    }
   }
 
   public void updateOverlayTreeViewRecentFolder(boolean selectMostRecent) {
@@ -1518,29 +1597,32 @@ public class TokenTool_Controller {
     overlayTreeProgressBar.setStyle("-fx-accent: forestgreen;");
     progressBarLabel.setVisible(false);
 
-    FadeTransition progressBarFadeOut = new FadeTransition(Duration.millis(2000));
-    progressBarFadeOut.setNode(overlayTreeProgressBar);
-    progressBarFadeOut.setFromValue(1.0);
-    progressBarFadeOut.setToValue(0.0);
-    progressBarFadeOut.setCycleCount(1);
-    progressBarFadeOut.setAutoReverse(false);
-    progressBarFadeOut.playFromStart();
+    Platform.runLater(
+        () -> {
+          FadeTransition progressBarFadeOut = new FadeTransition(Duration.millis(2000));
+          progressBarFadeOut.setNode(overlayTreeProgressBar);
+          progressBarFadeOut.setFromValue(1.0);
+          progressBarFadeOut.setToValue(0.0);
+          progressBarFadeOut.setCycleCount(1);
+          progressBarFadeOut.setAutoReverse(false);
+          progressBarFadeOut.playFromStart();
 
-    FadeTransition nameFadeIn = new FadeTransition(Duration.millis(4000));
-    nameFadeIn.setNode(overlayNameLabel);
-    nameFadeIn.setFromValue(0.0);
-    nameFadeIn.setToValue(1.0);
-    nameFadeIn.setCycleCount(1);
-    nameFadeIn.setAutoReverse(false);
-    nameFadeIn.playFromStart();
+          FadeTransition nameFadeIn = new FadeTransition(Duration.millis(4000));
+          nameFadeIn.setNode(overlayNameLabel);
+          nameFadeIn.setFromValue(0.0);
+          nameFadeIn.setToValue(1.0);
+          nameFadeIn.setCycleCount(1);
+          nameFadeIn.setAutoReverse(false);
+          nameFadeIn.playFromStart();
 
-    FadeTransition infoFadeIn = new FadeTransition(Duration.millis(4000));
-    infoFadeIn.setNode(overlayInfoLabel);
-    infoFadeIn.setFromValue(0.0);
-    infoFadeIn.setToValue(1.0);
-    infoFadeIn.setCycleCount(1);
-    infoFadeIn.setAutoReverse(false);
-    infoFadeIn.playFromStart();
+          FadeTransition infoFadeIn = new FadeTransition(Duration.millis(4000));
+          infoFadeIn.setNode(overlayInfoLabel);
+          infoFadeIn.setFromValue(0.0);
+          infoFadeIn.setToValue(1.0);
+          infoFadeIn.setCycleCount(1);
+          infoFadeIn.setAutoReverse(false);
+          infoFadeIn.playFromStart();
+        });
   }
 
   private TreeItem<Path> cacheOverlays(File dir, TreeItem<Path> parent) throws IOException {
@@ -1795,6 +1877,22 @@ public class TokenTool_Controller {
     }
   }
 
+  public String getFileSaveFormatChoiceboxSelection() {
+    return fileSaveFormatChoicebox.getSelectionModel().getSelectedItem();
+  }
+
+  public void setFileSaveFormatChoiceboxSelection(String item) {
+    fileSaveFormatChoicebox.getSelectionModel().select(item);
+  }
+
+  public String getPortraitSaveFormatChoiceboxSelection() {
+    return portraitSaveFormatChoicebox.getSelectionModel().getSelectedItem();
+  }
+
+  public void setPortraitSaveFormatChoiceboxSelection(String item) {
+    portraitSaveFormatChoicebox.getSelectionModel().select(item);
+  }
+
   // For user preferences...
   public void setWindowFrom_Preferences(String preferencesJson) {
     if (preferencesJson != null) {
@@ -1857,6 +1955,10 @@ public class TokenTool_Controller {
 
   public Slider getOverlayTransparencySlider() {
     return overlayTransparencySlider;
+  }
+
+  public PdfViewer getPdfViewer() {
+    return pdfViewer;
   }
 
   public void exitApplication() {

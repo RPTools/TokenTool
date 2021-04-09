@@ -1,3 +1,26 @@
+TokenTool 2.2.0
+=====
+You can now add background images, extract images from PDF files, and save the portrait alongside the token using the same background image and/or colors!  Several bug fixes and requested enhancements have also been added.
+
+
+Enhancements
+-----
+* [#146][i146] - *Add WebP Support*. You can now open, drag-n-drop, and save images as WebP.
+* [#40][i40] - *Finer control over image size needed*. You can now open, drag-n-drop, and save images as WebP.
+* Misc - *Bulk PDF Image Extraction*. You can now extract all images in a PDF to a directory, either by current page or whole PDF.
+* Misc - *PDF Image filter by size*. You can now filter the images extracted from a PDF, hiding any image that had a width and height < specified size. Useful for hiding small decorative images.
+
+
+Bug Fixes
+-----
+* [#122][i122] - *TokenTool cannot handle UTF8 strings in file names*. Control + Mousewheel now reduces zoom (and Control + Shift + Mousewheel for rotation) by a factor of 10 for finer control. 
+
+[i146]: https://github.com/RPTools/TokenTool/issues/146
+[i122]: https://github.com/RPTools/TokenTool/issues/122
+[i40]: https://github.com/RPTools/TokenTool/issues/40
+
+---
+
 TokenTool 2.1
 =====
 You can now add background images, extract images from PDF files, and save the portrait alongside the token using the same background image and/or colors!  Several bug fixes and requested enhancements have also been added. 

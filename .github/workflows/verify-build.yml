@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macOS-latest]
-        java: [ '14' ]
+        java: [ '15' ]
       fail-fast: false
     steps:
     - name: Git checkout
@@ -33,13 +33,13 @@ jobs:
       with:
         java-version: ${{ matrix.java }}
     - name: Cache Gradle
-      uses: actions/cache@v1
-      # Cache only seems to work on ubuntu right now...
-      if: matrix.os == 'ubuntu-latest'
+      uses: actions/cache@v2
       with:
-        path: ~/.gradle/caches
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-v2-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
-          ${{ runner.os }}-gradle-
+          ${{ runner.os }}-gradle-v2-
     - name: Build with Gradle
       run: ./gradlew build

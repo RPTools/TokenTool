@@ -33,6 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class AppPreferences {
+
   private static final Logger log = LogManager.getLogger(AppPreferences.class);
   private static final Preferences prefs = Preferences.userNodeForPackage(TokenTool.class);
 
@@ -46,6 +47,11 @@ public class AppPreferences {
   private static final String FILE_NAME_TEXT_FIELD = "fileNameTextField";
   private static final String FILE_NAME_SUFFIX_TEXT_FIELD = "fileNameSuffixTextField";
   private static final String USE_FILE_NUMBERING = "useFileNumberingCheckbox";
+  private static final String TOKEN_IMAGE_SAVE_FORMAT = "tokenImageSaveFormat";
+  private static final String PORTRAIT_IMAGE_SAVE_FORMAT = "portraitImageSaveFormat";
+  public static final String PDF_IMAGE_SAVE_FORMAT = "pdfImageSaveFormat";
+  public static final String PDF_IMAGE_MIN_EXPORT_SIZE = "pdfImageMinExportSize";
+
   private static final String SAVE_PORTRAIT_ON_DRAG = "savePortraitOnDragCheckbox";
   private static final String USE_BACKGROUND_ON_DRAG = "useBackgroundOnDragCheckbox";
 
@@ -63,6 +69,7 @@ public class AppPreferences {
   public static final String WINDOW_CREDITS_PREFERENCES = "windowCredits_preferences";
 
   public static final String LAST_PDF_FILE = "lastPdfFileSaved";
+  public static final String LAST_PDF_EXPORT_LOCATION = "lastPdfExportLocation";
   public static final String LAST_BACKGROUND_IMAGE_FILE = "lastBackgroundImageFile";
   public static final String LAST_PORTRAIT_IMAGE_FILE = "lastPortraitImageFile";
 
@@ -127,6 +134,24 @@ public class AppPreferences {
         PORTRAIT_NAME_SUFFIX_TEXT_FIELD, tokentool_Controller.getPortraitNameSuffixTextField());
     prefs.putBoolean(SAVE_PORTRAIT_ON_DRAG, tokentool_Controller.getSavePortraitOnDragCheckbox());
     prefs.putBoolean(USE_BACKGROUND_ON_DRAG, tokentool_Controller.getUseBackgroundOnDragCheckbox());
+    prefs.put(TOKEN_IMAGE_SAVE_FORMAT, tokentool_Controller.getFileSaveFormatChoiceboxSelection());
+    prefs.put(
+        PORTRAIT_IMAGE_SAVE_FORMAT, tokentool_Controller.getPortraitSaveFormatChoiceboxSelection());
+
+    if (tokentool_Controller.getPdfViewer() != null) {
+      prefs.put(
+          PDF_IMAGE_SAVE_FORMAT,
+          tokentool_Controller
+              .getPdfViewer()
+              .getPdfViewerController()
+              .getPdfSaveFormatChoiceBoxSelection());
+      prefs.put(
+          PDF_IMAGE_MIN_EXPORT_SIZE,
+          tokentool_Controller
+              .getPdfViewer()
+              .getPdfViewerController()
+              .getPdfMinDimensionTextFieldText());
+    }
 
     // Save recent overlays used
     log.debug("...saving recent overlay count");
@@ -135,14 +160,18 @@ public class AppPreferences {
 
     log.debug("...saving recent overlays");
     int i = 1;
-    for (Path path : recentOverlays.keySet()) prefs.put(RECENT_OVERLAY + i++, path.toString());
+    for (Path path : recentOverlays.keySet()) {
+      prefs.put(RECENT_OVERLAY + i++, path.toString());
+    }
 
     // Save location of save
     log.debug("...saving last file save location");
     try {
-      if (FileSaveUtil.getLastFile() != null)
-        if (FileSaveUtil.getLastFile().getParentFile().exists())
+      if (FileSaveUtil.getLastFile() != null) {
+        if (FileSaveUtil.getLastFile().getParentFile().exists()) {
           prefs.put(LAST_TOKEN_SAVE_LOCATION, FileSaveUtil.getLastFile().getCanonicalPath());
+        }
+      }
     } catch (NullPointerException e) {
       log.warn("No last save location to save...");
     } catch (IOException e) {
@@ -194,6 +223,12 @@ public class AppPreferences {
   public static void restorePreferences(TokenTool_Controller tokentool_Controller) {
     log.info("Restoring preferences from " + prefs.toString());
 
+    // Restore last portrait used
+    tokentool_Controller.setPortraitFrom_Preferences(
+        prefs.get(PORTRAIT_IMAGEVIEW_PREFERENCES, null));
+    tokentool_Controller.setBackgroundFrom_Preferences(
+        prefs.get(BACKGROUND_IMAGEVIEW_PREFERENCES, null));
+
     // Restore Overlay details
     tokentool_Controller.setOverlayAspect(
         prefs.getBoolean(OVERLAY_ASPECT, AppConstants.DEFAULT_OVERLAY_ASPECT));
@@ -224,6 +259,10 @@ public class AppPreferences {
         prefs.getBoolean(USE_BACKGROUND_ON_DRAG, AppConstants.DEFAULT_USE_BACKGROUND_ON_DRAG));
     tokentool_Controller.setSavePortraitOnDragCheckbox(
         prefs.getBoolean(SAVE_PORTRAIT_ON_DRAG, AppConstants.DEFAULT_SAVE_PORTRAIT_ON_DRAG));
+    tokentool_Controller.setFileSaveFormatChoiceboxSelection(
+        prefs.get(TOKEN_IMAGE_SAVE_FORMAT, AppConstants.DEFAULT_IMAGE_EXTENSION));
+    tokentool_Controller.setPortraitSaveFormatChoiceboxSelection(
+        prefs.get(PORTRAIT_IMAGE_SAVE_FORMAT, AppConstants.DEFAULT_IMAGE_EXTENSION));
 
     // Restore Portrait Effects
     tokentool_Controller
@@ -245,10 +284,11 @@ public class AppPreferences {
     int overlayCount = prefs.getInt(RECENT_OVERLAY_COUNT, 0);
     for (int i = 1; i <= overlayCount; i++) {
       String filePath = prefs.get(RECENT_OVERLAY + i, "");
-      if (!filePath.isEmpty())
+      if (!filePath.isEmpty()) {
         if (new File(filePath).exists()) {
           tokentool_Controller.updateRecentOverlayTreeItems(Paths.get(filePath));
         }
+      }
     }
 
     // Restore window size/position
@@ -260,12 +300,6 @@ public class AppPreferences {
 
     // Restore location of save
     FileSaveUtil.setLastFile(prefs.get(LAST_TOKEN_SAVE_LOCATION, null));
-
-    // Restore last portrait used
-    tokentool_Controller.setPortraitFrom_Preferences(
-        prefs.get(PORTRAIT_IMAGEVIEW_PREFERENCES, null));
-    tokentool_Controller.setBackgroundFrom_Preferences(
-        prefs.get(BACKGROUND_IMAGEVIEW_PREFERENCES, null));
   }
 
   public static void removeAllPreferences() {

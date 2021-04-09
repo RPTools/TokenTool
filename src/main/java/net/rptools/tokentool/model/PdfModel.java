@@ -99,6 +99,14 @@ public class PdfModel {
     }
   }
 
+  public boolean isClosed() {
+    return document.getDocument().isClosed();
+  }
+
+  public int getPdfPageCount() {
+    return document.getNumberOfPages();
+  }
+
   public ArrayList<ToggleButton> extractImages(int currentPageIndex) {
     try {
       // imageExtractor.interrupt();
@@ -107,6 +115,23 @@ public class PdfModel {
       log.error("Error extracting images from PDF...", e);
       return null;
     }
+  }
+
+  public void extractAllImagesFromPage(
+      String filePath, String imageFormat, int page, double imageMinDimension) {
+    try {
+      if (!document.getDocument().isClosed()) {
+        imageExtractor.extractAllImagesFromPage(filePath, imageFormat, page, imageMinDimension);
+      }
+    } catch (IOException e) {
+      log.error("Error extracting images from PDF...", e);
+      interrupt();
+      close();
+    }
+  }
+
+  public void resetImageHashTracker() {
+    imageExtractor.resetImageHashTracker();
   }
 
   public void interrupt() {

@@ -13,8 +13,7 @@ module net.rptools.tokentool {
   requires reflections;
   requires org.apache.commons.io;
   requires org.apache.pdfbox;
-  requires io.sentry;
-  requires com.fasterxml.jackson.core;
+  requires sentry;
 
   opens net.rptools.tokentool to
       javafx.fxml;

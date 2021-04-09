@@ -17,8 +17,10 @@ package net.rptools.tokentool.client;
 import io.sentry.Sentry;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import javafx.application.Application;
 import javafx.application.ConditionalFeature;
@@ -50,23 +52,31 @@ import org.apache.logging.log4j.ThreadContext;
  */
 public class TokenTool extends Application {
 
+  private static final boolean DEV_MODE_FAST_LOAD = false; // Skip overlay cache load if true
   private static TokenTool appInstance;
   private static Logger log; // Don't instantiate until we set user_home/logs directory in AppSetup
   private static BorderPane root;
   private static TokenTool_Controller tokentool_Controller;
-  private static String VERSION = "";
-  private static String VENDOR = "";
   private static int overlayCount = 0;
   private static int loadCount = 1;
 
   private static TreeItem<Path> overlayTreeItems;
   private static Stage stage;
 
+  private static final Properties buildProperties = new Properties();
+
   static {
     // This will inject additional data tags in log4j2 which will be picked up by Sentry.io
     System.setProperty("log4j2.isThreadContextMapInheritable", "true");
     ThreadContext.put(
         "OS", System.getProperty("os.name")); // Added to the JavaFX Application Thread thread...
+
+    InputStream inputStream = ClassLoader.getSystemResourceAsStream("build.properties");
+    try {
+      buildProperties.load(inputStream);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   public static TokenTool getInstance() {
@@ -74,29 +84,19 @@ public class TokenTool extends Application {
   }
 
   public static String getVersion() {
-    if (!VERSION.isEmpty()) {
-      return VERSION;
-    }
-
-    VERSION = "DEVELOPMENT";
-
-    if (TokenTool.class.getPackage().getImplementationVersion() != null) {
-      VERSION = TokenTool.class.getPackage().getImplementationVersion().trim();
-    }
-
-    return VERSION;
+    return buildProperties.getProperty("version", "DEVELOPMENT");
   }
 
   public static String getVendor() {
-    if (!VENDOR.isEmpty()) {
-      return VENDOR;
-    }
+    return buildProperties.getProperty("vendor", "RPTools");
+  }
 
-    if (TokenTool.class.getPackage().getImplementationVendor() != null) {
-      VENDOR = TokenTool.class.getPackage().getImplementationVendor().trim();
-    }
+  public static String getEnvironment() {
+    return buildProperties.getProperty("environment", "development");
+  }
 
-    return VENDOR;
+  public static String getSentryDsn() {
+    return buildProperties.getProperty("sentryDSN", "");
   }
 
   //  public static String getLoggerFileName() {
@@ -120,19 +120,28 @@ public class TokenTool extends Application {
     registry.registerServiceProvider(new com.github.jaiimageio.jpeg2000.impl.J2KImageReaderSpi());
 
     appInstance = this;
-    VERSION = getVersion();
 
     // Lets install/update the overlays if newer version
-    AppSetup.install(VERSION);
+    AppSetup.install(getVersion());
     log = LogManager.getLogger(TokenTool.class);
 
+    Sentry.init(
+        options -> {
+          options.setDsn(getSentryDsn());
+          options.setEnvironment(getEnvironment());
+          options.setRelease("tokentool@" + getVersion());
+        });
+
     // Log some basic info
-    log.info("Environment: " + Sentry.getStoredClient().getEnvironment());
-    if (!Sentry.getStoredClient().getEnvironment().toLowerCase().equals("production")) {
+    log.info("Environment: {}", getEnvironment());
+    log.info("Sentry DSN: {}", getSentryDsn());
+
+    if (!Sentry.isEnabled()) {
       log.info("Not in Production mode and thus will not log any events to Sentry.io");
     }
 
-    log.info("Release: " + Sentry.getStoredClient().getRelease());
+    log.info("Vendor: " + getVendor());
+    log.info("Release: " + getVersion());
     log.info("OS: " + ThreadContext.get("OS"));
     log.info("3D Hardware Available? " + Platform.isSupported(ConditionalFeature.SCENE3D));
 
@@ -211,6 +220,10 @@ public class TokenTool extends Application {
     TreeItem<Path> root = new TreeItem<>(dir.toPath());
     root.setExpanded(false);
 
+    if (DEV_MODE_FAST_LOAD) {
+      return root;
+    }
+
     log.debug("caching " + dir.getAbsolutePath());
 
     File[] files = dir.listFiles();
@@ -255,9 +268,9 @@ public class TokenTool extends Application {
    * Legacy, it simply launches the FX Application which calls init() then start(). Also sets/calls
    * the preloader class
    *
+   * @param args the command line arguments
    * @author Jamz
    * @since 2.0
-   * @param args the command line arguments
    */
   public static void main(String[] args) {
     System.setProperty("javafx.preloader", "net.rptools.tokentool.client.SplashScreenLoader");

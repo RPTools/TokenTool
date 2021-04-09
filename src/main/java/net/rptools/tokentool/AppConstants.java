@@ -15,8 +15,9 @@
 package net.rptools.tokentool;
 
 import java.io.File;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 public class AppConstants {
@@ -41,17 +42,18 @@ public class AppConstants {
 
   public static final String RPTOOLS_URL = "http://www.rptools.net";
 
-  public static final String DEFAULT_IMAGE_EXTENSION = ".png";
-  public static final String DEFAULT_IMAGE_EXTENSION_DESCRIPTION = "PNG Image";
+  public static final ObservableList VALID_IMAGE_EXTENSIONS =
+      FXCollections.observableArrayList("webp", "png", "jpg", "gif", "tif");
+  public static final String DEFAULT_IMAGE_EXTENSION = "webp";
+  public static final String DEFAULT_IMAGE_EXTENSION_DESCRIPTION = "WebP Image";
   public static final String DEFAULT_TOKEN_NAME = "token";
   public static final String DEFAULT_FILE_NAME_SUFFIX = "0001";
+  public static final String DEFAULT_PDF_IMAGE_MIN_EXPORT_SIZE = "";
 
-  public static final String VALID_FILE_NAME_PATTERN = "[a-zA-Z0-9._ `~!@#$%^&()\\-=+\\[\\]{}',]*";
   public static final String VALID_FILE_NAME_REPLACEMENT_PATTERN =
       "[^a-zA-Z0-9._ `~!@#$%^&()\\-=+\\[\\]{}',]";
   public static final String VALID_FILE_NAME_REPLACEMENT_CHARACTER = "_";
 
-  public static final int THUMB_SIZE = 100;
   public static final int MAX_RECENT_SIZE = 10;
 
   // UI Defaults
@@ -65,14 +67,14 @@ public class AppConstants {
   public static final File OVERLAY_DIR = AppSetup.getAppHome("overlays");
   public static final File CACHE_DIR = AppSetup.getAppHome("cache");
   public static final ExtensionFilter IMAGE_EXTENSION_FILTER =
-      new ExtensionFilter(DEFAULT_IMAGE_EXTENSION_DESCRIPTION, "*" + DEFAULT_IMAGE_EXTENSION);
+      new ExtensionFilter(DEFAULT_IMAGE_EXTENSION_DESCRIPTION, "*." + DEFAULT_IMAGE_EXTENSION);
   public static final double DEFAULT_PORTRAIT_TRANSPARENCY = 1;
   public static final double DEFAULT_PORTRAIT_BLUR = 0;
   public static final double DEFAULT_PORTRAIT_GLOW = 0;
   public static final double DEFAULT_OVERLAY_TRANSPARENCY = 1;
+
   // Set by controller using defaults set in FXML
   public static Image DEFAULT_PORTRAIT_IMAGE;
-  public static ImageView DEFAULT_BACKGROUND_IMAGE_VIEW;
   public static Image DEFAULT_MASK_IMAGE;
   public static Image DEFAULT_OVERLAY_IMAGE;
   public static double DEFAULT_PORTRAIT_IMAGE_X;
@@ -84,10 +86,4 @@ public class AppConstants {
   public static String DEFAULT_PORTRAIT_NAME_TEXT_FIELD;
   public static boolean DEFAULT_USE_TOKEN_NAME;
   public static String DEFAULT_PORTRAIT_NAME_SUFFIX_TEXT_FIELD;
-
-  // public static final String DEFAULT_TOKEN_EXTENSION = ".rptok";
-  // public static final String DEFAULT_TOKEN_EXTENSION_DESCRIPTION = "MapTool Token";
-
-  // public static final ExtensionFilter TOKEN_EXTENSION_FILTER = new ExtensionFilter(
-  // DEFAULT_TOKEN_EXTENSION_DESCRIPTION, "*" + DEFAULT_TOKEN_EXTENSION);
 }

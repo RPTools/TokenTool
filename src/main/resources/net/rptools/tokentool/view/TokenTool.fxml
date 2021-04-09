@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -38,7 +39,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.rptools.tokentool.controller.TokenTool_Controller">
+<BorderPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.rptools.tokentool.controller.TokenTool_Controller">
 	<center>
 		<VBox prefHeight="825.0" prefWidth="825.0">
 			<children>
@@ -219,6 +220,16 @@
 																				<Insets />
 																			</VBox.margin>
 																		</HBox>
+                                                      <HBox alignment="CENTER_LEFT">
+                                                         <children>
+                                                            <Label text="%controls.tokenSaveFormat.text">
+                                                               <HBox.margin>
+                                                                  <Insets right="5.0" />
+                                                               </HBox.margin>
+                                                            </Label>
+                                                            <ChoiceBox fx:id="fileSaveFormatChoicebox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                                                         </children>
+                                                      </HBox>
 																		<Separator prefWidth="210.0">
 																			<VBox.margin>
 																				<Insets top="10.0" />
@@ -247,6 +258,16 @@
 																				</TextField>
 																			</children>
 																		</HBox>
+                                                      <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="136.0">
+                                                         <children>
+                                                            <Label text="%controls.tokenSaveFormat.text">
+                                                               <HBox.margin>
+                                                                  <Insets right="5.0" />
+                                                               </HBox.margin>
+                                                            </Label>
+                                                            <ChoiceBox fx:id="portraitSaveFormatChoicebox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                                                         </children>
+                                                      </HBox>
 																		<Separator layoutX="20.0" layoutY="146.0" prefWidth="210.0">
 																			<opaqueInsets>
 																				<Insets />
