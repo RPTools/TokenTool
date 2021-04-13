@@ -5,7 +5,7 @@ plugins {
     java
     id("org.openjfx.javafxplugin") version "0.0.9"
     id("org.beryx.jlink") version "2.23.6"
-    id("com.diffplug.spotless") version "5.11.1"
+    id("com.diffplug.spotless") version "5.12.1"
     id("io.wusa.semver-git-plugin") version "2.3.7"
 }
 
