@@ -120,7 +120,7 @@ dependencies {
     implementation(group = "org.sejda.imageio", name = "webp-imageio", version = "0.1.6")
 
     // Image processing lib https://github.com/haraldk/TwelveMonkeys
-    implementation(group = "com.twelvemonkeys.imageio", name = "imageio-core", version = "3.6.4")
+    implementation(group = "com.twelvemonkeys.imageio", name = "imageio-core", version = "3.7.0")
     implementation(group = "com.twelvemonkeys.imageio", name = "imageio-jpeg", version = "3.6.4")
     implementation(group = "com.twelvemonkeys.imageio", name = "imageio-psd", version = "3.6.4")
 
