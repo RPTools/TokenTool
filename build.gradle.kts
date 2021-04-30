@@ -116,7 +116,7 @@ dependencies {
 
     // For pdf image extraction, specifically for jpeg2000 (jpx) support.
     implementation(group = "com.github.jai-imageio", name = "jai-imageio-core", version = "1.4.0")
-    implementation(group = "com.github.jai-imageio", name = "jai-imageio-jpeg2000", version = "1.3.0")
+    implementation(group = "com.github.jai-imageio", name = "jai-imageio-jpeg2000", version = "1.4.0")
     implementation(group = "org.sejda.imageio", name = "webp-imageio", version = "0.1.6")
 
     // Image processing lib https://github.com/haraldk/TwelveMonkeys
