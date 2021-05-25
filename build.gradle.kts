@@ -127,7 +127,7 @@ dependencies {
     // Other public libs
     implementation(group = "commons-io", name = "commons-io", version = "2.8.0")
     implementation(group = "org.reflections", name = "reflections", version = "0.9.12")
-    implementation(group = "com.google.code.gson", name = "gson", version = "2.8.6")
+    implementation(group = "com.google.code.gson", name = "gson", version = "2.8.7")
 }
 
 val sharedManifest = the<JavaPluginConvention>().manifest {
