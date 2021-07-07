@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macOS-latest]
-        java: [ '15' ]
+        java: [ '16' ]
       fail-fast: false
     steps:
     - name: Git checkout
