@@ -3,9 +3,9 @@ import java.time.LocalDateTime
 plugins {
     application
     java
-    id("org.openjfx.javafxplugin") version "0.0.9"
+    id("org.openjfx.javafxplugin") version "0.0.10"
     id("org.beryx.jlink") version "2.23.6"
-    id("com.diffplug.spotless") version "5.11.1"
+    id("com.diffplug.spotless") version "5.14.1"
     id("io.wusa.semver-git-plugin") version "2.3.7"
 }
 
@@ -61,25 +61,25 @@ application {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
     modularity.inferModulePath.set(true)
 }
 
 javafx {
-    version = "15.0.1"
+    version = "16"
     modules = listOf("javafx.base", "javafx.controls", "javafx.fxml", "javafx.swing", "javafx.graphics")
 }
 
 spotless {
     java {
         licenseHeaderFile("${projectDir}/spotless.license.java")
-        googleJavaFormat()
+        targetExclude("**/module-info.java")
+        //googleJavaFormat()
     }
 
     format("misc") {
         target("**/*.gradle", "**/.gitignore")
-
         // spotless has built-in rules for most basic formatting tasks
         trimTrailingWhitespace()
         // or spaces. Takes an integer argument if you don"t like 4
@@ -126,7 +126,8 @@ dependencies {
 
     // Other public libs
     implementation(group = "commons-io", name = "commons-io", version = "2.8.0")
-    implementation(group = "org.reflections", name = "reflections", version = "0.9.12")
+    // *** NOTE: Do not upgrade org.reflections to 0.9.12 as this causes TokenTool to fail during startup
+    implementation(group = "org.reflections", name = "reflections", version = "0.9.11")
     implementation(group = "com.google.code.gson", name = "gson", version = "2.8.6")
 }
 
