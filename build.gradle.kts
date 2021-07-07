@@ -126,6 +126,7 @@ dependencies {
 
     // Other public libs
     implementation(group = "commons-io", name = "commons-io", version = "2.8.0")
+    // *** NOTE: Do not upgrade org.reflections to 0.9.12 as this causes TokenTool to fail during startup
     implementation(group = "org.reflections", name = "reflections", version = "0.9.11")
     implementation(group = "com.google.code.gson", name = "gson", version = "2.8.6")
 }
@@ -276,4 +277,4 @@ open class GenerateBuildProperties @javax.inject.Inject constructor(objects: Obj
 
 tasks.getByName<Zip>("distZip").enabled = false
 tasks.getByName<Tar>("distTar").enabled = false
-tasks.named("compileJava") { dependsOn("generateBuildProperties") }
+tasks.named("compileJava") { dependsOn("generateBuildProperties") 
