@@ -277,4 +277,4 @@ open class GenerateBuildProperties @javax.inject.Inject constructor(objects: Obj
 
 tasks.getByName<Zip>("distZip").enabled = false
 tasks.getByName<Tar>("distTar").enabled = false
-tasks.named("compileJava") { dependsOn("generateBuildProperties") 
+tasks.named("compileJava") { dependsOn("generateBuildProperties") }
