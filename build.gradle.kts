@@ -109,7 +109,7 @@ dependencies {
     implementation(group = "javax.servlet", name = "javax.servlet-api", version = "4.0.1")
 
     // For PDF image extraction
-    implementation(group = "org.apache.pdfbox", name = "pdfbox", version = "2.0.23")
+    implementation(group = "org.apache.pdfbox", name = "pdfbox", version = "2.0.24")
 
     // To decrypt password/secured PDFs
     implementation(group = "org.bouncycastle", name = "bcmail-jdk15on", version = "1.69")
