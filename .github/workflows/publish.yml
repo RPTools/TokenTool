@@ -53,6 +53,7 @@ jobs:
     - name: Rename windows release
       if: matrix.os == 'windows-latest'
       run: |
+        dir
         mv releases/TokenTool-*.exe releases/TokenTool-${{ github.event.release.tag_name }}.exe
         mv releases/TokenTool-*.msi releases/MapTool-${{ github.event.release.tag_name }}.msi
     - name: Upload Windows EXE Release Asset
