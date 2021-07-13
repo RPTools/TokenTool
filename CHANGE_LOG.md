@@ -15,10 +15,12 @@ Enhancements
 Bug Fixes
 -----
 * [#122][i122] - *TokenTool cannot handle UTF8 strings in file names*. Fixed.
+* [#39][i39] - *Crash when dragging from TokenTool to MapTool on macOS*. Fixed.
 
 [i146]: https://github.com/RPTools/TokenTool/issues/146
 [i122]: https://github.com/RPTools/TokenTool/issues/122
 [i40]: https://github.com/RPTools/TokenTool/issues/40
+[i39]: https://github.com/RPTools/TokenTool/issues/39
 
 ---
 
