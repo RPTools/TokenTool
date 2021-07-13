@@ -104,7 +104,7 @@ dependencies {
     // Bridges v1 to v2 for other code in other libs
     implementation(group = "org.slf4j", name = "slf4j-simple", version = "1.7.31")
 
-    implementation(group = "io.sentry", name = "sentry", version = "4.1.0")
+    implementation(group = "io.sentry", name = "sentry", version = "5.0.1")
     implementation(group = "io.sentry", name = "sentry-log4j2", version = "4.1.0")
     implementation(group = "javax.servlet", name = "javax.servlet-api", version = "4.0.1")
 
