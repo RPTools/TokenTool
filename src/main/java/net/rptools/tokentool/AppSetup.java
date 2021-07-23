@@ -17,10 +17,11 @@ package net.rptools.tokentool;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.module.ResolvedModule;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Set;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -32,8 +33,6 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
-import org.reflections.Reflections;
-import org.reflections.scanners.ResourcesScanner;
 
 /** Executes only the first time the application is run. */
 public class AppSetup {
@@ -135,11 +134,17 @@ public class AppSetup {
     overlayDir.mkdirs();
     int overlaysInstalled = 0;
 
-    // Copy default overlays from resources
-    Reflections reflections = new Reflections(DEFAULT_OVERLAYS, new ResourcesScanner());
-    Set<String> resourcePathSet = reflections.getResources(Pattern.compile(".*"));
+    // Get list of overlays from src/main/resources
+    Set<String> moduleResourceSet = ModuleLayer.boot().configuration().modules()
+        .stream()
+        .map(ResolvedModule::reference)
+        .filter(it -> it.descriptor().name().equals("net.rptools.tokentool"))
+        .findFirst().get().open()
+        .list()
+        .filter(it -> it.startsWith(DEFAULT_OVERLAYS) && !it.endsWith("/"))
+        .collect(Collectors.toSet());
 
-    for (String resourcePath : resourcePathSet) {
+    for (String resourcePath : moduleResourceSet) {
       String resourceName = resourcePath.substring(DEFAULT_OVERLAYS.length());
       InputStream resourceAsStream = AppSetup.class.getResourceAsStream("/" + resourcePath);
 
@@ -209,11 +214,11 @@ public class AppSetup {
       return false;
     }
 
-    String[] versions = version.indexOf(".") > 0 ? version.split("\\.") : new String[] {version};
+    String[] versions = version.indexOf(".") > 0 ? version.split("\\.") : new String[]{version};
     String[] installedVersions =
         installedVersion.indexOf(".") > 0
             ? installedVersion.split("\\.")
-            : new String[] {installedVersion};
+            : new String[]{installedVersion};
 
     int i = 0;
     try {

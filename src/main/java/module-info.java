@@ -10,7 +10,6 @@ module net.rptools.tokentool {
   requires imageio.psd;
   requires org.apache.logging.log4j;
   requires jai.imageio.jpeg2000;
-  requires reflections;
   requires org.apache.commons.io;
   requires org.apache.pdfbox;
   requires sentry;
