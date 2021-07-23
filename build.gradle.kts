@@ -125,7 +125,7 @@ dependencies {
     implementation(group = "com.twelvemonkeys.imageio", name = "imageio-psd", version = "3.6.4")
 
     // Other public libs
-    implementation(group = "commons-io", name = "commons-io", version = "2.10.0")
+    implementation(group = "commons-io", name = "commons-io", version = "2.11.0")
     implementation(group = "com.google.code.gson", name = "gson", version = "2.8.6")
 }
 
