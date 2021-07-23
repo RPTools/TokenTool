@@ -195,7 +195,7 @@ public class TokenTool_Controller {
   private NavigableSet<Integer> overlaySpinnerSteps =
       new TreeSet<>(
           Arrays.asList(
-              50, 100, 128, 150, 200, 256, 300, 400, 500, 512, 600, 700, 750, 800, 900, 1000));
+              50, 64, 100, 128, 150, 200, 256, 300, 400, 500, 512, 600, 700, 750, 800, 900, 1000, 1024));
 
   private PdfViewer pdfViewer;
 
@@ -674,7 +674,7 @@ public class TokenTool_Controller {
               getFileSaveFormatChoiceboxSelection(),
               fileNameSuffixTextField);
 
-      writeTokenImage(tempTokenFile);
+      writeTokenImage(tempTokenFile, getFileSaveFormatChoiceboxSelection());
       content.putFiles(java.util.Collections.singletonList(tempTokenFile));
       tempTokenFile.deleteOnExit();
     } catch (Exception e) {
@@ -1078,7 +1078,7 @@ public class TokenTool_Controller {
               getFileSaveFormatChoiceboxSelection(),
               fileNameSuffixTextField,
               false);
-      writeTokenImage(tempTokenFile);
+      writeTokenImage(tempTokenFile, getFileSaveFormatChoiceboxSelection());
       tempFiles.add(tempTokenFile);
 
       tempPortraitFile =
@@ -1290,7 +1290,13 @@ public class TokenTool_Controller {
 
     fileChooser.getExtensionFilters().addAll(AppConstants.IMAGE_EXTENSION_FILTER);
     fileChooser.setTitle(I18N.getString("TokenTool.save.filechooser.title"));
-    fileChooser.setSelectedExtensionFilter(AppConstants.IMAGE_EXTENSION_FILTER);
+
+    fileChooser.setSelectedExtensionFilter(AppConstants.IMAGE_EXTENSION_FILTER
+        .stream()
+        .filter(it -> it.getExtensions().contains("*." + fileExtension))
+        .findFirst()
+        .orElse(AppConstants.DEFAULT_EXTENSION_FILTER)
+    );
 
     File tokenSaved = fileChooser.showSaveDialog(saveOptionsPane.getScene().getWindow());
 
@@ -1298,17 +1304,20 @@ public class TokenTool_Controller {
       return;
     }
 
-    writeTokenImage(tokenSaved);
+    final String extension = FilenameUtils.getExtension(tokenSaved.getName());
+    setFileSaveFormatChoiceboxSelection(extension); // Update UI selection using Platform.runLater
+    writeTokenImage(tokenSaved, extension);
 
     updateFileNameTextField(FilenameUtils.getBaseName(tokenSaved.getName()));
     FileSaveUtil.setLastFile(tokenSaved);
     updateOverlayTreeViewRecentFolder(true);
   }
 
-  private boolean writeTokenImage(File tokenFile) {
+  private boolean writeTokenImage(File tokenFile, String extension) {
     try {
-      String imageType = getFileSaveFormatChoiceboxSelection();
+      String imageType = extension;
       Image tokenImage;
+
       if (clipPortraitCheckbox.isSelected()) {
         tokenImage =
             ImageUtil.resizeCanvas(
@@ -1882,7 +1891,7 @@ public class TokenTool_Controller {
   }
 
   public void setFileSaveFormatChoiceboxSelection(String item) {
-    fileSaveFormatChoicebox.getSelectionModel().select(item);
+    Platform.runLater(() -> fileSaveFormatChoicebox.getSelectionModel().select(item));
   }
 
   public String getPortraitSaveFormatChoiceboxSelection() {
