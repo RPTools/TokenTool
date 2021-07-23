@@ -10,6 +10,8 @@ Bug Fixes
 [i205]: https://github.com/RPTools/TokenTool/issues/205
 [i203]: https://github.com/RPTools/TokenTool/issues/203
 
+---
+
 TokenTool 2.2.0
 =====
 - Updated to Java 16.
