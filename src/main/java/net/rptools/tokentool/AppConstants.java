@@ -15,6 +15,9 @@
 package net.rptools.tokentool;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
@@ -66,8 +69,16 @@ public class AppConstants {
   public static final double WINDOW_HEIGHT = 825;
   public static final File OVERLAY_DIR = AppSetup.getAppHome("overlays");
   public static final File CACHE_DIR = AppSetup.getAppHome("cache");
-  public static final ExtensionFilter IMAGE_EXTENSION_FILTER =
+  public static final ExtensionFilter DEFAULT_EXTENSION_FILTER =
       new ExtensionFilter(DEFAULT_IMAGE_EXTENSION_DESCRIPTION, "*." + DEFAULT_IMAGE_EXTENSION);
+  public static final Set<ExtensionFilter> IMAGE_EXTENSION_FILTER = new HashSet<>(Arrays.asList(
+      new ExtensionFilter("WebP Image", "*.webp"),
+      new ExtensionFilter("PNG Image", "*.png"),
+      new ExtensionFilter("JPEG Image", "*.jpg"),
+      new ExtensionFilter("GIF Image", "*.gif"),
+      new ExtensionFilter("TIFF Image", "*.tif")
+  ));
+
   public static final double DEFAULT_PORTRAIT_TRANSPARENCY = 1;
   public static final double DEFAULT_PORTRAIT_BLUR = 0;
   public static final double DEFAULT_PORTRAIT_GLOW = 0;
