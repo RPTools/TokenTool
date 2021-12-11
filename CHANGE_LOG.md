@@ -1,3 +1,14 @@
+TokenTool 2.2.2
+=====
+Security fix release for vulnerability in [Apache Log4J library](https://www.cisa.gov/uscert/ncas/current-activity/2021/12/10/apache-releases-log4j-version-2150-address-critical-rce)
+
+Changes
+-----
+* [#254][i254] - Updates Log4J to 2.15.0
+
+[i254]: https://github.com/RPTools/TokenTool/issues/254
+
+
 TokenTool 2.2.1
 =====
 Bug fix release.  Two quick bug fixes related to overlays and save file type.  See below.
