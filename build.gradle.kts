@@ -95,11 +95,9 @@ repositories {
 
 dependencies {
     // Logging
-    annotationProcessor(group = "org.apache.logging.log4j", name = "log4j-core", version = "2.14.1")
-    implementation(group = "org.apache.logging.log4j", name = "log4j-api", version = "2.14.1")
-
-    // Note: log4j-1.2-api(versions 2.12.1+ breaks logging)
-    implementation(group = "org.apache.logging.log4j", name = "log4j-1.2-api", version = "2.14.1")
+    annotationProcessor(group = "org.apache.logging.log4j", name = "log4j-core", version = "2.15.0")
+    implementation(group = "org.apache.logging.log4j", name = "log4j-api", version = "2.15.0")
+    implementation(group = "org.apache.logging.log4j", name = "log4j-1.2-api", version = "2.15.0")
 
     // Bridges v1 to v2 for other code in other libs
     implementation(group = "org.slf4j", name = "slf4j-simple", version = "1.7.31")
