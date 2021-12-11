@@ -1,3 +1,17 @@
+TokenTool 2.2.1
+=====
+Bug fix release.  Two quick bug fixes related to overlays and save file type.  See below.
+
+Bug Fixes
+-----
+* [#205][i205] - Default overlays were not being copied into user directory. Fixed.
+* [#203][i203] - File -> Save As... file type selector would only allow `.webp`. Fixed.
+
+[i205]: https://github.com/RPTools/TokenTool/issues/205
+[i203]: https://github.com/RPTools/TokenTool/issues/203
+
+---
+
 TokenTool 2.2.0
 =====
 - Updated to Java 16.
