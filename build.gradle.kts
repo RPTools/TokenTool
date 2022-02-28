@@ -95,7 +95,7 @@ repositories {
 
 dependencies {
     // Logging
-    annotationProcessor(group = "org.apache.logging.log4j", name = "log4j-core", version = "2.15.0")
+    annotationProcessor(group = "org.apache.logging.log4j", name = "log4j-core", version = "2.17.2")
     implementation(group = "org.apache.logging.log4j", name = "log4j-api", version = "2.15.0")
     implementation(group = "org.apache.logging.log4j", name = "log4j-1.2-api", version = "2.15.0")
 
