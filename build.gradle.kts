@@ -119,7 +119,7 @@ dependencies {
 
     // Image processing lib https://github.com/haraldk/TwelveMonkeys
     implementation(group = "com.twelvemonkeys.imageio", name = "imageio-core", version = "3.6.4")
-    implementation(group = "com.twelvemonkeys.imageio", name = "imageio-jpeg", version = "3.6.4")
+    implementation(group = "com.twelvemonkeys.imageio", name = "imageio-jpeg", version = "3.8.3")
     implementation(group = "com.twelvemonkeys.imageio", name = "imageio-psd", version = "3.6.4")
 
     // Other public libs
