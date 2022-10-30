@@ -37,7 +37,7 @@ public class SplashScreenLoader extends Preloader {
 
   public void start(Stage stage) throws Exception {
     setUserAgentStylesheet(
-        STYLESHEET_CASPIAN); // I like the look of the this progress bar better for this screen...
+        STYLESHEET_CASPIAN); // I like the look of this progress bar better for this screen...
 
     FXMLLoader fxmlLoader =
         new FXMLLoader(

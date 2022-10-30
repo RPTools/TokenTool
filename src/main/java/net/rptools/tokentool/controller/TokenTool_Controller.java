@@ -37,6 +37,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
+
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -807,48 +809,28 @@ public class TokenTool_Controller {
       double y = getCurrentLayer().getTranslateY();
 
       switch (key.getCode()) {
-        case LEFT:
-        case KP_LEFT:
-        case NUMPAD4:
-          x--;
-          break;
-        case RIGHT:
-        case KP_RIGHT:
-        case NUMPAD6:
-          x++;
-          break;
-        case UP:
-        case KP_UP:
-        case NUMPAD8:
-          y--;
-          break;
-        case DOWN:
-        case KP_DOWN:
-        case NUMPAD2:
-          y++;
-          break;
-        case HOME:
-        case NUMPAD7:
+        case LEFT, KP_LEFT, NUMPAD4 -> x--;
+        case RIGHT, KP_RIGHT, NUMPAD6 -> x++;
+        case UP, KP_UP, NUMPAD8 -> y--;
+        case DOWN, KP_DOWN, NUMPAD2 -> y++;
+        case HOME, NUMPAD7 -> {
           x--;
           y--;
-          break;
-        case END:
-        case NUMPAD1:
+        }
+        case END, NUMPAD1 -> {
           x--;
           y++;
-          break;
-        case PAGE_UP:
-        case NUMPAD9:
+        }
+        case PAGE_UP, NUMPAD9 -> {
           x++;
           y--;
-          break;
-        case PAGE_DOWN:
-        case NUMPAD3:
+        }
+        case PAGE_DOWN, NUMPAD3 -> {
           x++;
           y++;
-          break;
-        default:
-          break;
+        }
+        default -> {
+        }
       }
 
       getCurrentLayer().setTranslateX(x);
@@ -1269,23 +1251,16 @@ public class TokenTool_Controller {
     FileChooser fileChooser = new FileChooser();
     log.info("***** Saving Token as a {}", fileExtension);
 
-    try {
-      File tokenFile =
-          fileSaveUtil.getFileName(
-              false,
-              useFileNumberingCheckbox.isSelected(),
-              fileNameTextField.getText(),
-              getFileSaveFormatChoiceboxSelection(),
-              fileNameSuffixTextField,
-              true);
-      fileChooser.setInitialFileName(tokenFile.getName());
-      if (tokenFile.getParentFile() != null) {
-        if (tokenFile.getParentFile().isDirectory()) {
-          fileChooser.setInitialDirectory(tokenFile.getParentFile());
-        }
-      }
-    } catch (IOException e1) {
-      log.error("Error writing token!", e1);
+    File tokenFile = fileSaveUtil.getFileName(
+      false,
+      useFileNumberingCheckbox.isSelected(),
+      fileNameTextField.getText(),
+      getFileSaveFormatChoiceboxSelection(),
+      fileNameSuffixTextField,
+      true);
+    fileChooser.setInitialFileName(tokenFile.getName());
+    if (tokenFile.getParentFile() != null && tokenFile.getParentFile().isDirectory()) {
+      fileChooser.setInitialDirectory(tokenFile.getParentFile());
     }
 
     fileChooser.getExtensionFilters().addAll(AppConstants.IMAGE_EXTENSION_FILTER);
@@ -1315,7 +1290,6 @@ public class TokenTool_Controller {
 
   private boolean writeTokenImage(File tokenFile, String extension) {
     try {
-      String imageType = extension;
       Image tokenImage;
 
       if (clipPortraitCheckbox.isSelected()) {
@@ -1328,8 +1302,8 @@ public class TokenTool_Controller {
 
       BufferedImage imageRGB = SwingFXUtils.fromFXImage(tokenImage, null);
 
-      log.debug("Writing token image as: " + imageType);
-      boolean writeSuccessful = ImageIO.write(imageRGB, imageType, tokenFile);
+      log.debug("Writing token image as: " + extension);
+      boolean writeSuccessful = ImageIO.write(imageRGB, extension, tokenFile);
 
       if (!writeSuccessful) {
         // Remove alpha-channel from buffered image
@@ -1339,16 +1313,15 @@ public class TokenTool_Controller {
         graphics.drawImage(image, 0, 0, null);
         graphics.dispose();
 
-        log.debug("Writing token image as:" + imageType);
-        writeSuccessful = ImageIO.write(imageRGB, imageType, tokenFile);
+        log.debug("Writing token image as:" + extension);
+        writeSuccessful = ImageIO.write(imageRGB, extension, tokenFile);
       }
 
       return writeSuccessful;
     } catch (IOException e) {
       log.error("Unable to write token to file: " + tokenFile.getAbsolutePath(), e);
     } catch (IndexOutOfBoundsException e) {
-      log.error(
-          "Image width/height out of bounds: " + getOverlayWidth() + " x " + getOverlayHeight(), e);
+      log.error("Image width/height out of bounds: " + getOverlayWidth() + " x " + getOverlayHeight(), e);
     }
 
     return false;
@@ -1434,7 +1407,7 @@ public class TokenTool_Controller {
         recentFolder.getChildren().add(iter.previous().getValue());
       }
 
-      if (overlayTreeView.getRoot().getChildren().indexOf(recentFolder) != -1) {
+      if (overlayTreeView.getRoot().getChildren().contains(recentFolder)) {
         overlayTreeView.getRoot().getChildren().remove(recentFolder);
       }
       overlayTreeView.getRoot().getChildren().add(recentFolder);
@@ -1582,10 +1555,9 @@ public class TokenTool_Controller {
     progressBarLabel.setVisible(true);
     updateOverlayTreeview(null);
 
-    try {
+    try (Stream<Path> files = Files.walk(AppConstants.OVERLAY_DIR.toPath())) {
       loadCount.set(0);
-      overlayCount =
-          (int) Files.walk(AppConstants.OVERLAY_DIR.toPath()).filter(Files::isRegularFile).count();
+      overlayCount = (int) files.filter(Files::isRegularFile).count();
       log.info("overlayCount: " + overlayCount);
 
       treeItems = cacheOverlays(AppConstants.OVERLAY_DIR, null);
@@ -1634,7 +1606,7 @@ public class TokenTool_Controller {
         });
   }
 
-  private TreeItem<Path> cacheOverlays(File dir, TreeItem<Path> parent) throws IOException {
+  private TreeItem<Path> cacheOverlays(File dir, TreeItem<Path> parent) {
     log.debug("Caching " + dir.getAbsolutePath());
 
     TreeItem<Path> root = new TreeItem<>(dir.toPath());

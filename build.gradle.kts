@@ -3,9 +3,9 @@ import java.time.LocalDateTime
 plugins {
     application
     java
-    id("org.openjfx.javafxplugin") version "0.0.10"
-    id("org.beryx.jlink") version "2.24.4"
-    id("com.diffplug.spotless") version "6.0.4"
+    id("org.openjfx.javafxplugin") version "0.0.13"
+    id("org.beryx.jlink") version "2.25.0"
+    id("com.diffplug.spotless") version "6.11.0"
     id("io.wusa.semver-git-plugin") version "2.3.7"
 }
 
@@ -61,13 +61,13 @@ application {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
     modularity.inferModulePath.set(true)
 }
 
 javafx {
-    version = "16"
+    version = "17.0.2"
     modules = listOf("javafx.base", "javafx.controls", "javafx.fxml", "javafx.swing", "javafx.graphics")
 }
 
@@ -95,19 +95,19 @@ repositories {
 
 dependencies {
     // Logging
-    annotationProcessor(group = "org.apache.logging.log4j", name = "log4j-core", version = "2.15.0")
-    implementation(group = "org.apache.logging.log4j", name = "log4j-api", version = "2.15.0")
-    implementation(group = "org.apache.logging.log4j", name = "log4j-1.2-api", version = "2.15.0")
+    annotationProcessor(group = "org.apache.logging.log4j", name = "log4j-core", version = "2.19.0")
+    implementation(group = "org.apache.logging.log4j", name = "log4j-api", version = "2.19.0")
+    implementation(group = "org.apache.logging.log4j", name = "log4j-1.2-api", version = "2.19.0")
 
     // Bridges v1 to v2 for other code in other libs
-    implementation(group = "org.slf4j", name = "slf4j-simple", version = "1.7.32")
+    implementation(group = "org.slf4j", name = "slf4j-simple", version = "1.7.36")
 
-    implementation(group = "io.sentry", name = "sentry", version = "5.4.3")
-    implementation(group = "io.sentry", name = "sentry-log4j2", version = "4.1.0")
+    implementation(group = "io.sentry", name = "sentry", version = "5.7.4")
+    implementation(group = "io.sentry", name = "sentry-log4j2", version = "5.7.4")
     implementation(group = "javax.servlet", name = "javax.servlet-api", version = "4.0.1")
 
     // For PDF image extraction
-    implementation(group = "org.apache.pdfbox", name = "pdfbox", version = "2.0.24")
+    implementation(group = "org.apache.pdfbox", name = "pdfbox", version = "2.0.27")
 
     // To decrypt password/secured PDFs
     implementation(group = "org.bouncycastle", name = "bcmail-jdk15on", version = "1.70")
@@ -118,13 +118,13 @@ dependencies {
     implementation(group = "org.sejda.imageio", name = "webp-imageio", version = "0.1.6")
 
     // Image processing lib https://github.com/haraldk/TwelveMonkeys
-    implementation(group = "com.twelvemonkeys.imageio", name = "imageio-core", version = "3.6.4")
-    implementation(group = "com.twelvemonkeys.imageio", name = "imageio-jpeg", version = "3.6.4")
-    implementation(group = "com.twelvemonkeys.imageio", name = "imageio-psd", version = "3.6.4")
+    implementation(group = "com.twelvemonkeys.imageio", name = "imageio-core", version = "3.9.3")
+    implementation(group = "com.twelvemonkeys.imageio", name = "imageio-jpeg", version = "3.9.3")
+    implementation(group = "com.twelvemonkeys.imageio", name = "imageio-psd", version = "3.9.3")
 
     // Other public libs
     implementation(group = "commons-io", name = "commons-io", version = "2.11.0")
-    implementation(group = "com.google.code.gson", name = "gson", version = "2.8.9")
+    implementation(group = "com.google.code.gson", name = "gson", version = "2.10")
 }
 
 val sharedManifest = the<JavaPluginConvention>().manifest {

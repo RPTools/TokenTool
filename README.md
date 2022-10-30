@@ -7,4 +7,4 @@ Rewritten in JavaFX to bring a modern and updated UI as well as a few new featur
 
 You can add background images, extract images from PDF files, and save the portrait alongside the token using the same background image and/or colors! Several bug fixes and requested enhancements have also been added since 2.0.
 
-Newly built using the latest JDK (16+) and using GitHub actions for Continuous Integration & Deployment!
+Newly built using the latest JDK 17 and using GitHub actions for Continuous Integration & Deployment!

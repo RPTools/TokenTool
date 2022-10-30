@@ -45,7 +45,7 @@ public class AppConstants {
 
   public static final String RPTOOLS_URL = "http://www.rptools.net";
 
-  public static final ObservableList VALID_IMAGE_EXTENSIONS =
+  public static final ObservableList<String> VALID_IMAGE_EXTENSIONS =
       FXCollections.observableArrayList("webp", "png", "jpg", "gif", "tif");
   public static final String DEFAULT_IMAGE_EXTENSION = "webp";
   public static final String DEFAULT_IMAGE_EXTENSION_DESCRIPTION = "WebP Image";

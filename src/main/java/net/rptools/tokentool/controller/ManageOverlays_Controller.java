@@ -140,8 +140,8 @@ public class ManageOverlays_Controller {
 
     executorService =
         Executors.newSingleThreadScheduledExecutor(
-            runable -> {
-              loadOverlaysThread = Executors.defaultThreadFactory().newThread(runable);
+            runnable -> {
+              loadOverlaysThread = Executors.defaultThreadFactory().newThread(runnable);
               loadOverlaysThread.setDaemon(true);
               return loadOverlaysThread;
             });
