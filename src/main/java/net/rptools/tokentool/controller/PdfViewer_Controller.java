@@ -343,8 +343,8 @@ public class PdfViewer_Controller implements Initializable {
       pdfSideStackPane.setOpacity(0.2);
       pdfSideStackPane.setDisable(true);
 
-      Task task =
-          new Task<Void>() {
+      Task<Void> task =
+          new Task<>() {
             @Override
             public Void call() {
               final int pageCount = pdfModel.getPdfPageCount();
@@ -359,8 +359,7 @@ public class PdfViewer_Controller implements Initializable {
               extractAllImagesLabel.setVisible(true);
 
               for (int page = 0; page < pageCount; page++) {
-                pdfModel.extractAllImagesFromPage(
-                    selectedDirectory.getPath(), imageFormat, page, imageMinDimension);
+                pdfModel.extractAllImagesFromPage(selectedDirectory.getPath(), imageFormat, page, imageMinDimension);
                 updateProgress(page, pageCount);
                 updateMessage("Extracting page " + page + " of " + pageCount);
 
@@ -413,7 +412,7 @@ public class PdfViewer_Controller implements Initializable {
             pdfProgressIndicator.setVisible(true);
             pdfProgressIndicator.setOpacity(1);
           });
-      Platform.runLater(() -> pause.play());
+      Platform.runLater(pause::play);
 
       // Do the actual work
       Image image = pdfModel.getImage(pageIndex);
@@ -423,7 +422,7 @@ public class PdfViewer_Controller implements Initializable {
       // Skip the animation for quick page turns
       long loadTime = System.currentTimeMillis() - startTime;
       if (loadTime < 500) {
-        Platform.runLater(() -> pause.stop());
+        Platform.runLater(pause::stop);
         pdfProgressIndicator.setVisible(false);
       } else {
         pdfProgressIndicator.setVisible(true);
@@ -516,7 +515,7 @@ public class PdfViewer_Controller implements Initializable {
               try {
                 imageTilePane.getChildren().clear();
 
-                Collections.sort(imageButtons, new ToggleButtonComparator());
+                imageButtons.sort(new ToggleButtonComparator());
                 Collections.reverse(imageButtons);
 
                 double pdfMinDimension = 0;
@@ -546,10 +545,10 @@ public class PdfViewer_Controller implements Initializable {
 
     @Override
     public int compare(ToggleButton tb1, ToggleButton tb2) {
-      Double d1 =
+      double d1 =
           ((ImageView) tb1.getGraphic()).getImage().getWidth()
               * ((ImageView) tb1.getGraphic()).getImage().getHeight();
-      Double d2 =
+      double d2 =
           ((ImageView) tb2.getGraphic()).getImage().getWidth()
               * ((ImageView) tb2.getGraphic()).getImage().getHeight();
       return Double.compare(d1, d2);

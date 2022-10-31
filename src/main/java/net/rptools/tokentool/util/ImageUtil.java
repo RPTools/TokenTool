@@ -125,7 +125,6 @@ public class ImageUtil {
     if (ImageUtil.SUPPORTED_IMAGE_FILE_FILTER.accept(null, fileURL)) {
       thumb = processMagenta(new Image(fileURL), COLOR_THRESHOLD, overlayWanted);
     } else if (ImageUtil.PSD_FILE_FILTER.accept(null, fileURL)) {
-      ImageInputStream is = null;
       PSDImageReader reader = null;
       int imageIndex = 1;
 
@@ -137,8 +136,7 @@ public class ImageUtil {
 
       File file = filePath.toFile();
 
-      try {
-        is = ImageIO.createImageInputStream(file);
+      try (ImageInputStream is = ImageIO.createImageInputStream(file)) {
         if (is == null || is.length() == 0) {
           log.info("Image from file " + file.getAbsolutePath() + " is null");
         }
@@ -183,8 +181,9 @@ public class ImageUtil {
         log.error("Processing: " + file.getAbsolutePath(), e);
       } finally {
         // Dispose reader in finally block to avoid memory leaks
-        reader.dispose();
-        is.close();
+        if (reader != null) {
+          reader.dispose();
+        }
       }
     }
 
@@ -452,15 +451,11 @@ public class ImageUtil {
       return false;
     }
 
-    if (g > r - fudge || g > b - fudge) {
-      return false;
-    }
-
-    return true;
+    return !(g > r - fudge) && !(g > b - fudge);
   }
 
   public static String getFileType(File imageFile) {
-    if (FilenameUtils.getExtension(imageFile.getName()).toLowerCase().equals("psd")) {
+    if (FilenameUtils.getExtension(imageFile.getName()).equalsIgnoreCase("psd")) {
       return "Adobe Photoshop " + I18N.getString("imageUtil.filetype.label.image");
     } else {
       return FilenameUtils.getExtension(imageFile.getName()).toUpperCase()

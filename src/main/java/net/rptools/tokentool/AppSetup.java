@@ -122,7 +122,7 @@ public class AppSetup {
   }
 
   /*
-   * OK so here will will only install any overlays that are in a directory with a newer version
+   * OK so here we will only install any overlays that are in a directory with a newer version
    * than what is installed. So, if a user skips versions and goes from 2 to 2.3 any overlays
    * in 2.1, 2.2, and 2.3 will get installed. I'm doing it this way in case a user reorganizes his
    * directory structure or deletes overlays he doesn't want, we don't reinstall them and annoy

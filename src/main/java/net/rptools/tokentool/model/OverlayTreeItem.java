@@ -67,7 +67,7 @@ public class OverlayTreeItem extends TreeItem<Path> {
         // try-with-resources statement ensures that each resource is closed at the end of the
         // statement otherwise stream is left open and directory can not be deleted!
         try (Stream<Path> files = Files.list(getValue()).filter(Files::isDirectory)) {
-          isLeaf = files.count() == 0;
+          isLeaf = files.findAny().isEmpty();
         }
 
       } catch (IOException e) {
@@ -86,8 +86,8 @@ public class OverlayTreeItem extends TreeItem<Path> {
    */
   private ObservableList<TreeItem<Path>> buildChildren() {
     if (Files.isDirectory(getValue())) {
-      try {
-        return Files.list(getValue())
+      try (Stream<Path> files = Files.list(getValue())) {
+        return files
             .filter(Files::isDirectory)
             .map(OverlayTreeItem::new)
             .collect(Collectors.toCollection(FXCollections::observableArrayList));

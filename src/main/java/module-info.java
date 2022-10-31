@@ -6,8 +6,8 @@ module net.rptools.tokentool {
   requires javafx.swing;
   requires java.prefs;
   requires com.google.gson;
-  requires common.io;
-  requires imageio.psd;
+  requires com.twelvemonkeys.imageio.psd;
+  requires com.twelvemonkeys.common.io;
   requires org.apache.logging.log4j;
   requires jai.imageio.jpeg2000;
   requires org.apache.commons.io;

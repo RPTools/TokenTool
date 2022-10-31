@@ -117,8 +117,7 @@ public class FileSaveUtil {
       boolean useNumbering,
       String tempFileName,
       String imageExtension,
-      TextField fileNameSuffix)
-      throws IOException {
+      TextField fileNameSuffix) {
     return getTempFileName(
         asToken, useNumbering, tempFileName, imageExtension, fileNameSuffix, true);
   }
@@ -129,8 +128,7 @@ public class FileSaveUtil {
       String tempFileName,
       String imageExtension,
       TextField fileNameSuffix,
-      boolean advanceFileNameSuffix)
-      throws IOException {
+      boolean advanceFileNameSuffix) {
     return new File(
         System.getProperty("java.io.tmpdir"),
         getFileName(
@@ -143,7 +141,7 @@ public class FileSaveUtil {
             .getName());
   }
 
-  public File getTempFileName(String tempFileName, String imageExtension) throws IOException {
+  public File getTempFileName(String tempFileName, String imageExtension) {
     final String _extension = "." + imageExtension;
 
     if (!tempFileName.endsWith(_extension)) {
@@ -153,20 +151,10 @@ public class FileSaveUtil {
     return new File(System.getProperty("java.io.tmpdir"), tempFileName);
   }
 
-  public File getFileName(
-      boolean asToken,
-      boolean useNumbering,
-      String tempFileName,
-      String imageExtension,
-      TextField fileNameSuffix,
-      boolean advanceFileNameSuffix)
-      throws IOException {
+  public File getFileName(boolean asToken, boolean useNumbering, String tempFileName, String imageExtension,
+      TextField fileNameSuffix, boolean advanceFileNameSuffix) {
 
-    if (!imageExtension.startsWith(".")) {
-      imageExtension = "." + imageExtension;
-    } else {
-      imageExtension = "." + imageExtension;
-    }
+    imageExtension = "." + imageExtension;
 
     if (useNumbering) {
       int dragCounter;
