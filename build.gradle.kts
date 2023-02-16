@@ -103,7 +103,7 @@ dependencies {
     implementation(group = "org.slf4j", name = "slf4j-simple", version = "1.7.36")
 
     implementation(group = "io.sentry", name = "sentry", version = "5.7.4")
-    implementation(group = "io.sentry", name = "sentry-log4j2", version = "5.7.4")
+    implementation(group = "io.sentry", name = "sentry-log4j2", version = "6.14.0")
     implementation(group = "javax.servlet", name = "javax.servlet-api", version = "4.0.1")
 
     // For PDF image extraction
