@@ -1,0 +1,55 @@
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  target-branch: develop
+  ignore:
+  - dependency-name: com.diffplug.spotless
+    versions:
+    - 5.12.0
+    - 5.12.1
+  - dependency-name: com.diffplug.gradle.spotless
+    versions:
+    - 5.10.0
+    - 5.10.1
+    - 5.10.2
+    - 5.11.0
+    - 5.11.1
+    - 5.9.0
+  - dependency-name: org.beryx.jlink
+    versions:
+    - 2.23.2
+    - 2.23.3
+    - 2.23.4
+    - 2.23.5
+  - dependency-name: org.apache.pdfbox:pdfbox
+    versions:
+    - 2.0.22
+    - 2.0.23
+  - dependency-name: org.apache.logging.log4j:log4j-1.2-api
+    versions:
+    - 2.14.0
+    - 2.14.1
+  - dependency-name: org.apache.logging.log4j:log4j-api
+    versions:
+    - 2.14.0
+    - 2.14.1
+  - dependency-name: org.apache.logging.log4j:log4j-core
+    versions:
+    - 2.14.0
+    - 2.14.1
+  - dependency-name: org.bouncycastle:bcmail-jdk15on
+    versions:
+    - "1.68"
+  - dependency-name: org.ajoberstar.grgit
+    versions:
+    - 4.1.0
+  - dependency-name: commons-io:commons-io
+    versions:
+    - 2.8.0
+  - dependency-name: org.openjfx.javafxplugin
+    versions:
+    - 0.0.9
