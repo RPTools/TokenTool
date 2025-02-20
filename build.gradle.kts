@@ -61,13 +61,13 @@ application {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
     modularity.inferModulePath.set(true)
 }
 
 javafx {
-    version = "17.0.2"
+    version = "21.0.6"
     modules = listOf("javafx.base", "javafx.controls", "javafx.fxml", "javafx.swing", "javafx.graphics")
 }
 
