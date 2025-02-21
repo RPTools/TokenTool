@@ -3,8 +3,8 @@ import java.time.LocalDateTime
 plugins {
     application
     java
-    id("org.openjfx.javafxplugin") version "0.0.13"
-    id("org.beryx.jlink") version "2.25.0"
+    id("org.openjfx.javafxplugin") version "0.0.14"
+    id("org.beryx.jlink") version "3.1.1"
     id("com.diffplug.spotless") version "6.11.0"
     id("io.wusa.semver-git-plugin") version "2.3.7"
 }
@@ -110,7 +110,7 @@ dependencies {
     implementation(group = "org.apache.pdfbox", name = "pdfbox", version = "2.0.27")
 
     // To decrypt password/secured PDFs
-    implementation(group = "org.bouncycastle", name = "bcmail-jdk15on", version = "1.70")
+    implementation(group = "org.bouncycastle", name = "bcmail-jdk18on", version = "1.80")
 
     // For pdf image extraction, specifically for jpeg2000 (jpx) support.
     implementation(group = "com.github.jai-imageio", name = "jai-imageio-core", version = "1.4.0")
@@ -173,14 +173,16 @@ jlink {
     val appVersion = "${semver.info.version.major}.${semver.info.version.minor}.${semver.info.version.patch}"
     project.version = appVersion;
 
-    options.set(listOf("--strip-debug", "--strip-native-commands", "--compress", "2", "--no-header-files", "--no-man-pages"))
+    options.set(listOf("--strip-debug", "--strip-native-commands", "--compress", "2",
+        "--no-header-files", "--no-man-pages", "--ignore-signing-information"))
 
-    forceMerge("log4j-api", "gson")
+    forceMerge("log4j-api", "gson", "bcmail")
 
     launcher {
         name = "TokenTool"
         jvmArgs = listOf("-Dfile.encoding=UTF-8")
     }
+
 
     jpackage {
         val os = org.gradle.internal.os.OperatingSystem.current()
