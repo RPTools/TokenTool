@@ -24,9 +24,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -34,7 +36,6 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javax.imageio.ImageIO;
@@ -249,142 +250,9 @@ public class ImageUtil {
     return outputImage;
   }
 
-  /*
-   * Crop image to smallest width/height based on transparency
-   */
-  private static Image autoCropImage(Image imageSource) {
-    return autoCropImage(imageSource, Color.TRANSPARENT, null);
-  }
-
   public static Image autoCropImage(
       Image imageSource, Color backgroundColor, Image backgroundImage) {
-    ImageView croppedImageView = new ImageView(imageSource);
-    PixelReader pixelReader = imageSource.getPixelReader();
-
-    int imageWidth = (int) imageSource.getWidth();
-    int imageHeight = (int) imageSource.getHeight();
-    int minX = imageWidth, minY = imageHeight, maxX = 0, maxY = 0;
-
-    // Find the first and last pixels that are not transparent to create a bounding viewport
-    for (int readY = 0; readY < imageHeight; readY++) {
-      for (int readX = 0; readX < imageWidth; readX++) {
-        Color pixelColor = pixelReader.getColor(readX, readY);
-
-        if (!pixelColor.equals(Color.TRANSPARENT)) {
-          if (readX < minX) {
-            minX = readX;
-          }
-          if (readX > maxX) {
-            maxX = readX;
-          }
-
-          if (readY < minY) {
-            minY = readY;
-          }
-          if (readY > maxY) {
-            maxY = readY;
-          }
-        }
-      }
-    }
-
-    if (maxX - minX <= 0 || maxY - minY <= 0) {
-      return new WritableImage(1, 1);
-    }
-
-    // Create a viewport to clip the image using snapshot
-    Rectangle2D viewPort = new Rectangle2D(minX, minY, maxX - minX, maxY - minY);
-    SnapshotParameters parameter = new SnapshotParameters();
-    parameter.setViewport(viewPort);
-    parameter.setFill(backgroundColor);
-
-    if (backgroundImage != null) {
-      return new Group(new ImageView(backgroundImage), croppedImageView).snapshot(parameter, null);
-    } else {
-      return croppedImageView.snapshot(parameter, null);
-    }
-  }
-
-  public static Image composePreview(
-      StackPane compositeTokenPane,
-      ImageView backgroundImageView,
-      Color bgColor,
-      ImageView portraitImageView,
-      ImageView maskImageView,
-      ImageView overlayImageView,
-      boolean useAsBase,
-      boolean clipImage) {
-
-    // Process layout as maskImage may have changed size if the overlay was changed
-    compositeTokenPane.layout();
-    SnapshotParameters parameter = new SnapshotParameters();
-    Image finalImage;
-    Group blend;
-
-    // check if there is a mask image
-    if (maskImageView.getFitWidth() <= 0 || maskImageView.getFitHeight() <= 0) {
-      clipImage = false;
-    }
-
-    if (clipImage) {
-      // We need to clip the portrait image first then blend the overlay image over it
-      // We will first get a snapshot of the portrait equal to the mask overlay image width/height
-      // We will then get a snapshot of the background image, if any.
-      double x, y, width, height;
-
-      x = overlayImageView.getParent().getLayoutX();
-      y = overlayImageView.getParent().getLayoutY();
-      width = overlayImageView.getFitWidth();
-      height = overlayImageView.getFitHeight();
-
-      Rectangle2D viewPort = new Rectangle2D(x, y, width, height);
-      Rectangle2D maskViewPort = new Rectangle2D(1, 1, width, height);
-      WritableImage newBackgroundImage = new WritableImage((int) width, (int) height);
-      WritableImage newImage = new WritableImage((int) width, (int) height);
-      WritableImage newMaskImage = new WritableImage((int) width, (int) height);
-
-      ImageView newBackgroundImageView = new ImageView();
-      ImageView overlayCopyImageView = new ImageView();
-      ImageView clippedImageView = new ImageView();
-
-      parameter.setViewport(viewPort);
-      parameter.setFill(bgColor);
-      backgroundImageView.snapshot(parameter, newBackgroundImage);
-
-      parameter.setFill(Color.TRANSPARENT);
-      portraitImageView.snapshot(parameter, newImage);
-
-      parameter.setViewport(maskViewPort);
-      maskImageView.snapshot(parameter, newMaskImage);
-
-      clippedImageView.setFitWidth(width);
-      clippedImageView.setFitHeight(height);
-      clippedImageView.setImage(clipImageWithMask(newImage, newMaskImage));
-      newBackgroundImageView.setImage(clipImageWithMask(newBackgroundImage, newMaskImage));
-
-      // Our masked portrait image is now stored in clippedImageView, lets now blend the overlay
-      // image over it
-      // We'll create a temporary group to hold our temporary ImageViews's and blend them and take a
-      // snapshot
-      overlayCopyImageView.setImage(overlayImageView.getImage());
-      overlayCopyImageView.setFitWidth(overlayImageView.getFitWidth());
-      overlayCopyImageView.setFitHeight(overlayImageView.getFitHeight());
-      overlayCopyImageView.setOpacity(overlayImageView.getOpacity());
-
-      if (useAsBase) {
-        blend = new Group(newBackgroundImageView, overlayCopyImageView, clippedImageView);
-      } else {
-        blend = new Group(newBackgroundImageView, clippedImageView, overlayCopyImageView);
-      }
-
-      // Last, we'll clean up any excess transparent edges by cropping it
-      finalImage = autoCropImage(blend.snapshot(parameter, null));
-    } else {
-      parameter.setFill(Color.TRANSPARENT);
-      finalImage = autoCropImage(compositeTokenPane.snapshot(parameter, null));
-    }
-
-    return finalImage;
+    return Async.autoCrop(imageSource, backgroundColor, backgroundImage, false).join();
   }
 
   /*
@@ -463,5 +331,184 @@ public class ImageUtil {
         new ExtensionFilter("BMP" + I18N.getString("imageUtil.filetype.label.files"), "*.bmp"));
 
     return extensionFilters;
+  }
+
+  public static final class Async {
+    public static CompletableFuture<WritableImage> snapshot(
+        Node node, SnapshotParameters parameters, WritableImage image) {
+      CompletableFuture<WritableImage> future = new CompletableFuture<>();
+      node.snapshot(
+          result -> {
+            future.complete(result.getImage());
+            return null;
+          },
+          parameters,
+          image);
+      return future;
+    }
+
+    public static CompletableFuture<WritableImage> autoCrop(Image imageSource) {
+      return autoCrop(imageSource, Color.TRANSPARENT, null, true);
+    }
+
+    private static CompletableFuture<WritableImage> autoCrop(
+        Image imageSource, Color backgroundColor, Image backgroundImage, boolean async) {
+      PixelReader pixelReader = imageSource.getPixelReader();
+
+      int imageWidth = (int) imageSource.getWidth();
+      int imageHeight = (int) imageSource.getHeight();
+      int minX = imageWidth, minY = imageHeight, maxX = 0, maxY = 0;
+
+      // Find the first and last pixels that are not transparent to create a bounding viewport
+      for (int readY = 0; readY < imageHeight; readY++) {
+        for (int readX = 0; readX < imageWidth; readX++) {
+          Color pixelColor = pixelReader.getColor(readX, readY);
+
+          if (!pixelColor.equals(Color.TRANSPARENT)) {
+            if (readX < minX) {
+              minX = readX;
+            }
+            if (readX > maxX) {
+              maxX = readX;
+            }
+
+            if (readY < minY) {
+              minY = readY;
+            }
+            if (readY > maxY) {
+              maxY = readY;
+            }
+          }
+        }
+      }
+
+      if (maxX - minX <= 0 || maxY - minY <= 0) {
+        return CompletableFuture.completedFuture(new WritableImage(1, 1));
+      }
+
+      // Create a viewport to clip the image using snapshot
+      Rectangle2D viewPort = new Rectangle2D(minX, minY, maxX - minX, maxY - minY);
+      SnapshotParameters parameter = new SnapshotParameters();
+      parameter.setViewport(viewPort);
+      parameter.setFill(backgroundColor);
+
+      Node node = new ImageView(imageSource);
+      if (backgroundImage != null) {
+        node = new Group(new ImageView(backgroundImage), node);
+      }
+
+      if (async) {
+        return snapshot(node, parameter, null);
+      } else {
+        return CompletableFuture.completedFuture(node.snapshot(parameter, null));
+      }
+    }
+
+    public static CompletableFuture<WritableImage> composeUnclippedPreview(Node node) {
+      SnapshotParameters parameter = new SnapshotParameters();
+      parameter.setFill(Color.TRANSPARENT);
+      return ImageUtil.Async.snapshot(node, parameter, null);
+    }
+
+    public static CompletableFuture<WritableImage> composeClippedPreview(
+        ImageView backgroundImageView,
+        Color bgColor,
+        ImageView portraitImageView,
+        ImageView maskImageView,
+        ImageView overlayImageView,
+        boolean useAsBase) {
+      // We need to clip the portrait image first then blend the overlay image over it
+      // We will first get a snapshot of the portrait equal to the mask overlay image width/height
+      // We will then get a snapshot of the background image, if any.
+      final var viewport =
+          new Rectangle2D(
+              overlayImageView.getParent().getLayoutX(),
+              overlayImageView.getParent().getLayoutY(),
+              overlayImageView.getFitWidth(),
+              overlayImageView.getFitHeight());
+      final var maskViewport = new Rectangle2D(1, 1, viewport.getWidth(), viewport.getHeight());
+
+      final CompletableFuture<? extends Image> backgroundFuture;
+      {
+        SnapshotParameters backgroundParameters = new SnapshotParameters();
+        backgroundParameters.setViewport(viewport);
+        backgroundParameters.setFill(bgColor);
+        backgroundFuture =
+            snapshot(
+                backgroundImageView,
+                backgroundParameters,
+                null // new WritableImage((int) viewport.getWidth(), (int) viewport.getHeight())
+                );
+      }
+
+      final CompletableFuture<? extends Image> portraitFuture;
+      {
+        SnapshotParameters portraitParameters = new SnapshotParameters();
+        portraitParameters.setViewport(viewport);
+        portraitParameters.setFill(Color.TRANSPARENT);
+        portraitFuture =
+            snapshot(
+                portraitImageView,
+                portraitParameters,
+                new WritableImage((int) viewport.getWidth(), (int) viewport.getHeight()));
+      }
+
+      final CompletableFuture<? extends Image> maskFuture;
+      {
+        // TODO Surely this is just a scaled version of the original mask image. Can we not somehow
+        //  use that directly?
+        SnapshotParameters maskParameters = new SnapshotParameters();
+        maskParameters.setViewport(maskViewport);
+        maskParameters.setFill(Color.TRANSPARENT);
+        maskFuture =
+            snapshot(
+                maskImageView,
+                maskParameters,
+                new WritableImage((int) viewport.getWidth(), (int) viewport.getHeight()));
+      }
+
+      return CompletableFuture.allOf(backgroundFuture, portraitFuture, maskFuture)
+          .thenCompose(
+              ignored -> {
+                var newBackgroundImage = backgroundFuture.join();
+                var newImage = portraitFuture.join();
+                var newMaskImage = maskFuture.join();
+
+                ImageView clippedImageView = new ImageView();
+                clippedImageView.setFitWidth(viewport.getWidth());
+                clippedImageView.setFitHeight(viewport.getHeight());
+                clippedImageView.setImage(clipImageWithMask(newImage, newMaskImage));
+
+                ImageView newBackgroundImageView = new ImageView();
+                newBackgroundImageView.setImage(
+                    clipImageWithMask(newBackgroundImage, newMaskImage));
+
+                // Our masked portrait image is now stored in clippedImageView, lets now blend the
+                // overlay
+                // image over it
+                // We'll create a temporary group to hold our temporary ImageViews's and blend them
+                // and take a
+                // snapshot
+                ImageView overlayCopyImageView = new ImageView();
+                overlayCopyImageView.setImage(overlayImageView.getImage());
+                overlayCopyImageView.setFitWidth(overlayImageView.getFitWidth());
+                overlayCopyImageView.setFitHeight(overlayImageView.getFitHeight());
+                overlayCopyImageView.setOpacity(overlayImageView.getOpacity());
+
+                Group blend;
+                if (useAsBase) {
+                  blend = new Group(newBackgroundImageView, overlayCopyImageView, clippedImageView);
+                } else {
+                  blend = new Group(newBackgroundImageView, clippedImageView, overlayCopyImageView);
+                }
+
+                // Last, we'll clean up any excess transparent edges by cropping it
+                SnapshotParameters groupParameters = new SnapshotParameters();
+                groupParameters.setViewport(
+                    new Rectangle2D(1, 1, viewport.getWidth(), viewport.getHeight()));
+                groupParameters.setFill(Color.TRANSPARENT);
+                return snapshot(blend, groupParameters, null);
+              });
+    }
   }
 }

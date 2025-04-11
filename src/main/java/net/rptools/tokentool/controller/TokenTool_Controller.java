@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -1250,17 +1251,29 @@ public class TokenTool_Controller {
   }
 
   public void updateTokenPreviewImageView() {
-    tokenImageView.setImage(
-        ImageUtil.composePreview(
-            compositeTokenPane,
-            backgroundImageView,
-            backgroundColorPicker.getValue(),
-            portraitImageView,
-            maskImageView,
-            overlayImageView,
-            overlayUseAsBaseCheckbox.isSelected(),
-            clipPortraitCheckbox.isSelected()));
-    tokenImageView.setPreserveRatio(true);
+    compositeTokenPane.layout();
+
+    boolean clip =
+        clipPortraitCheckbox.isSelected()
+            && maskImageView.getFitWidth() > 0
+            && maskImageView.getFitHeight() > 0;
+    CompletableFuture<? extends Image> future =
+        clip
+            ? ImageUtil.Async.composeClippedPreview(
+                backgroundImageView,
+                backgroundColorPicker.getValue(),
+                portraitImageView,
+                maskImageView,
+                overlayImageView,
+                overlayUseAsBaseCheckbox.isSelected())
+            : ImageUtil.Async.composeUnclippedPreview(compositeTokenPane);
+    future
+        .thenCompose(i -> ImageUtil.Async.autoCrop(i))
+        .thenAccept(
+            cropped -> {
+              tokenImageView.setImage(cropped);
+              tokenImageView.setPreserveRatio(true);
+            });
   }
 
   private void saveToken() {
