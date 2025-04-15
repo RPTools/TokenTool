@@ -157,7 +157,6 @@ public class TokenTool_Controller {
   @FXML private StackPane imagesStackPane;
   @FXML private ImageView backgroundImageView; // The background image layer
   @FXML private ImageView portraitImageView; // The bottom "Portrait" layer
-  @FXML private ImageView maskImageView; // The mask layer used to crop the Portrait layer
   @FXML private ImageView overlayImageView; // The overlay layer to apply on top of everything
   @FXML private ImageView tokenImageView; // The final token image created
   @FXML private CheckBox useFileNumberingCheckbox;
@@ -191,6 +190,13 @@ public class TokenTool_Controller {
   @FXML private RadioMenuItem portraitMenuItem;
   @FXML private RadioMenuItem overlayMenuItem;
   private FileSaveUtil fileSaveUtil = new FileSaveUtil();
+
+  /**
+   * The mask layer used to crop the Portrait layer.
+   *
+   * <p>This is not part of the main scene, but is used when compositing result images.
+   */
+  private ImageView maskImageView;
 
   // A custom set of Width/Height sizes to use for Overlays
   private NavigableSet<Integer> overlaySpinnerSteps =
@@ -252,8 +258,6 @@ public class TokenTool_Controller {
         : "fx:id=\"backgroundImageView\" was not injected: check your FXML file 'TokenTool.fxml'.";
     assert portraitImageView != null
         : "fx:id=\"portraitImageView\" was not injected: check your FXML file 'TokenTool.fxml'.";
-    assert maskImageView != null
-        : "fx:id=\"maskImageView\" was not injected: check your FXML file 'TokenTool.fxml'.";
     assert overlayImageView != null
         : "fx:id=\"overlayImageView\" was not injected: check your FXML file 'TokenTool.fxml'.";
     assert tokenImageView != null
@@ -324,6 +328,20 @@ public class TokenTool_Controller {
         : "fx:id=\"portraitMenuItem\" was not injected: check your FXML file 'TokenTool.fxml'.";
     assert overlayMenuItem != null
         : "fx:id=\"overlayMenuItem\" was not injected: check your FXML file 'TokenTool.fxml'.";
+
+    var defaultImageUrl =
+        getClass().getResource("/net/rptools/tokentool/image/gear-chrome-mask.png");
+    maskImageView =
+        defaultImageUrl == null ? new ImageView() : new ImageView(defaultImageUrl.toExternalForm());
+    maskImageView.setVisible(true);
+    maskImageView.setId("maskImageView");
+    maskImageView.setFitWidth(256);
+    maskImageView.setFitHeight(256);
+    maskImageView.setLayoutX(1);
+    maskImageView.setLayoutY(1);
+    maskImageView.setMouseTransparent(true);
+    maskImageView.setPickOnBounds(true);
+    maskImageView.setPreserveRatio(true);
 
     // We're getting the defaults set by the FXML before updating them with the saved preferences...
     AppConstants.DEFAULT_MASK_IMAGE = maskImageView.getImage();

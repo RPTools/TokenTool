@@ -117,11 +117,6 @@
 										</ScrollPane>
 										<Group fx:id="compositeGroup">
 											<children>
-												<ImageView fx:id="maskImageView" fitHeight="256.0" fitWidth="256.0" layoutX="1.0" layoutY="1.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true" visible="false">
-													<image>
-														<Image url="@../image/gear-chrome-mask.png" />
-													</image>
-												</ImageView>
 												<ImageView fx:id="overlayImageView" fitHeight="256.0" fitWidth="256.0" layoutX="1.0" layoutY="1.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
 													<image>
 														<Image url="@../image/gear-chrome-no-mask.png" />

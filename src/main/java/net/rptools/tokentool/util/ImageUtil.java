@@ -332,10 +332,10 @@ public class ImageUtil {
       // We will then get a snapshot of the background image, if any.
       double x, y, width, height;
 
-      x = maskImageView.getParent().getLayoutX();
-      y = maskImageView.getParent().getLayoutY();
-      width = maskImageView.getFitWidth();
-      height = maskImageView.getFitHeight();
+      x = overlayImageView.getParent().getLayoutX();
+      y = overlayImageView.getParent().getLayoutY();
+      width = overlayImageView.getFitWidth();
+      height = overlayImageView.getFitHeight();
 
       Rectangle2D viewPort = new Rectangle2D(x, y, width, height);
       Rectangle2D maskViewPort = new Rectangle2D(1, 1, width, height);
@@ -355,9 +355,7 @@ public class ImageUtil {
       portraitImageView.snapshot(parameter, newImage);
 
       parameter.setViewport(maskViewPort);
-      maskImageView.setVisible(true);
       maskImageView.snapshot(parameter, newMaskImage);
-      maskImageView.setVisible(false);
 
       clippedImageView.setFitWidth(width);
       clippedImageView.setFitHeight(height);
