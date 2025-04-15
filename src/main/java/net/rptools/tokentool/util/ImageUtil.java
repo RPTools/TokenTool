@@ -16,7 +16,6 @@ package net.rptools.tokentool.util;
 
 import com.twelvemonkeys.imageio.plugins.psd.PSDImageReader;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -138,7 +137,7 @@ public class ImageUtil {
 
       try (ImageInputStream is = ImageIO.createImageInputStream(file)) {
         if (is == null || is.length() == 0) {
-          log.info("Image from file " + file.getAbsolutePath() + " is null");
+          log.info("Image from file {} is null", file.getAbsolutePath());
         }
 
         Iterator<ImageReader> iterator = ImageIO.getImageReaders(is);
@@ -178,7 +177,7 @@ public class ImageUtil {
           thumb = resizeCanvas(SwingFXUtils.toFXImage(thumbBI, null), width, height, x, y);
         }
       } catch (Exception e) {
-        log.error("Processing: " + file.getAbsolutePath(), e);
+        log.error("Processing: {}", file.getAbsolutePath(), e);
       } finally {
         // Dispose reader in finally block to avoid memory leaks
         if (reader != null) {
@@ -223,18 +222,6 @@ public class ImageUtil {
         offsetX, offsetY, sourceWidth, sourceHeight, format, buffer, 0, sourceWidth);
 
     return outputImage;
-  }
-
-  /*
-   * Resize the overall image width/height scaled to the target width/height
-   */
-  public static Image scaleImage(
-      Image source, double targetWidth, double targetHeight, boolean preserveRatio) {
-    ImageView imageView = new ImageView(source);
-    imageView.setPreserveRatio(preserveRatio);
-    imageView.setFitWidth(targetWidth);
-    imageView.setFitHeight(targetHeight);
-    return imageView.snapshot(null, null);
   }
 
   /*
@@ -402,14 +389,6 @@ public class ImageUtil {
     return finalImage;
   }
 
-  public static double getScaleXRatio(ImageView imageView) {
-    return imageView.getBoundsInParent().getWidth() / imageView.getImage().getWidth();
-  }
-
-  public static double getScaleYRatio(ImageView imageView) {
-    return imageView.getBoundsInParent().getHeight() / imageView.getImage().getHeight();
-  }
-
   /*
    * This is for Legacy support but can cause magenta bleed on edges if there is transparency overlap. The preferred overlay storage is now PhotoShop PSD format with layer 1 containing the mask and
    * layer 2 containing the image
@@ -461,17 +440,6 @@ public class ImageUtil {
       return FilenameUtils.getExtension(imageFile.getName()).toUpperCase()
           + I18N.getString("imageUtil.filetype.label.extension");
     }
-  }
-
-  public static byte[] imageToBytes(BufferedImage image) throws IOException {
-    return imageToBytes(image, "png");
-  }
-
-  public static byte[] imageToBytes(BufferedImage image, String format) throws IOException {
-    ByteArrayOutputStream outStream = new ByteArrayOutputStream(10000);
-    ImageIO.write(image, format, outStream);
-
-    return outStream.toByteArray();
   }
 
   public static List<ExtensionFilter> GET_EXTENSION_FILTERS() {
