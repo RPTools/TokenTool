@@ -359,7 +359,8 @@ public class PdfViewer_Controller implements Initializable {
               extractAllImagesLabel.setVisible(true);
 
               for (int page = 0; page < pageCount; page++) {
-                pdfModel.extractAllImagesFromPage(selectedDirectory.getPath(), imageFormat, page, imageMinDimension);
+                pdfModel.extractAllImagesFromPage(
+                    selectedDirectory.getPath(), imageFormat, page, imageMinDimension);
                 updateProgress(page, pageCount);
                 updateMessage("Extracting page " + page + " of " + pageCount);
 

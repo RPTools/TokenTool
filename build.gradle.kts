@@ -75,7 +75,7 @@ spotless {
     java {
         licenseHeaderFile("${projectDir}/spotless.license.java")
         targetExclude("**/module-info.java")
-        //googleJavaFormat()
+        googleJavaFormat()
     }
 
     format("misc") {

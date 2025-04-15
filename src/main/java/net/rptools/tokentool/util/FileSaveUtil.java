@@ -151,8 +151,13 @@ public class FileSaveUtil {
     return new File(System.getProperty("java.io.tmpdir"), tempFileName);
   }
 
-  public File getFileName(boolean asToken, boolean useNumbering, String tempFileName, String imageExtension,
-      TextField fileNameSuffix, boolean advanceFileNameSuffix) {
+  public File getFileName(
+      boolean asToken,
+      boolean useNumbering,
+      String tempFileName,
+      String imageExtension,
+      TextField fileNameSuffix,
+      boolean advanceFileNameSuffix) {
 
     imageExtension = "." + imageExtension;
 

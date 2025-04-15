@@ -149,7 +149,8 @@ public final class ExtractImagesFromPDF {
         if (!imageTracker.contains(xObject.getCOSObject())) {
           imageTracker.add(xObject.getCOSObject());
 
-          String name = pdfName + " - pg " + (currentPageNumber + 1) + " - img " + imageTracker.size();
+          String name =
+              pdfName + " - pg " + (currentPageNumber + 1) + " - img " + imageTracker.size();
 
           log.debug("Extracting image... " + name);
 
