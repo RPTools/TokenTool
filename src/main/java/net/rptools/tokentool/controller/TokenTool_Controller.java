@@ -38,7 +38,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
-
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -197,7 +196,8 @@ public class TokenTool_Controller {
   private NavigableSet<Integer> overlaySpinnerSteps =
       new TreeSet<>(
           Arrays.asList(
-              50, 64, 100, 128, 150, 200, 256, 300, 400, 500, 512, 600, 700, 750, 800, 900, 1000, 1024));
+              50, 64, 100, 128, 150, 200, 256, 300, 400, 500, 512, 600, 700, 750, 800, 900, 1000,
+              1024));
 
   private PdfViewer pdfViewer;
 
@@ -829,8 +829,7 @@ public class TokenTool_Controller {
           x++;
           y++;
         }
-        default -> {
-        }
+        default -> {}
       }
 
       getCurrentLayer().setTranslateX(x);
@@ -1251,13 +1250,14 @@ public class TokenTool_Controller {
     FileChooser fileChooser = new FileChooser();
     log.info("***** Saving Token as a {}", fileExtension);
 
-    File tokenFile = fileSaveUtil.getFileName(
-      false,
-      useFileNumberingCheckbox.isSelected(),
-      fileNameTextField.getText(),
-      getFileSaveFormatChoiceboxSelection(),
-      fileNameSuffixTextField,
-      true);
+    File tokenFile =
+        fileSaveUtil.getFileName(
+            false,
+            useFileNumberingCheckbox.isSelected(),
+            fileNameTextField.getText(),
+            getFileSaveFormatChoiceboxSelection(),
+            fileNameSuffixTextField,
+            true);
     fileChooser.setInitialFileName(tokenFile.getName());
     if (tokenFile.getParentFile() != null && tokenFile.getParentFile().isDirectory()) {
       fileChooser.setInitialDirectory(tokenFile.getParentFile());
@@ -1266,12 +1266,11 @@ public class TokenTool_Controller {
     fileChooser.getExtensionFilters().addAll(AppConstants.IMAGE_EXTENSION_FILTER);
     fileChooser.setTitle(I18N.getString("TokenTool.save.filechooser.title"));
 
-    fileChooser.setSelectedExtensionFilter(AppConstants.IMAGE_EXTENSION_FILTER
-        .stream()
-        .filter(it -> it.getExtensions().contains("*." + fileExtension))
-        .findFirst()
-        .orElse(AppConstants.DEFAULT_EXTENSION_FILTER)
-    );
+    fileChooser.setSelectedExtensionFilter(
+        AppConstants.IMAGE_EXTENSION_FILTER.stream()
+            .filter(it -> it.getExtensions().contains("*." + fileExtension))
+            .findFirst()
+            .orElse(AppConstants.DEFAULT_EXTENSION_FILTER));
 
     File tokenSaved = fileChooser.showSaveDialog(saveOptionsPane.getScene().getWindow());
 
@@ -1321,7 +1320,8 @@ public class TokenTool_Controller {
     } catch (IOException e) {
       log.error("Unable to write token to file: " + tokenFile.getAbsolutePath(), e);
     } catch (IndexOutOfBoundsException e) {
-      log.error("Image width/height out of bounds: " + getOverlayWidth() + " x " + getOverlayHeight(), e);
+      log.error(
+          "Image width/height out of bounds: " + getOverlayWidth() + " x " + getOverlayHeight(), e);
     }
 
     return false;
