@@ -135,14 +135,16 @@ public class AppSetup {
     int overlaysInstalled = 0;
 
     // Get list of overlays from src/main/resources
-    Set<String> moduleResourceSet = ModuleLayer.boot().configuration().modules()
-        .stream()
-        .map(ResolvedModule::reference)
-        .filter(it -> it.descriptor().name().equals("net.rptools.tokentool"))
-        .findFirst().get().open()
-        .list()
-        .filter(it -> it.startsWith(DEFAULT_OVERLAYS) && !it.endsWith("/"))
-        .collect(Collectors.toSet());
+    Set<String> moduleResourceSet =
+        ModuleLayer.boot().configuration().modules().stream()
+            .map(ResolvedModule::reference)
+            .filter(it -> it.descriptor().name().equals("net.rptools.tokentool"))
+            .findFirst()
+            .get()
+            .open()
+            .list()
+            .filter(it -> it.startsWith(DEFAULT_OVERLAYS) && !it.endsWith("/"))
+            .collect(Collectors.toSet());
 
     for (String resourcePath : moduleResourceSet) {
       String resourceName = resourcePath.substring(DEFAULT_OVERLAYS.length());
@@ -214,11 +216,11 @@ public class AppSetup {
       return false;
     }
 
-    String[] versions = version.indexOf(".") > 0 ? version.split("\\.") : new String[]{version};
+    String[] versions = version.indexOf(".") > 0 ? version.split("\\.") : new String[] {version};
     String[] installedVersions =
         installedVersion.indexOf(".") > 0
             ? installedVersion.split("\\.")
-            : new String[]{installedVersion};
+            : new String[] {installedVersion};
 
     int i = 0;
     try {

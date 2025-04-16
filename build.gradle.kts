@@ -75,7 +75,7 @@ spotless {
     java {
         licenseHeaderFile("${projectDir}/spotless.license.java")
         targetExclude("**/module-info.java")
-        //googleJavaFormat()
+        googleJavaFormat()
     }
 
     format("misc") {
@@ -96,6 +96,7 @@ repositories {
 dependencies {
     // Logging
     annotationProcessor(group = "org.apache.logging.log4j", name = "log4j-core", version = "2.19.0")
+    implementation(group = "org.apache.logging.log4j", name = "log4j-core", version = "2.19.0")
     implementation(group = "org.apache.logging.log4j", name = "log4j-api", version = "2.19.0")
     implementation(group = "org.apache.logging.log4j", name = "log4j-1.2-api", version = "2.19.0")
 

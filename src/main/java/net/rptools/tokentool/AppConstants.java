@@ -71,13 +71,14 @@ public class AppConstants {
   public static final File CACHE_DIR = AppSetup.getAppHome("cache");
   public static final ExtensionFilter DEFAULT_EXTENSION_FILTER =
       new ExtensionFilter(DEFAULT_IMAGE_EXTENSION_DESCRIPTION, "*." + DEFAULT_IMAGE_EXTENSION);
-  public static final Set<ExtensionFilter> IMAGE_EXTENSION_FILTER = new HashSet<>(Arrays.asList(
-      new ExtensionFilter("WebP Image", "*.webp"),
-      new ExtensionFilter("PNG Image", "*.png"),
-      new ExtensionFilter("JPEG Image", "*.jpg"),
-      new ExtensionFilter("GIF Image", "*.gif"),
-      new ExtensionFilter("TIFF Image", "*.tif")
-  ));
+  public static final Set<ExtensionFilter> IMAGE_EXTENSION_FILTER =
+      new HashSet<>(
+          Arrays.asList(
+              new ExtensionFilter("WebP Image", "*.webp"),
+              new ExtensionFilter("PNG Image", "*.png"),
+              new ExtensionFilter("JPEG Image", "*.jpg"),
+              new ExtensionFilter("GIF Image", "*.gif"),
+              new ExtensionFilter("TIFF Image", "*.tif")));
 
   public static final double DEFAULT_PORTRAIT_TRANSPARENCY = 1;
   public static final double DEFAULT_PORTRAIT_BLUR = 0;
