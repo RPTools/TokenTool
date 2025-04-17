@@ -5,7 +5,7 @@ plugins {
     java
     id("org.openjfx.javafxplugin") version "0.0.14"
     id("org.beryx.jlink") version "3.1.1"
-    id("com.diffplug.spotless") version "6.11.0"
+    id("com.diffplug.spotless") version "6.25.0"
     id("io.wusa.semver-git-plugin") version "2.3.7"
 }
 
@@ -18,10 +18,12 @@ semver {
     initialVersion = "2.0.0" // (default) initial version in semantic versioning
     tagType = io.wusa.TagType.LIGHTWEIGHT
 
-    branches { // list of branch configurations
+    branches {
+        // list of branch configurations
         branch {
             incrementer = "NO_VERSION_INCREMENTER" // NO_VERSION_INCREMENTER, PATCH_INCREMENTER, MINOR_INCREMENTER, MAJOR_INCREMENTER, CONVENTIONAL_COMMITS_INCREMENTER
-            formatter = Transformer<Any, io.wusa.Info> { info: io.wusa.Info -> "${info.version.major}.${info.version.minor}.${info.version.patch}" }
+            formatter =
+                Transformer<Any, io.wusa.Info> { info: io.wusa.Info -> "${info.version.major}.${info.version.minor}.${info.version.patch}" }
             regex = ".+" // regex for the branch you want to configure, put this one last
         }
     }
@@ -35,9 +37,15 @@ val environment: String by project
 
 // Custom properties
 ext {
-    val os = org.gradle.internal.os.OperatingSystem.current()
+    val os =
+        org.gradle.internal.os.OperatingSystem
+            .current()
 
-    if (semver.info.dirty || semver.info.version.toString().endsWith(semver.snapshotSuffix)) {
+    if (semver.info.dirty ||
+        semver.info.version
+            .toString()
+            .endsWith(semver.snapshotSuffix)
+    ) {
         set("sentryDSN", "")
         set("environment", "Development")
     } else {
@@ -73,7 +81,7 @@ javafx {
 
 spotless {
     java {
-        licenseHeaderFile("${projectDir}/spotless.license.java")
+        licenseHeaderFile("$projectDir/spotless.license.java")
         targetExclude("**/module-info.java")
         googleJavaFormat()
     }
@@ -86,7 +94,6 @@ spotless {
         indentWithSpaces(4)
     }
 }
-
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -128,8 +135,9 @@ dependencies {
     implementation(group = "com.google.code.gson", name = "gson", version = "2.10")
 }
 
-val sharedManifest = the<JavaPluginConvention>().manifest {
-    attributes(
+val sharedManifest =
+    the<JavaPluginConvention>().manifest {
+        attributes(
             "Implementation-Title" to project.name,
             "Implementation-Version" to semver.info,
             "Implementation-Vendor" to vendor,
@@ -140,20 +148,22 @@ val sharedManifest = the<JavaPluginConvention>().manifest {
             "Built-JDK" to System.getProperty("java.version"),
             "Source-Compatibility" to project.java.sourceCompatibility,
             "Target-Compatibility" to project.java.targetCompatibility,
-            "Main-Class" to mainClassName
-    )
-}
+            "Main-Class" to mainClassName,
+        )
+    }
 
 tasks.jar {
-    manifest = project.the<JavaPluginConvention>().manifest {
-        from(sharedManifest)
-    }
+    manifest =
+        project.the<JavaPluginConvention>().manifest {
+            from(sharedManifest)
+        }
 }
 
 tasks.register<Jar>("uberJar") {
-    manifest = project.the<JavaPluginConvention>().manifest {
-        from(sharedManifest)
-    }
+    manifest =
+        project.the<JavaPluginConvention>().manifest {
+            from(sharedManifest)
+        }
 
     archiveClassifier.set("uber")
 
@@ -172,10 +182,19 @@ tasks.register<Jar>("uberJar") {
 jlink {
     // We need to keep the semver down to just major.minor.patch (no -alpha.1 or -rc.1, etc) otherwise jpackage fails
     val appVersion = "${semver.info.version.major}.${semver.info.version.minor}.${semver.info.version.patch}"
-    project.version = appVersion;
+    project.version = appVersion
 
-    options.set(listOf("--strip-debug", "--strip-native-commands", "--compress", "2",
-        "--no-header-files", "--no-man-pages", "--ignore-signing-information"))
+    options.set(
+        listOf(
+            "--strip-debug",
+            "--strip-native-commands",
+            "--compress",
+            "2",
+            "--no-header-files",
+            "--no-man-pages",
+            "--ignore-signing-information",
+        ),
+    )
 
     forceMerge("log4j-api", "gson", "bcmail")
 
@@ -184,9 +203,10 @@ jlink {
         jvmArgs = listOf("-Dfile.encoding=UTF-8")
     }
 
-
     jpackage {
-        val os = org.gradle.internal.os.OperatingSystem.current()
+        val os =
+            org.gradle.internal.os.OperatingSystem
+                .current()
         // not working :(
         // installerOutputDir = releaseDir
         // installerOutputDir = file("releases")
@@ -197,25 +217,34 @@ jlink {
         imageName = "TokenTool"
 
         installerName = "TokenTool"
-        installerOptions = mutableListOf(
+        installerOptions =
+            mutableListOf(
                 "--verbose",
-                "--description", project.description,
-                "--copyright", "Copyright 2000-2020 RPTools.net",
-                "--license-file", "package/license/COPYING.AFFERO",
-                "--app-version", appVersion,
-                "--vendor", vendor
-        )
+                "--description",
+                project.description,
+                "--copyright",
+                "Copyright 2000-2020 RPTools.net",
+                "--license-file",
+                "package/license/COPYING.AFFERO",
+                "--app-version",
+                appVersion,
+                "--vendor",
+                vendor,
+            )
 
         if (os.isWindows) {
             println("Setting Windows installer options")
             imageOptions.addAll(listOf("--icon", "package/windows/TokenTool.ico"))
-            installerOptions.addAll(listOf(
+            installerOptions.addAll(
+                listOf(
                     "--win-dir-chooser",
                     "--win-per-user-install",
                     "--win-shortcut",
                     "--win-menu",
-                    "--win-menu-group", "RPTools"
-            ))
+                    "--win-menu-group",
+                    "RPTools",
+                ),
+            )
         }
 
         if (os.isMacOsX) {
@@ -226,21 +255,30 @@ jlink {
         if (os.isLinux) {
             println("Setting Linux installer options")
             imageOptions.addAll(listOf("--icon", "package/linux/tokentool.png"))
-            installerOptions.addAll(listOf(
-                    "--linux-menu-group", "RPTools",
-                    "--linux-shortcut")
+            installerOptions.addAll(
+                listOf(
+                    "--linux-menu-group",
+                    "RPTools",
+                    "--linux-shortcut",
+                ),
             )
 
             if (installerType == "deb") {
-                installerOptions.addAll(listOf(
-                        "--linux-deb-maintainer", "admin@rptools.net"
-                ))
+                installerOptions.addAll(
+                    listOf(
+                        "--linux-deb-maintainer",
+                        "admin@rptools.net",
+                    ),
+                )
             }
 
             if (installerType == "rpm") {
-                installerOptions.addAll(listOf(
-                        "--linux-rpm-license-type", "AGPLv3"
-                ))
+                installerOptions.addAll(
+                    listOf(
+                        "--linux-rpm-license-type",
+                        "AGPLv3",
+                    ),
+                )
             }
         }
     }
@@ -252,26 +290,30 @@ tasks.register<GenerateBuildProperties>("generateBuildProperties") {
 }
 
 // A task that generates various dynamic properties used at runtime
-open class GenerateBuildProperties @javax.inject.Inject constructor(objects: ObjectFactory) : DefaultTask() {
-    @OutputDirectory
-    val outputDir: DirectoryProperty = objects.directoryProperty()
+open class GenerateBuildProperties
+    @javax.inject.Inject
+    constructor(
+        objects: ObjectFactory,
+    ) : DefaultTask() {
+        @OutputDirectory
+        val outputDir: DirectoryProperty = objects.directoryProperty()
 
-    @TaskAction
-    fun compile() {
-        val dir = outputDir.get().asFile
-        val srcFile = File(dir, "build.properties")
-        logger.quiet("output dir = $dir")
+        @TaskAction
+        fun compile() {
+            val dir = outputDir.get().asFile
+            val srcFile = File(dir, "build.properties")
+            logger.quiet("output dir = $dir")
 
-        srcFile.writeText("# Auto-Generated properties from Gradle compileJava step\n")
-        srcFile.appendText("# ${LocalDateTime.now()}\n\n")
-        srcFile.appendText("version=${project.semver.info}\n")
-        srcFile.appendText("vendor=${project.ext["vendor"]}\n")
-        srcFile.appendText("environment=${project.ext["environment"]}\n")
-        srcFile.appendText("sentryDSN=${project.ext["sentryDSN"]}\n")
-        srcFile.appendText("git-commit=${project.semver.info.shortCommit}\n")
-        srcFile.appendText("git-commit-sha=${project.semver.info.commit}\n")
+            srcFile.writeText("# Auto-Generated properties from Gradle compileJava step\n")
+            srcFile.appendText("# ${LocalDateTime.now()}\n\n")
+            srcFile.appendText("version=${project.semver.info}\n")
+            srcFile.appendText("vendor=${project.ext["vendor"]}\n")
+            srcFile.appendText("environment=${project.ext["environment"]}\n")
+            srcFile.appendText("sentryDSN=${project.ext["sentryDSN"]}\n")
+            srcFile.appendText("git-commit=${project.semver.info.shortCommit}\n")
+            srcFile.appendText("git-commit-sha=${project.semver.info.commit}\n")
+        }
     }
-}
 
 tasks.getByName<Zip>("distZip").enabled = false
 tasks.getByName<Tar>("distTar").enabled = false
