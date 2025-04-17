@@ -22,8 +22,8 @@ jobs:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest, macOS-latest]
-        java: [ '17' ]
+        os: [windows-latest, ubuntu-latest, macOS-13]
+        java: [ '21' ]
       fail-fast: false
     steps:
     - name: Git checkout
