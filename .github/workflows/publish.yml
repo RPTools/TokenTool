@@ -16,7 +16,7 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest, macOS-13]
         java: ["21"]
-        distribution: "temurin"
+        distribution: ["temurin"]
       fail-fast: false
     steps:
       #       ____          _  __     __   ___        ____                __
