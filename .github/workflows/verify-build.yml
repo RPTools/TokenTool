@@ -4,14 +4,14 @@
 name: Build Verification
 
 on:
-  push: 
-    branches:    
+  push:
+    branches:
       - main
       - develop
       - feature*
       - release*
   pull_request:
-    branches:    
+    branches:
       - main
       - develop
       - feature*
@@ -19,27 +19,29 @@ on:
 jobs:
   build:
     name: ${{ matrix.os }} w/JDK ${{ matrix.java }}
-    runs-on:  ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macOS-13]
-        java: [ '21' ]
+        java: ["21"]
+        distribution: ["temurin"]
       fail-fast: false
     steps:
-    - name: Git checkout
-      uses: actions/checkout@v2
-    - name: Set up JDK
-      uses: actions/setup-java@v1
-      with:
-        java-version: ${{ matrix.java }}
-    - name: Cache Gradle
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-v4-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-v4-
-    - name: Build with Gradle
-      run: ./gradlew build
+      - name: Git checkout
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: ${{ matrix.distribution }}
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-v4-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-v4-
+      - name: Build with Gradle
+        run: ./gradlew build
