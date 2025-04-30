@@ -25,9 +25,9 @@ jobs:
       #   /_____/ \__,_//_//_/ \__,_/   \____/\/  /_/     \__,_/ \___//_/|_| \__,_/ \__, / \___/
       #                                                                            /____/
       - name: Git checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
       - name: Cache Gradle
