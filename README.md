@@ -101,3 +101,27 @@ Because compiled developer builds are unsigned, Windows **Smart App Control (SAC
 *   **For Distribution**: 
     1.  Instruct users to right-click the downloaded `.exe`, select **Properties**, and check the **Unblock** box at the bottom.
     2.  Alternatively, publish the app through the **Microsoft Store**—Microsoft Store packages are automatically signed during verification, completely bypassing Smart App Control warnings for free!
+
+---
+
+## ❤️ Credits & Attributions
+
+This project is a modern, high-performance desktop refactor and tribute to the original open-source **[TokenTool](https://github.com/RPTools/TokenTool)**, a beloved utility created and maintained by the extraordinary **[RPTools Community](https://github.com/RPTools)**.
+
+We want to give **full credit** and express our deepest gratitude to the original creators, developers, designers, and maintainers who have dedicated years of volunteer effort to supporting the Virtual Tabletop (VTT) gaming community. Without their visionary work, this modernized version would not exist.
+
+### Key Contributors & Maintainers of the Original TokenTool Ecosystem:
+*   **[JamzTheMan (Jamz)](https://github.com/JamzTheMan)**: For driving massive updates, major releases, and the JavaFX port of classic TokenTool.
+*   **[Phergus](https://github.com/Phergus)**: For core development, design guidance, and extensive community support.
+*   **[Craig Wisniewski](https://github.com/cwisniewski)**: For key architectural work across the RPTools suite.
+*   **[Azhrei](https://github.com/Azhrei)**, **[RPTroll](https://github.com/RPTroll)**, **[Jagged](https://github.com/Jagged)**, **[kayila](https://github.com/kayila)**: For their stewardship of the RPTools ecosystem and their work in keeping the suite alive and vibrant.
+*   **Trevor Croft**: The original founder of RPTools whose early work laid the foundation for the entire ecosystem.
+*   The numerous open-source translators, artists who designed default overlay frames, and community members who provided bug reports, testing, and feature ideas over the decades.
+
+### Licensing & Open Source Spirit:
+*   The original **TokenTool** is published under the open-source **GNU General Public License (GPL)**.
+*   This refactored version is built as a lightweight, modern web-and-Rust-native tribute. It is intended as an independent, modernized demonstration proof-of-concept to carry their outstanding legacy forward into a fast, native, JRE-free desktop era. All original overlay graphics, design concepts, and credits remain the property of the RPTools community.
+
+*Thank you, RPTools team, for keeping our tabletop sessions alive and inspiring developers to build!*
+
+
