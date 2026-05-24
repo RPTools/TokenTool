@@ -153,9 +153,9 @@
         let drawW = w * zoom;
         let drawH = h * zoom;
         if (aspect > 1) {
-          drawH = drawW / aspect;
-        } else {
           drawW = drawH * aspect;
+        } else {
+          drawH = drawW / aspect;
         }
 
         let filters: string[] = [];
@@ -190,9 +190,9 @@
         let drawW = w * zoom;
         let drawH = h * zoom;
         if (aspect > 1) {
-          drawH = drawW / aspect;
-        } else {
           drawW = drawH * aspect;
+        } else {
+          drawH = drawW / aspect;
         }
 
         let filters: string[] = [];

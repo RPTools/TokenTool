@@ -5,11 +5,19 @@ mod pdf_extractor;
 
 use pdf_extractor::extract_images_from_pdf_page;
 
-#[tauri::command]
-fn extract_pdf_images(pdf_path: String, page_number: usize) -> Result<Vec<String>, String> {
-    println!("Tauri invoking PDF extraction: {} (pg {})", pdf_path, page_number);
-    extract_images_from_pdf_page(pdf_path, page_number)
+#[derive(serde::Serialize)]
+struct PdfPageOutput {
+    images: Vec<String>,
+    total_pages: usize,
 }
+
+#[tauri::command]
+fn extract_pdf_images(pdf_path: String, page_number: usize) -> Result<PdfPageOutput, String> {
+    println!("Tauri invoking PDF extraction: {} (pg {})", pdf_path, page_number);
+    let (images, total_pages) = extract_images_from_pdf_page(pdf_path, page_number)?;
+    Ok(PdfPageOutput { images, total_pages })
+}
+
 
 fn main() {
     tauri::Builder::default()
