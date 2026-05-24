@@ -1,0 +1,1126 @@
+{
+  "categories": {
+    "v2/Create": [
+      {
+        "name": "Base, Create Custom Overlay",
+        "path": "/overlays/v2/Create/Base, Create Custom Overlay.psd",
+        "thumbPath": "/overlays/v2/Create/Base, Create Custom Overlay_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Blank",
+        "path": "/overlays/v2/Create/Blank.psd",
+        "thumbPath": "/overlays/v2/Create/Blank_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Frame, Create Custom Overlay",
+        "path": "/overlays/v2/Create/Frame, Create Custom Overlay.psd",
+        "thumbPath": "/overlays/v2/Create/Frame, Create Custom Overlay_thumb.png",
+        "type": "psd"
+      }
+    ],
+    "v2/Hex": [
+      {
+        "name": "Dark Marble",
+        "path": "/overlays/v2/Hex/Dark Marble.psd",
+        "thumbPath": "/overlays/v2/Hex/Dark Marble_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Marble",
+        "path": "/overlays/v2/Hex/Marble.psd",
+        "thumbPath": "/overlays/v2/Hex/Marble_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Red",
+        "path": "/overlays/v2/Hex/Red.psd",
+        "thumbPath": "/overlays/v2/Hex/Red_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Stone",
+        "path": "/overlays/v2/Hex/Stone.psd",
+        "thumbPath": "/overlays/v2/Hex/Stone_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Translucent",
+        "path": "/overlays/v2/Hex/Translucent.psd",
+        "thumbPath": "/overlays/v2/Hex/Translucent_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Weave",
+        "path": "/overlays/v2/Hex/Weave.psd",
+        "thumbPath": "/overlays/v2/Hex/Weave_thumb.png",
+        "type": "psd"
+      }
+    ],
+    "v2/Round/Bottlecaps": [
+      {
+        "name": "Base, Black",
+        "path": "/overlays/v2/Round/Bottlecaps/Base, Black.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Base, Black_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Base, Blue",
+        "path": "/overlays/v2/Round/Bottlecaps/Base, Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Base, Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Base, Gold",
+        "path": "/overlays/v2/Round/Bottlecaps/Base, Gold.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Base, Gold_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Base, Green",
+        "path": "/overlays/v2/Round/Bottlecaps/Base, Green.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Base, Green_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Base, Grey, Light",
+        "path": "/overlays/v2/Round/Bottlecaps/Base, Grey, Light.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Base, Grey, Light_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Base, Grey. Dark",
+        "path": "/overlays/v2/Round/Bottlecaps/Base, Grey. Dark.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Base, Grey. Dark_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Base, Red",
+        "path": "/overlays/v2/Round/Bottlecaps/Base, Red.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Base, Red_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Base, Silver",
+        "path": "/overlays/v2/Round/Bottlecaps/Base, Silver.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Base, Silver_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Black",
+        "path": "/overlays/v2/Round/Bottlecaps/Black.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Black_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Blue",
+        "path": "/overlays/v2/Round/Bottlecaps/Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Gold",
+        "path": "/overlays/v2/Round/Bottlecaps/Gold.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Gold_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Green",
+        "path": "/overlays/v2/Round/Bottlecaps/Green.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Green_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Grey, Light",
+        "path": "/overlays/v2/Round/Bottlecaps/Grey, Light.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Grey, Light_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Grey. Dark",
+        "path": "/overlays/v2/Round/Bottlecaps/Grey. Dark.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Grey. Dark_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Red",
+        "path": "/overlays/v2/Round/Bottlecaps/Red.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Red_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Silver",
+        "path": "/overlays/v2/Round/Bottlecaps/Silver.psd",
+        "thumbPath": "/overlays/v2/Round/Bottlecaps/Silver_thumb.png",
+        "type": "psd"
+      }
+    ],
+    "v2/Round/Chains": [
+      {
+        "name": "Blood Steel",
+        "path": "/overlays/v2/Round/Chains/Blood Steel.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Blood Steel_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Blue Enchanted",
+        "path": "/overlays/v2/Round/Chains/Blue Enchanted.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Blue Enchanted_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Blue Steel",
+        "path": "/overlays/v2/Round/Chains/Blue Steel.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Blue Steel_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Blue",
+        "path": "/overlays/v2/Round/Chains/Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Brass",
+        "path": "/overlays/v2/Round/Chains/Brass.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Brass_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Burnished Orange",
+        "path": "/overlays/v2/Round/Chains/Burnished Orange.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Burnished Orange_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Cobalt",
+        "path": "/overlays/v2/Round/Chains/Cobalt.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Cobalt_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Copper, Pitted",
+        "path": "/overlays/v2/Round/Chains/Copper, Pitted.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Copper, Pitted_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Copper",
+        "path": "/overlays/v2/Round/Chains/Copper.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Copper_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Dark",
+        "path": "/overlays/v2/Round/Chains/Dark.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Dark_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Gold",
+        "path": "/overlays/v2/Round/Chains/Gold.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Gold_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Green",
+        "path": "/overlays/v2/Round/Chains/Green.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Green_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Iron, Pitted",
+        "path": "/overlays/v2/Round/Chains/Iron, Pitted.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Iron, Pitted_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Purple",
+        "path": "/overlays/v2/Round/Chains/Purple.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Purple_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Silver",
+        "path": "/overlays/v2/Round/Chains/Silver.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Silver_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Steel, Pitted",
+        "path": "/overlays/v2/Round/Chains/Steel, Pitted.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Steel, Pitted_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Verdigris, Pitted",
+        "path": "/overlays/v2/Round/Chains/Verdigris, Pitted.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Verdigris, Pitted_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Verdigris",
+        "path": "/overlays/v2/Round/Chains/Verdigris.psd",
+        "thumbPath": "/overlays/v2/Round/Chains/Verdigris_thumb.png",
+        "type": "psd"
+      }
+    ],
+    "v2/Round/Decorated": [
+      {
+        "name": "Brass Frame",
+        "path": "/overlays/v2/Round/Decorated/Brass Frame.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Brass Frame_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Draco",
+        "path": "/overlays/v2/Round/Decorated/Draco.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Draco_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Fairy Ring",
+        "path": "/overlays/v2/Round/Decorated/Fairy Ring.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Fairy Ring_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Infinite Dragon, Lava",
+        "path": "/overlays/v2/Round/Decorated/Infinite Dragon, Lava.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Infinite Dragon, Lava_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Infinite Dragon",
+        "path": "/overlays/v2/Round/Decorated/Infinite Dragon.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Infinite Dragon_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Klingon",
+        "path": "/overlays/v2/Round/Decorated/Klingon.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Klingon_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Leaves",
+        "path": "/overlays/v2/Round/Decorated/Leaves.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Leaves_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Ouroboros",
+        "path": "/overlays/v2/Round/Decorated/Ouroboros.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Ouroboros_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Picture Frame, Fancy, Gold",
+        "path": "/overlays/v2/Round/Decorated/Picture Frame, Fancy, Gold.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Picture Frame, Fancy, Gold_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Picture Frame, Gold",
+        "path": "/overlays/v2/Round/Decorated/Picture Frame, Gold.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Picture Frame, Gold_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Picture Frame, Silver",
+        "path": "/overlays/v2/Round/Decorated/Picture Frame, Silver.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Picture Frame, Silver_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Picture Frame",
+        "path": "/overlays/v2/Round/Decorated/Picture Frame.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Picture Frame_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Rope",
+        "path": "/overlays/v2/Round/Decorated/Rope.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Rope_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Roses",
+        "path": "/overlays/v2/Round/Decorated/Roses.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Roses_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Splash, Blue",
+        "path": "/overlays/v2/Round/Decorated/Splash, Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Splash, Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Splash, Green",
+        "path": "/overlays/v2/Round/Decorated/Splash, Green.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Splash, Green_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Splash, Red",
+        "path": "/overlays/v2/Round/Decorated/Splash, Red.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Splash, Red_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Target Aquired",
+        "path": "/overlays/v2/Round/Decorated/Target Aquired.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Target Aquired_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Tribal Ouroboros",
+        "path": "/overlays/v2/Round/Decorated/Tribal Ouroboros.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Tribal Ouroboros_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Undead",
+        "path": "/overlays/v2/Round/Decorated/Undead.psd",
+        "thumbPath": "/overlays/v2/Round/Decorated/Undead_thumb.png",
+        "type": "psd"
+      }
+    ],
+    "v2/Round/Gears": [
+      {
+        "name": "Gear, Black",
+        "path": "/overlays/v2/Round/Gears/Gear, Black.psd",
+        "thumbPath": "/overlays/v2/Round/Gears/Gear, Black_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Gear, Blue",
+        "path": "/overlays/v2/Round/Gears/Gear, Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Gears/Gear, Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Gear, Chrome",
+        "path": "/overlays/v2/Round/Gears/Gear, Chrome.psd",
+        "thumbPath": "/overlays/v2/Round/Gears/Gear, Chrome_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Gear, Silver and Brass",
+        "path": "/overlays/v2/Round/Gears/Gear, Silver and Brass.psd",
+        "thumbPath": "/overlays/v2/Round/Gears/Gear, Silver and Brass_thumb.png",
+        "type": "psd"
+      }
+    ],
+    "v2/Round/Runes": [
+      {
+        "name": "A Narrow, Black and White",
+        "path": "/overlays/v2/Round/Runes/A Narrow, Black and White.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/A Narrow, Black and White_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Black and Dark Blue",
+        "path": "/overlays/v2/Round/Runes/Black and Dark Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/Black and Dark Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Black and Light Blue",
+        "path": "/overlays/v2/Round/Runes/Black and Light Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/Black and Light Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Black and Red",
+        "path": "/overlays/v2/Round/Runes/Black and Red.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/Black and Red_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Blue and Gold",
+        "path": "/overlays/v2/Round/Runes/Blue and Gold.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/Blue and Gold_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Dark Blue and Light Blue",
+        "path": "/overlays/v2/Round/Runes/Dark Blue and Light Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/Dark Blue and Light Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Dark Gray and Red",
+        "path": "/overlays/v2/Round/Runes/Dark Gray and Red.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/Dark Gray and Red_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Gold",
+        "path": "/overlays/v2/Round/Runes/Gold.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/Gold_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Green and Blue",
+        "path": "/overlays/v2/Round/Runes/Green and Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/Green and Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Green and White",
+        "path": "/overlays/v2/Round/Runes/Green and White.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/Green and White_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Light Blue and Dark Blue",
+        "path": "/overlays/v2/Round/Runes/Light Blue and Dark Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/Light Blue and Dark Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Light Blue and White",
+        "path": "/overlays/v2/Round/Runes/Light Blue and White.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/Light Blue and White_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Purple and Gold",
+        "path": "/overlays/v2/Round/Runes/Purple and Gold.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/Purple and Gold_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Red and Gold",
+        "path": "/overlays/v2/Round/Runes/Red and Gold.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/Red and Gold_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "White and Light Blue",
+        "path": "/overlays/v2/Round/Runes/White and Light Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/White and Light Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "White and Purple",
+        "path": "/overlays/v2/Round/Runes/White and Purple.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/White and Purple_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "White and Red",
+        "path": "/overlays/v2/Round/Runes/White and Red.psd",
+        "thumbPath": "/overlays/v2/Round/Runes/White and Red_thumb.png",
+        "type": "psd"
+      }
+    ],
+    "v2/Round/Smooth": [
+      {
+        "name": "Alien",
+        "path": "/overlays/v2/Round/Smooth/Alien.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Alien_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Aztec",
+        "path": "/overlays/v2/Round/Smooth/Aztec.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Aztec_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Beige",
+        "path": "/overlays/v2/Round/Smooth/Beige.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Beige_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Black Satin",
+        "path": "/overlays/v2/Round/Smooth/Black Satin.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Black Satin_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Black with Reflections",
+        "path": "/overlays/v2/Round/Smooth/Black with Reflections.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Black with Reflections_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Blood Red",
+        "path": "/overlays/v2/Round/Smooth/Blood Red.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Blood Red_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Blue Maze",
+        "path": "/overlays/v2/Round/Smooth/Blue Maze.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Blue Maze_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Blue, Shiny",
+        "path": "/overlays/v2/Round/Smooth/Blue, Shiny.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Blue, Shiny_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Blue",
+        "path": "/overlays/v2/Round/Smooth/Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Brass",
+        "path": "/overlays/v2/Round/Smooth/Brass.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Brass_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Bronze",
+        "path": "/overlays/v2/Round/Smooth/Bronze.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Bronze_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Brown",
+        "path": "/overlays/v2/Round/Smooth/Brown.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Brown_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Camo",
+        "path": "/overlays/v2/Round/Smooth/Camo.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Camo_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Chain Link, Black",
+        "path": "/overlays/v2/Round/Smooth/Chain Link, Black.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Chain Link, Black_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Chain Link, Blue",
+        "path": "/overlays/v2/Round/Smooth/Chain Link, Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Chain Link, Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Circuit Board",
+        "path": "/overlays/v2/Round/Smooth/Circuit Board.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Circuit Board_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Cobblestone",
+        "path": "/overlays/v2/Round/Smooth/Cobblestone.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Cobblestone_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Concrete",
+        "path": "/overlays/v2/Round/Smooth/Concrete.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Concrete_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Cracked",
+        "path": "/overlays/v2/Round/Smooth/Cracked.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Cracked_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Crimson",
+        "path": "/overlays/v2/Round/Smooth/Crimson.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Crimson_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Dark and Shiny",
+        "path": "/overlays/v2/Round/Smooth/Dark and Shiny.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Dark and Shiny_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Fire",
+        "path": "/overlays/v2/Round/Smooth/Fire.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Fire_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Gold",
+        "path": "/overlays/v2/Round/Smooth/Gold.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Gold_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Green Proto",
+        "path": "/overlays/v2/Round/Smooth/Green Proto.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Green Proto_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Green, light",
+        "path": "/overlays/v2/Round/Smooth/Green, light.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Green, light_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Green",
+        "path": "/overlays/v2/Round/Smooth/Green.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Green_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Hi-Tech, Black",
+        "path": "/overlays/v2/Round/Smooth/Hi-Tech, Black.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Hi-Tech, Black_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Hi-Tech, Blue",
+        "path": "/overlays/v2/Round/Smooth/Hi-Tech, Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Hi-Tech, Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Hi-Tech, Red",
+        "path": "/overlays/v2/Round/Smooth/Hi-Tech, Red.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Hi-Tech, Red_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Inscriptions",
+        "path": "/overlays/v2/Round/Smooth/Inscriptions.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Inscriptions_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Jade",
+        "path": "/overlays/v2/Round/Smooth/Jade.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Jade_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Lava",
+        "path": "/overlays/v2/Round/Smooth/Lava.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Lava_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Lead",
+        "path": "/overlays/v2/Round/Smooth/Lead.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Lead_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Marble",
+        "path": "/overlays/v2/Round/Smooth/Marble.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Marble_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Masonry",
+        "path": "/overlays/v2/Round/Smooth/Masonry.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Masonry_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Metal",
+        "path": "/overlays/v2/Round/Smooth/Metal.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Metal_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Metallic, Blue",
+        "path": "/overlays/v2/Round/Smooth/Metallic, Blue.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Metallic, Blue_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Metallic, Gold Strata",
+        "path": "/overlays/v2/Round/Smooth/Metallic, Gold Strata.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Metallic, Gold Strata_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Metallic, Gold",
+        "path": "/overlays/v2/Round/Smooth/Metallic, Gold.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Metallic, Gold_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Metallic, Silver",
+        "path": "/overlays/v2/Round/Smooth/Metallic, Silver.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Metallic, Silver_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Metallic, Steel, Heated",
+        "path": "/overlays/v2/Round/Smooth/Metallic, Steel, Heated.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Metallic, Steel, Heated_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Metallic, Steel",
+        "path": "/overlays/v2/Round/Smooth/Metallic, Steel.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Metallic, Steel_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Modern, Dark Gray",
+        "path": "/overlays/v2/Round/Smooth/Modern, Dark Gray.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Modern, Dark Gray_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Modern, Grate",
+        "path": "/overlays/v2/Round/Smooth/Modern, Grate.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Modern, Grate_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Modern, Light Gray",
+        "path": "/overlays/v2/Round/Smooth/Modern, Light Gray.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Modern, Light Gray_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "NPC",
+        "path": "/overlays/v2/Round/Smooth/NPC.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/NPC_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Onyx",
+        "path": "/overlays/v2/Round/Smooth/Onyx.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Onyx_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Orange",
+        "path": "/overlays/v2/Round/Smooth/Orange.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Orange_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "PC",
+        "path": "/overlays/v2/Round/Smooth/PC.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/PC_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Pewter",
+        "path": "/overlays/v2/Round/Smooth/Pewter.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Pewter_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Pink",
+        "path": "/overlays/v2/Round/Smooth/Pink.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Pink_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Platinum",
+        "path": "/overlays/v2/Round/Smooth/Platinum.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Platinum_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Purple Haze",
+        "path": "/overlays/v2/Round/Smooth/Purple Haze.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Purple Haze_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Purple",
+        "path": "/overlays/v2/Round/Smooth/Purple.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Purple_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Red",
+        "path": "/overlays/v2/Round/Smooth/Red.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Red_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Rednium",
+        "path": "/overlays/v2/Round/Smooth/Rednium.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Rednium_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Rock",
+        "path": "/overlays/v2/Round/Smooth/Rock.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Rock_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Rocky Chunk",
+        "path": "/overlays/v2/Round/Smooth/Rocky Chunk.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Rocky Chunk_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Rocky Scale",
+        "path": "/overlays/v2/Round/Smooth/Rocky Scale.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Rocky Scale_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Rosewood",
+        "path": "/overlays/v2/Round/Smooth/Rosewood.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Rosewood_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Sandy Green",
+        "path": "/overlays/v2/Round/Smooth/Sandy Green.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Sandy Green_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Silver, Thin",
+        "path": "/overlays/v2/Round/Smooth/Silver, Thin.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Silver, Thin_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Silver",
+        "path": "/overlays/v2/Round/Smooth/Silver.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Silver_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Stones",
+        "path": "/overlays/v2/Round/Smooth/Stones.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Stones_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Stucco",
+        "path": "/overlays/v2/Round/Smooth/Stucco.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Stucco_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Translucent",
+        "path": "/overlays/v2/Round/Smooth/Translucent.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Translucent_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "White",
+        "path": "/overlays/v2/Round/Smooth/White.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/White_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Wooden",
+        "path": "/overlays/v2/Round/Smooth/Wooden.psd",
+        "thumbPath": "/overlays/v2/Round/Smooth/Wooden_thumb.png",
+        "type": "psd"
+      }
+    ],
+    "v2/Square": [
+      {
+        "name": "Base, Camo",
+        "path": "/overlays/v2/Square/Base, Camo.png",
+        "thumbPath": "/overlays/v2/Square/Base, Camo.png",
+        "type": "png"
+      },
+      {
+        "name": "Base, Firelight",
+        "path": "/overlays/v2/Square/Base, Firelight.png",
+        "thumbPath": "/overlays/v2/Square/Base, Firelight.png",
+        "type": "png"
+      },
+      {
+        "name": "Base, Grass with Border",
+        "path": "/overlays/v2/Square/Base, Grass with Border.png",
+        "thumbPath": "/overlays/v2/Square/Base, Grass with Border.png",
+        "type": "png"
+      },
+      {
+        "name": "Base, Grass",
+        "path": "/overlays/v2/Square/Base, Grass.png",
+        "thumbPath": "/overlays/v2/Square/Base, Grass.png",
+        "type": "png"
+      },
+      {
+        "name": "Base, Hay",
+        "path": "/overlays/v2/Square/Base, Hay.png",
+        "thumbPath": "/overlays/v2/Square/Base, Hay.png",
+        "type": "png"
+      },
+      {
+        "name": "Base, Metal Plate",
+        "path": "/overlays/v2/Square/Base, Metal Plate.png",
+        "thumbPath": "/overlays/v2/Square/Base, Metal Plate.png",
+        "type": "png"
+      },
+      {
+        "name": "Base, Rock",
+        "path": "/overlays/v2/Square/Base, Rock.png",
+        "thumbPath": "/overlays/v2/Square/Base, Rock.png",
+        "type": "png"
+      },
+      {
+        "name": "Base, Transparent",
+        "path": "/overlays/v2/Square/Base, Transparent.psd",
+        "thumbPath": "/overlays/v2/Square/Base, Transparent_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Blue",
+        "path": "/overlays/v2/Square/Blue.png",
+        "thumbPath": "/overlays/v2/Square/Blue.png",
+        "type": "png"
+      },
+      {
+        "name": "Cobble",
+        "path": "/overlays/v2/Square/Cobble.png",
+        "thumbPath": "/overlays/v2/Square/Cobble.png",
+        "type": "png"
+      },
+      {
+        "name": "Hay",
+        "path": "/overlays/v2/Square/Hay.png",
+        "thumbPath": "/overlays/v2/Square/Hay.png",
+        "type": "png"
+      },
+      {
+        "name": "Marble",
+        "path": "/overlays/v2/Square/Marble.png",
+        "thumbPath": "/overlays/v2/Square/Marble.png",
+        "type": "png"
+      },
+      {
+        "name": "Metal",
+        "path": "/overlays/v2/Square/Metal.png",
+        "thumbPath": "/overlays/v2/Square/Metal.png",
+        "type": "png"
+      },
+      {
+        "name": "Rock",
+        "path": "/overlays/v2/Square/Rock.png",
+        "thumbPath": "/overlays/v2/Square/Rock.png",
+        "type": "png"
+      },
+      {
+        "name": "Tile",
+        "path": "/overlays/v2/Square/Tile.png",
+        "thumbPath": "/overlays/v2/Square/Tile.png",
+        "type": "png"
+      },
+      {
+        "name": "Translucent",
+        "path": "/overlays/v2/Square/Translucent.png",
+        "thumbPath": "/overlays/v2/Square/Translucent.png",
+        "type": "png"
+      },
+      {
+        "name": "Wooden",
+        "path": "/overlays/v2/Square/Wooden.png",
+        "thumbPath": "/overlays/v2/Square/Wooden.png",
+        "type": "png"
+      }
+    ],
+    "v2_1/Cards": [
+      {
+        "name": "European",
+        "path": "/overlays/v2_1/Cards/European.png",
+        "thumbPath": "/overlays/v2_1/Cards/European.png",
+        "type": "png"
+      },
+      {
+        "name": "Gear",
+        "path": "/overlays/v2_1/Cards/Gear.jpg",
+        "thumbPath": "/overlays/v2_1/Cards/Gear.jpg",
+        "type": "jpg"
+      },
+      {
+        "name": "Magic Armor",
+        "path": "/overlays/v2_1/Cards/Magic Armor.jpg",
+        "thumbPath": "/overlays/v2_1/Cards/Magic Armor.jpg",
+        "type": "jpg"
+      },
+      {
+        "name": "Magic Item",
+        "path": "/overlays/v2_1/Cards/Magic Item.png",
+        "thumbPath": "/overlays/v2_1/Cards/Magic Item.png",
+        "type": "png"
+      },
+      {
+        "name": "Magic Weapon",
+        "path": "/overlays/v2_1/Cards/Magic Weapon.png",
+        "thumbPath": "/overlays/v2_1/Cards/Magic Weapon.png",
+        "type": "png"
+      },
+      {
+        "name": "Mutation",
+        "path": "/overlays/v2_1/Cards/Mutation.jpg",
+        "thumbPath": "/overlays/v2_1/Cards/Mutation.jpg",
+        "type": "jpg"
+      },
+      {
+        "name": "Proxy",
+        "path": "/overlays/v2_1/Cards/Proxy.png",
+        "thumbPath": "/overlays/v2_1/Cards/Proxy.png",
+        "type": "png"
+      },
+      {
+        "name": "Threat",
+        "path": "/overlays/v2_1/Cards/Threat.jpg",
+        "thumbPath": "/overlays/v2_1/Cards/Threat.jpg",
+        "type": "jpg"
+      },
+      {
+        "name": "Town",
+        "path": "/overlays/v2_1/Cards/Town.jpg",
+        "thumbPath": "/overlays/v2_1/Cards/Town.jpg",
+        "type": "jpg"
+      },
+      {
+        "name": "Wanted",
+        "path": "/overlays/v2_1/Cards/Wanted.jpg",
+        "thumbPath": "/overlays/v2_1/Cards/Wanted.jpg",
+        "type": "jpg"
+      }
+    ],
+    "v2_1/Round/Decorated": [
+      {
+        "name": "Leaves, Large",
+        "path": "/overlays/v2_1/Round/Decorated/Leaves, Large.psd",
+        "thumbPath": "/overlays/v2_1/Round/Decorated/Leaves, Large_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Stargate",
+        "path": "/overlays/v2_1/Round/Decorated/Stargate.psd",
+        "thumbPath": "/overlays/v2_1/Round/Decorated/Stargate_thumb.png",
+        "type": "psd"
+      }
+    ],
+    "v2_1/Round/Runes": [
+      {
+        "name": "Silver and Blue with Vortex",
+        "path": "/overlays/v2_1/Round/Runes/Silver and Blue with Vortex.psd",
+        "thumbPath": "/overlays/v2_1/Round/Runes/Silver and Blue with Vortex_thumb.png",
+        "type": "psd"
+      },
+      {
+        "name": "Silver and Blue",
+        "path": "/overlays/v2_1/Round/Runes/Silver and Blue.psd",
+        "thumbPath": "/overlays/v2_1/Round/Runes/Silver and Blue_thumb.png",
+        "type": "psd"
+      }
+    ]
+  }
+}

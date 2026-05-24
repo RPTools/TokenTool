@@ -1,5 +1,4 @@
 # OS generated files
-################################################################################
 .DS_Store
 .DS_Store?
 ._*
@@ -9,37 +8,52 @@ Icon?
 ehthumbs.db
 Thumbs.db
 
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Others
-################################################################################
-.gradle
+# Node / JS Dependencies
+node_modules/
+/dist/
+/dist-ssr/
+
+# Rust / Cargo / Tauri
+/src-tauri/target/
+/src-tauri/gen/
+/src-tauri/bin/
+
+# Legacy Gradle / Java (Keep ignored just in case)
+.gradle/
 build/
 /bin/
-target/
 out/
 /releases/
-*.log
-*~
-\${sys:appHome}/
 
-
-# Automatically Generated
-################################################################################
-package/windows/TokenTool.iss
-src/main/resources/sentry.properties
-
-
-# IDEs
-################################################################################
-*.iml
+# IDEs & Editor configs
 .idea/
-.*.sw[p0-9]
-.sw[p0-9]
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 .project
 .settings/
 .classpath
 .history
-workbench.xmi
+*.iml
 
-# Keystore
-build-resources/rptools-keystore
+# Local env files / secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Local CLI agent directories
+.antigravitycli/

@@ -1,0 +1,19 @@
+[package]
+name = "tokentool"
+version = "2.2.0"
+description = "VTT Token Creation Utility"
+authors = ["RPTools"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+lopdf = "0.31.0"
+base64 = "0.22.1"
+image = "0.25.1"
