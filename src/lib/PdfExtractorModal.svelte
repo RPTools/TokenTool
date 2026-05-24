@@ -8,6 +8,7 @@
   let pdfPath = '';
   let currentPage = 1;
   let totalPages = 1; // Real page count loaded dynamically
+  let totalImages = 0; // Real image count loaded dynamically
   let loading = false;
   let statusMessage = '';
   let images: string[] = []; // Base64 extracted images
@@ -45,6 +46,7 @@
     pdfPath = "Campaign_Adventure_Module.pdf";
     currentPage = 1;
     totalPages = 12;
+    totalImages = 36; // Set a mock total images count
     selections = {}; // Reset selections on mock load
     loadPageImages();
   }
@@ -57,14 +59,15 @@
 
     try {
       const { invoke } = await import('@tauri-apps/api/core');
-      // Call Rust backend to parse the PDF page and return page count + images
-      const result = await invoke<{ images: string[], total_pages: number }>('extract_pdf_images', {
+      // Call Rust backend to parse the PDF page and return page count, images, and total images (enhancement)
+      const result = await invoke<{ images: string[], total_pages: number, total_images: number }>('extract_pdf_images', {
         pdfPath,
         pageNumber: currentPage
       });
       
       images = result.images.map(base64 => `data:image/png;base64,${base64}`);
       totalPages = result.total_pages;
+      totalImages = result.total_images;
       
       if (images.length === 0) {
         statusMessage = `Page ${currentPage} of ${totalPages} scanned. No images found on this page.`;
@@ -177,7 +180,9 @@
       const { save } = await import('@tauri-apps/plugin-dialog');
       const { writeFile } = await import('@tauri-apps/plugin-fs');
 
-      const pdfName = pdfPath.split('\\').pop()?.split('/').pop()?.replace('.pdf', '') || 'extracted';
+      const rawPdfName = pdfPath.split('\\').pop()?.split('/').pop()?.replace('.pdf', '') || 'extracted';
+      // Sanitize pdfName to prevent traversal and illegal characters (H-3 / L-6)
+      const pdfName = rawPdfName.replace(/[\\/:*?"<>|]/g, '_').trim() || 'extracted';
       const defaultFilename = `${pdfName}_pg${currentPage}_img${index + 1}.png`;
 
       const selectedPath = await save({
@@ -186,7 +191,13 @@
       });
 
       if (selectedPath) {
-        const base64Data = imgDataUrl.split(',')[1];
+        // Extract raw base64 data bytes with split guard (L-2)
+        const parts = imgDataUrl.split(',');
+        if (parts.length < 2) {
+          console.error("Malformed image data URL");
+          return;
+        }
+        const base64Data = parts[1];
         const bytes = base64ToUint8Array(base64Data);
         await writeFile(selectedPath, bytes);
         statusMessage = `Successfully saved image to: ${selectedPath.split('\\').pop()?.split('/').pop()}`;
@@ -215,7 +226,9 @@
         loading = true;
         statusMessage = `Saving ${selectedCount} selected images to folder...`;
 
-        const pdfName = pdfPath.split('\\').pop()?.split('/').pop()?.replace('.pdf', '') || 'extracted';
+        const rawPdfName = pdfPath.split('\\').pop()?.split('/').pop()?.replace('.pdf', '') || 'extracted';
+        // Sanitize pdfName to prevent traversal and illegal characters (H-3 / L-6)
+        const pdfName = rawPdfName.replace(/[\\/:*?"<>|]/g, '_').trim() || 'extracted';
         const separator = selectedDir.includes('\\') ? '\\' : '/';
         
         let savedCount = 0;
@@ -224,7 +237,13 @@
           const filename = `${pdfName}_pg${item.page}_img${item.index + 1}.png`;
           const filePath = `${selectedDir}${separator}${filename}`;
           
-          const base64Data = item.dataUrl.split(',')[1];
+          // Extract raw base64 data bytes with split guard (L-2)
+          const parts = item.dataUrl.split(',');
+          if (parts.length < 2) {
+            console.error(`Malformed image data URL for key: ${key}`);
+            continue;
+          }
+          const base64Data = parts[1];
           const bytes = base64ToUint8Array(base64Data);
           await writeFile(filePath, bytes);
           savedCount++;
@@ -246,7 +265,7 @@
 
 {#if show}
   <div 
-    class="modal-backdrop flex items-center justify-center p-6 select-none" 
+    class="modal-backdrop flex overflow-y-auto p-6 select-none" 
     on:click|self={() => show = false}
     on:keydown={(e) => { if (e.key === 'Escape') show = false; }}
     role="button"
@@ -277,11 +296,13 @@
         </button>
       </div>
 
-      <!-- Action Panel -->
-      <div class="flex flex-wrap items-center gap-4 px-6 py-3 border-b border-[#2e3440] bg-[#13161c]">
+      <!-- Action Panel (Clean 2-row, 3-column layout) -->
+      <div class="action-panel-grid">
+        
+        <!-- ROW 1, COL 1: Select PDF File Button -->
         <button 
           on:click={selectPdf}
-          class="select-pdf-button"
+          class="select-pdf-button flex items-center justify-center"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -289,47 +310,74 @@
           Select PDF File
         </button>
 
-        {#if pdfPath}
-          <div class="flex items-center gap-2 bg-[#1b1f28] border border-[#2e3440] px-3 py-1.5 rounded-lg text-sm">
-            <span class="text-slate-400 font-medium">Page:</span>
-            <button on:click={prevPage} disabled={currentPage <= 1} class="page-nav-button">&lt;</button>
-            <input 
-              type="number" 
-              bind:value={currentPage} 
-              on:change={loadPageImages}
-              min="1" 
-              max={totalPages} 
-              class="w-12 bg-transparent text-center focus:outline-none text-violet-400 font-semibold"
-            />
-            <span class="text-slate-500">/ {totalPages}</span>
-            <button on:click={nextPage} disabled={currentPage >= totalPages} class="page-nav-button">&gt;</button>
-          </div>
-          
-          {#if images.length > 0}
-            <!-- Select All Button -->
-            <button 
-              on:click={toggleSelectAll}
-              class="flex items-center gap-2 px-3 py-1.5 bg-[#1b1f28] border border-[#2e3440] hover:bg-[#252a35] hover:text-slate-100 text-slate-300 font-semibold text-xs rounded-lg transition-colors cursor-pointer"
-            >
-              {images.length > 0 && images.every((_, i) => selections[`${currentPage}_${i}`]) ? "Deselect All" : "Select All"}
-            </button>
+        <!-- ROW 1, COL 2: Page Counter Box -->
+        <div>
+          {#if pdfPath}
+            <div class="page-counter-box flex items-center justify-center gap-2 bg-[#1b1f28] border border-[#2e3440] px-3 rounded-lg text-xs font-semibold w-[13rem]">
+              <span class="text-slate-400 select-none">Page:</span>
+              <button on:click={prevPage} disabled={currentPage <= 1} class="page-nav-button font-bold">&lt;</button>
+              <input 
+                type="number" 
+                bind:value={currentPage} 
+                on:change={loadPageImages}
+                min="1" 
+                max={totalPages} 
+                class="w-12 bg-transparent text-center focus:outline-none text-violet-400 font-bold text-xs"
+              />
+              <span class="text-slate-500 select-none">/ {totalPages}</span>
+              <button on:click={nextPage} disabled={currentPage >= totalPages} class="page-nav-button font-bold">&gt;</button>
+            </div>
           {/if}
-        {/if}
+        </div>
 
-        {#if selectedCount > 0}
-          <!-- Bulk Save Button (Stunning Violet-Indigo Gradient with pulsing glow) -->
-          <button 
-            on:click={saveSelectedImages}
-            class="save-selected-button animate-pulse-glow"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-            </svg>
-            Save Selected ({selectedCount})
-          </button>
-        {/if}
+        <!-- ROW 1, COL 3: Select Page & Save Selected Buttons -->
+        <div>
+          {#if pdfPath}
+            <div class="flex items-center gap-3">
+              <button 
+                on:click={toggleSelectAll}
+                disabled={images.length === 0}
+                class="select-page-btn flex items-center justify-center gap-2 px-3 bg-[#1b1f28] border border-[#2e3440] hover:bg-[#252a35] hover:text-slate-100 text-slate-300 font-semibold text-xs rounded-lg transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed w-[7.5rem] text-center focus:outline-none focus:ring-0"
+              >
+                {images.length > 0 && images.every((_, i) => selections[`${currentPage}_${i}`]) ? "Deselect Page" : "Select Page"}
+              </button>
+              
+              {#if selectedCount > 0}
+                <button 
+                  on:click={saveSelectedImages}
+                  class="save-selected-button animate-pulse-glow flex items-center justify-center"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                  </svg>
+                  Save Selected ({selectedCount})
+                </button>
+              {/if}
+            </div>
+          {/if}
+        </div>
 
-        <span class="text-xs text-slate-400 ml-auto font-mono text-right">{statusMessage}</span>
+        <!-- ROW 2, COL 1: Empty space below Select PDF button -->
+        <div></div>
+
+        <!-- ROW 2, COL 2: Graphics in PDF count -->
+        <div>
+          {#if pdfPath}
+            <span class="text-[10px] text-slate-500 font-mono pl-1 leading-none">
+              Graphics in PDF: {totalImages}
+            </span>
+          {/if}
+        </div>
+
+        <!-- ROW 2, COL 3: Extracted Status text -->
+        <div>
+          {#if pdfPath}
+            <span class="text-[10px] text-slate-500 font-mono pl-1 leading-none">
+              {statusMessage}
+            </span>
+          {/if}
+        </div>
+
       </div>
 
       <!-- Content Area -->
@@ -418,6 +466,17 @@
 {/if}
 
 <style>
+  .action-panel-grid {
+    display: grid;
+    grid-template-columns: 10.5rem 14rem 1fr;
+    align-items: center;
+    column-gap: 1rem;
+    row-gap: 0.375rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #2e3440;
+    background-color: #13161c;
+  }
+
   .modal-backdrop {
     position: fixed;
     top: 0;
@@ -433,6 +492,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    margin: auto;
     width: 100%;
     max-width: 56rem; /* max-w-4xl */
     height: 85vh; /* h-[85vh] */
@@ -461,6 +521,14 @@
     color: #f8fafc;
   }
 
+  .select-pdf-button,
+  .save-selected-button,
+  .page-counter-box,
+  .select-page-btn {
+    height: 2.375rem !important; /* exactly 38px */
+    box-sizing: border-box !important;
+  }
+
   .select-pdf-button {
     display: flex;
     align-items: center;
@@ -468,8 +536,8 @@
     padding: 0.5rem 1rem;
     background-color: #7c3aed;
     color: #ffffff;
-    font-weight: 500;
-    font-size: 0.875rem;
+    font-weight: 600;
+    font-size: 0.75rem;
     border: none;
     border-radius: 0.5rem;
     cursor: pointer;

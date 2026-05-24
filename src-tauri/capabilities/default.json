@@ -12,22 +12,7 @@
     "core:app:default",
     "dialog:default",
     "fs:default",
-    "fs:allow-write-file",
-    "fs:allow-desktop-write",
-    "fs:allow-desktop-write-recursive",
-    "fs:allow-download-write",
-    "fs:allow-download-write-recursive",
-    "fs:allow-document-write",
-    "fs:allow-document-write-recursive",
-    "fs:allow-picture-write",
-    "fs:allow-picture-write-recursive",
-    "fs:allow-desktop-read",
-    "fs:allow-desktop-read-recursive",
-    "fs:allow-download-read",
-    "fs:allow-download-read-recursive",
-    "fs:allow-document-read",
-    "fs:allow-document-read-recursive",
-    "fs:allow-picture-read",
-    "fs:allow-picture-read-recursive"
+    "fs:allow-read-file",
+    "fs:allow-write-file"
   ]
 }

@@ -7,7 +7,7 @@ use image::ImageEncoder;
 pub fn extract_images_from_pdf_page<P: AsRef<Path>>(
     pdf_path: P,
     page_number: usize,
-) -> Result<(Vec<String>, usize), String> {
+) -> Result<(Vec<String>, usize, usize), String> {
     let pdf_path_ref = pdf_path.as_ref();
     println!("Rust reading file bytes for path: {:?}", pdf_path_ref);
 
@@ -93,7 +93,17 @@ pub fn extract_images_from_pdf_page<P: AsRef<Path>>(
         }
     }
 
-    Ok((extracted_images, total_pages))
+    let total_images = doc.objects.iter().filter(|(_, object)| {
+        if let Ok(dict) = object.as_dict() {
+            dict.get(b"Subtype").and_then(|o| o.as_name()).map_or(false, |s| s == b"Image")
+        } else if let Ok(stream) = object.as_stream() {
+            stream.dict.get(b"Subtype").and_then(|o| o.as_name()).map_or(false, |s| s == b"Image")
+        } else {
+            false
+        }
+    }).count();
+
+    Ok((extracted_images, total_pages, total_images))
 }
 
 // Find Resources dictionary, resolving Page tree inheritance if not present on page_dict itself
@@ -343,12 +353,26 @@ fn process_image_stream(stream: &Stream) -> Option<String> {
             return Some(BASE64_STANDARD.encode(data));
         }
     } else {
-        let width = stream.dict.get(b"Width").ok()?.as_i64().ok()? as u32;
-        let height = stream.dict.get(b"Height").ok()?.as_i64().ok()? as u32;
-        let bits_per_component = stream.dict.get(b"BitsPerComponent")
+        let width_val = stream.dict.get(b"Width").ok()?.as_i64().ok()?;
+        let height_val = stream.dict.get(b"Height").ok()?.as_i64().ok()?;
+        
+        // Validate image dimensions to prevent integer truncation, negative wrap-around, and DoS OOM
+        if width_val <= 0 || height_val <= 0 || width_val > 16384 || height_val > 16384 {
+            return None;
+        }
+        
+        let width = width_val as u32;
+        let height = height_val as u32;
+        
+        let bits_per_component_val = stream.dict.get(b"BitsPerComponent")
             .ok()
             .and_then(|o| o.as_i64().ok())
-            .unwrap_or(8) as usize;
+            .unwrap_or(8);
+            
+        if bits_per_component_val <= 0 || bits_per_component_val > 16 {
+            return None;
+        }
+        let bits_per_component = bits_per_component_val as usize;
 
         let color_space_name: Option<Vec<u8>> = stream.dict.get(b"ColorSpace").ok().and_then(|cs| {
             if let Ok(name) = cs.as_name() {
@@ -461,6 +485,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_parse_pdf() {
         let pdf_path = "C:\\Users\\matta\\Downloads\\Wave-Echo-Cave.pdf";
         println!("Testing PDF extraction for: {}", pdf_path);
@@ -471,8 +496,8 @@ mod tests {
         }
 
         match extract_images_from_pdf_page(pdf_path, 1) {
-            Ok((images, pages)) => {
-                println!("SUCCESS! Extracted {} images, total pages: {}", images.len(), pages);
+            Ok((images, pages, total_images)) => {
+                println!("SUCCESS! Extracted {} images, total pages: {}, total images: {}", images.len(), pages, total_images);
             }
             Err(e) => {
                 println!("FAILED: {}", e);

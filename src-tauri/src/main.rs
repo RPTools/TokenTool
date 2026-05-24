@@ -9,13 +9,32 @@ use pdf_extractor::extract_images_from_pdf_page;
 struct PdfPageOutput {
     images: Vec<String>,
     total_pages: usize,
+    total_images: usize,
 }
 
 #[tauri::command]
 fn extract_pdf_images(pdf_path: String, page_number: usize) -> Result<PdfPageOutput, String> {
     println!("Tauri invoking PDF extraction: {} (pg {})", pdf_path, page_number);
-    let (images, total_pages) = extract_images_from_pdf_page(pdf_path, page_number)?;
-    Ok(PdfPageOutput { images, total_pages })
+    
+    // Perform path validation
+    let path = std::path::Path::new(&pdf_path);
+    
+    // 1. Verify extension is `.pdf` (case-insensitive)
+    if !path.extension()
+        .and_then(|ext| ext.to_str())
+        .map(|ext| ext.eq_ignore_ascii_case("pdf"))
+        .unwrap_or(false) 
+    {
+        return Err("Invalid file type: File must be a PDF document.".to_string());
+    }
+
+    // 2. Verify file exists and is indeed a file
+    if !path.exists() || !path.is_file() {
+        return Err("File not found or is not a valid file.".to_string());
+    }
+
+    let (images, total_pages, total_images) = extract_images_from_pdf_page(pdf_path, page_number)?;
+    Ok(PdfPageOutput { images, total_pages, total_images })
 }
 
 

@@ -100,6 +100,12 @@
         const { readFile } = await import('@tauri-apps/plugin-fs');
         const data = await readFile(selected);
         const blob = new Blob([data]);
+        
+        // Revoke the old object URL to prevent memory leaks (M-5)
+        if (portraitUrl && portraitUrl.startsWith('blob:')) {
+          URL.revokeObjectURL(portraitUrl);
+        }
+        
         portraitUrl = URL.createObjectURL(blob);
       }
     } catch (e) {
@@ -112,6 +118,10 @@
         if (file) {
           const reader = new FileReader();
           reader.onload = () => {
+            // Revoke old object URL (M-5)
+            if (portraitUrl && portraitUrl.startsWith('blob:')) {
+              URL.revokeObjectURL(portraitUrl);
+            }
             portraitUrl = reader.result as string;
           };
           reader.readAsDataURL(file);
@@ -272,7 +282,10 @@
     if (!canvasRef) return;
     
     const dataUrl = canvasRef.exportPng();
-    const cleanFileName = `${fileName}${useFileNumbering ? '_' + fileSuffix.toString().padStart(4, '0') : ''}.png`;
+    
+    // Sanitize fileName to prevent directory traversal and illegal characters (L-6)
+    const sanitizedBaseName = fileName.replace(/[\\/:*?"<>|]/g, '_').trim() || 'token';
+    const cleanFileName = `${sanitizedBaseName}${useFileNumbering ? '_' + fileSuffix.toString().padStart(4, '0') : ''}.png`;
 
     try {
       const { save } = await import('@tauri-apps/plugin-dialog');
@@ -283,8 +296,14 @@
 
       if (selectedPath) {
         const { writeFile } = await import('@tauri-apps/plugin-fs');
-        // Extract raw base64 data bytes
-        const base64Data = dataUrl.split(',')[1];
+        
+        // Extract raw base64 data bytes with split guard (L-2)
+        const parts = dataUrl.split(',');
+        if (parts.length < 2) {
+          console.error("Malformed canvas data URL");
+          return;
+        }
+        const base64Data = parts[1];
         const binaryString = atob(base64Data);
         const len = binaryString.length;
         const bytes = new Uint8Array(len);
@@ -311,6 +330,9 @@
   }
 
   function handleSelectPdfPortrait(e: CustomEvent<{ url: string }>) {
+    if (portraitUrl && portraitUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(portraitUrl);
+    }
     portraitUrl = e.detail.url;
   }
 
