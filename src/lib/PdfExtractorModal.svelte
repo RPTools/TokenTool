@@ -11,6 +11,13 @@
   let loading = false;
   let statusMessage = '';
   let images: string[] = []; // Base64 extracted images
+  
+  // Cache of selected images across pages
+  // Key format: 'pageNumber_imageIndex'
+  let selections: { [key: string]: { page: number, index: number, dataUrl: string } } = {};
+
+  // Reactive count of currently selected items across all pages
+  $: selectedCount = Object.keys(selections).length;
 
   async function selectPdf() {
     try {
@@ -23,6 +30,7 @@
       if (selected && typeof selected === 'string') {
         pdfPath = selected;
         currentPage = 1;
+        selections = {}; // Clear selections when loading a new PDF
         statusMessage = `Loaded: ${pdfPath.split('\\').pop()}`;
         loadPageImages();
       }
@@ -37,6 +45,7 @@
     pdfPath = "Campaign_Adventure_Module.pdf";
     currentPage = 1;
     totalPages = 12;
+    selections = {}; // Reset selections on mock load
     loadPageImages();
   }
 
@@ -107,6 +116,17 @@
     show = false;
   }
 
+  // Helper to convert base64 image data to a standard Uint8Array binary buffer
+  function base64ToUint8Array(base64Str: string): Uint8Array {
+    const binaryString = atob(base64Str);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
+  }
+
   function handleDragStart(e: DragEvent, imgUrl: string) {
     if (e.dataTransfer) {
       e.dataTransfer.setData('text/plain', imgUrl);
@@ -114,6 +134,114 @@
       e.dataTransfer.effectAllowed = 'copy';
     }
   }
+
+  // --- NEW ENHANCEMENTS FOR FILE IMPORT/EXPORT ---
+
+  // Toggle selection for a thumbnail card index (fully reactive Svelte state across pages)
+  function toggleSelectImage(index: number) {
+    const key = `${currentPage}_${index}`;
+    if (selections[key]) {
+      delete selections[key];
+    } else {
+      selections[key] = {
+        page: currentPage,
+        index: index,
+        dataUrl: images[index]
+      };
+    }
+    selections = selections; // Trigger Svelte reactive compiler update
+  }
+
+  // Toggle select/deselect all images on the current page
+  function toggleSelectAll() {
+    const allSelectedOnPage = images.length > 0 && images.every((_, i) => selections[`${currentPage}_${i}`]);
+    if (allSelectedOnPage) {
+      for (let i = 0; i < images.length; i++) {
+        delete selections[`${currentPage}_${i}`];
+      }
+    } else {
+      for (let i = 0; i < images.length; i++) {
+        selections[`${currentPage}_${i}`] = {
+          page: currentPage,
+          index: i,
+          dataUrl: images[i]
+        };
+      }
+    }
+    selections = selections; // Trigger Svelte reactive compiler update
+  }
+
+  // Save a single extracted image directly to a user-selected path
+  async function saveSingleImage(imgDataUrl: string, index: number) {
+    try {
+      const { save } = await import('@tauri-apps/plugin-dialog');
+      const { writeFile } = await import('@tauri-apps/plugin-fs');
+
+      const pdfName = pdfPath.split('\\').pop()?.split('/').pop()?.replace('.pdf', '') || 'extracted';
+      const defaultFilename = `${pdfName}_pg${currentPage}_img${index + 1}.png`;
+
+      const selectedPath = await save({
+        defaultPath: defaultFilename,
+        filters: [{ name: 'PNG Images', extensions: ['png'] }]
+      });
+
+      if (selectedPath) {
+        const base64Data = imgDataUrl.split(',')[1];
+        const bytes = base64ToUint8Array(base64Data);
+        await writeFile(selectedPath, bytes);
+        statusMessage = `Successfully saved image to: ${selectedPath.split('\\').pop()?.split('/').pop()}`;
+      }
+    } catch (e) {
+      console.error('Failed to save image:', e);
+      statusMessage = `Save failed: ${e}`;
+    }
+  }
+
+  // Bulk save all selected images from ALL pages to a user-selected directory folder
+  async function saveSelectedImages() {
+    if (selectedCount === 0) return;
+    
+    try {
+      const { open } = await import('@tauri-apps/plugin-dialog');
+      const { writeFile } = await import('@tauri-apps/plugin-fs');
+
+      // Open directory selection dialog
+      const selectedDir = await open({
+        directory: true,
+        multiple: false
+      });
+
+      if (selectedDir && typeof selectedDir === 'string') {
+        loading = true;
+        statusMessage = `Saving ${selectedCount} selected images to folder...`;
+
+        const pdfName = pdfPath.split('\\').pop()?.split('/').pop()?.replace('.pdf', '') || 'extracted';
+        const separator = selectedDir.includes('\\') ? '\\' : '/';
+        
+        let savedCount = 0;
+        for (const key of Object.keys(selections)) {
+          const item = selections[key];
+          const filename = `${pdfName}_pg${item.page}_img${item.index + 1}.png`;
+          const filePath = `${selectedDir}${separator}${filename}`;
+          
+          const base64Data = item.dataUrl.split(',')[1];
+          const bytes = base64ToUint8Array(base64Data);
+          await writeFile(filePath, bytes);
+          savedCount++;
+        }
+
+        // Reset selection cache after successful bulk export
+        selections = {};
+        statusMessage = `Successfully saved ${savedCount} images to folder!`;
+      }
+    } catch (e) {
+      console.error('Bulk save failed:', e);
+      statusMessage = `Bulk save failed: ${e}`;
+    } finally {
+      loading = false;
+    }
+  }
+
 </script>
 
 {#if show}
@@ -176,9 +304,32 @@
             <span class="text-slate-500">/ {totalPages}</span>
             <button on:click={nextPage} disabled={currentPage >= totalPages} class="page-nav-button">&gt;</button>
           </div>
+          
+          {#if images.length > 0}
+            <!-- Select All Button -->
+            <button 
+              on:click={toggleSelectAll}
+              class="flex items-center gap-2 px-3 py-1.5 bg-[#1b1f28] border border-[#2e3440] hover:bg-[#252a35] hover:text-slate-100 text-slate-300 font-semibold text-xs rounded-lg transition-colors cursor-pointer"
+            >
+              {images.length > 0 && images.every((_, i) => selections[`${currentPage}_${i}`]) ? "Deselect All" : "Select All"}
+            </button>
+          {/if}
         {/if}
 
-        <span class="text-xs text-slate-400 ml-auto font-mono">{statusMessage}</span>
+        {#if selectedCount > 0}
+          <!-- Bulk Save Button (Stunning Violet-Indigo Gradient with pulsing glow) -->
+          <button 
+            on:click={saveSelectedImages}
+            class="save-selected-button animate-pulse-glow"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+            </svg>
+            Save Selected ({selectedCount})
+          </button>
+        {/if}
+
+        <span class="text-xs text-slate-400 ml-auto font-mono text-right">{statusMessage}</span>
       </div>
 
       <!-- Content Area -->
@@ -197,20 +348,35 @@
             {#each images as img, i}
               <div 
                 class="image-card"
-                draggable="true"
                 role="listitem"
-                on:dragstart={(e) => handleDragStart(e, img)}
               >
+                <!-- Checkbox Button in Top-Left Corner (Highly Reactive & Always on Top) -->
+                <button
+                  type="button"
+                  class="select-checkbox-badge"
+                  class:checked={selections[`${currentPage}_${i}`]}
+                  on:click|stopPropagation={() => toggleSelectImage(i)}
+                  aria-label="Select Image {i + 1}"
+                >
+                  {#if selections[`${currentPage}_${i}`]}
+                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  {/if}
+                </button>
+
                 <!-- Thumbnail -->
                 <div class="aspect-square bg-slate-900 overflow-hidden flex items-center justify-center">
                   <img 
                     src={img} 
                     alt="Extracted resource {i}"
-                    class="w-full h-full object-cover hover-scale"
+                    class="w-full h-full object-cover hover-scale cursor-grab active:cursor-grabbing"
+                    draggable="true"
+                    on:dragstart={(e) => handleDragStart(e, img)}
                   />
                 </div>
 
-                <!-- Hover Overlay actions -->
+                <!-- Hover Overlay actions (Slightly Layered Below Checkbox) -->
                 <div class="hover-overlay">
                   <button 
                     on:click={() => handleImageClick(img)}
@@ -218,7 +384,13 @@
                   >
                     Use as Portrait
                   </button>
-                  <p class="text-[10px] text-center text-slate-500 mt-2">Drag directly to Canvas</p>
+                  <button 
+                    on:click={() => saveSingleImage(img, i)}
+                    class="save-image-button"
+                  >
+                    Save to File
+                  </button>
+                  <p class="text-[10px] text-center text-slate-500 mt-1">Drag directly to Canvas</p>
                 </div>
               </div>
             {/each}
@@ -421,6 +593,37 @@
     transform: scale(1.05);
   }
 
+  /* Custom Checkbox Badges on Thumbnails */
+  .select-checkbox-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background-color: rgba(15, 17, 21, 0.65);
+    border: 2px solid #3f4756;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 20; /* Keep checkbox above the hover overlay */
+    backdrop-filter: blur(4px);
+    padding: 0;
+  }
+
+  .select-checkbox-badge:hover {
+    border-color: #8b5cf6;
+    background-color: rgba(139, 92, 246, 0.35);
+  }
+
+  .select-checkbox-badge.checked {
+    background-color: #7c3aed;
+    border-color: #7c3aed;
+    box-shadow: 0 0 8px rgba(124, 58, 237, 0.4);
+  }
+
   .hover-overlay {
     position: absolute;
     top: 0;
@@ -435,6 +638,8 @@
     padding: 0.75rem;
     transition: opacity 0.3s ease;
     pointer-events: none;
+    gap: 0.5rem;
+    z-index: 10; /* Hover overlay is below the checkbox */
   }
 
   .image-card:hover .hover-overlay {
@@ -458,6 +663,51 @@
 
   .use-portrait-button:hover {
     background-color: #8b5cf6;
+  }
+
+  .save-image-button {
+    width: 100%;
+    padding: 0.5rem 0;
+    background-color: #1b1f28;
+    border: 1px solid #2e3440;
+    color: #cbd5e1;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .save-image-button:hover {
+    background-color: #252a35;
+    color: #ffffff;
+    border-color: #434c5e;
+  }
+
+  .save-selected-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.75rem;
+    border: 1px solid #7c3aed;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    transition: all 0.2s ease;
+  }
+
+  .save-selected-button:hover {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    border-color: #8b5cf6;
+    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
+  }
+
+  .save-selected-button:active {
+    transform: scale(0.95);
   }
 
   .empty-state {
@@ -485,6 +735,21 @@
 
   .animate-modal-enter {
     animation: modalEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.25);
+      border-color: rgba(139, 92, 246, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.55);
+      border-color: rgba(139, 92, 246, 0.8);
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
   input[type="number"]::-webkit-inner-spin-button,

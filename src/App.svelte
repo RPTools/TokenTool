@@ -123,16 +123,24 @@
 
   // Handle Custom Overlay Selection (PNG, JPG, or PSD)
   async function loadCustomOverlay() {
+    let selected: string | null | string[] = null;
+    
     try {
       const { open } = await import('@tauri-apps/plugin-dialog');
-      const selected = await open({
+      selected = await open({
         filters: [{ name: 'Overlays (Image / PSD)', extensions: ['psd', 'png', 'jpg', 'jpeg', 'webp'] }],
         multiple: false
       });
+    } catch (e) {
+      // Tauri bridge unavailable, use browser fallback
+      browserOverlayImport();
+      return;
+    }
 
-      if (selected && typeof selected === 'string') {
-        loadingPsd = true;
-        errorMessage = '';
+    if (selected && typeof selected === 'string') {
+      loadingPsd = true;
+      errorMessage = '';
+      try {
         const name = selected.split('\\').pop() || 'Custom Frame';
         const { readFile } = await import('@tauri-apps/plugin-fs');
         const data = await readFile(selected);
@@ -162,60 +170,66 @@
           overlayUrl = dataUrl;
           activeOverlayId = `custom-${customOverlays.length - 1}`;
         }
+      } catch (err: any) {
+        console.error('Failed to load custom overlay:', err);
+        errorMessage = err.message || 'Failed to read or parse the overlay file.';
+      } finally {
+        loadingPsd = false;
       }
-    } catch (e) {
-      // Browser fallback for opening overlays
-      errorMessage = '';
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.psd,image/*';
-      input.onchange = async (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0];
-        if (file) {
-          loadingPsd = true;
-          const reader = new FileReader();
-          reader.onload = async () => {
-            try {
-              if (file.name.toLowerCase().endsWith('.psd')) {
-                const buffer = reader.result as ArrayBuffer;
-                const parsed = await parseTokenPsd(buffer);
-                customOverlays = [{
-                  name: `${file.name} (PSD)`,
-                  mask: parsed.mask,
-                  overlay: parsed.overlay || ''
-                }, ...customOverlays];
-                
-                maskUrl = parsed.mask;
-                overlayUrl = parsed.overlay;
-                activeOverlayId = `custom-${customOverlays.length - 1}`;
-              } else {
-                const dataUrl = reader.result as string;
-                customOverlays = [{
-                  name: file.name,
-                  mask: null,
-                  overlay: dataUrl
-                }, ...customOverlays];
-                
-                maskUrl = null;
-                overlayUrl = dataUrl;
-                activeOverlayId = `custom-${customOverlays.length - 1}`;
-              }
-            } catch (err: any) {
-              errorMessage = err.message;
-            } finally {
-              loadingPsd = false;
-            }
-          };
-          
-          if (file.name.toLowerCase().endsWith('.psd')) {
-            reader.readAsArrayBuffer(file);
-          } else {
-            reader.readAsDataURL(file);
-          }
-        }
-      };
-      input.click();
     }
+  }
+
+  function browserOverlayImport() {
+    errorMessage = '';
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.psd,image/*';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        loadingPsd = true;
+        const reader = new FileReader();
+        reader.onload = async () => {
+          try {
+            if (file.name.toLowerCase().endsWith('.psd')) {
+              const buffer = reader.result as ArrayBuffer;
+              const parsed = await parseTokenPsd(buffer);
+              customOverlays = [{
+                name: `${file.name} (PSD)`,
+                mask: parsed.mask,
+                overlay: parsed.overlay || ''
+              }, ...customOverlays];
+              
+              maskUrl = parsed.mask;
+              overlayUrl = parsed.overlay;
+              activeOverlayId = `custom-${customOverlays.length - 1}`;
+            } else {
+              const dataUrl = reader.result as string;
+              customOverlays = [{
+                name: file.name,
+                mask: null,
+                overlay: dataUrl
+              }, ...customOverlays];
+              
+              maskUrl = null;
+              overlayUrl = dataUrl;
+              activeOverlayId = `custom-${customOverlays.length - 1}`;
+            }
+          } catch (err: any) {
+            errorMessage = err.message || 'Failed to read browser overlay file.';
+          } finally {
+            loadingPsd = false;
+          }
+        };
+        
+        if (file.name.toLowerCase().endsWith('.psd')) {
+          reader.readAsArrayBuffer(file);
+        } else {
+          reader.readAsDataURL(file);
+        }
+      }
+    };
+    input.click();
   }
 
   async function handleSelectPreset(preset: any) {

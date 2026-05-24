@@ -13,7 +13,7 @@ This codebase represents a modern, lightweight rewrite converting the classic Ja
 *   **🖼️ Live Filter Adjustments**: Real-time adjustments for portrait opacity, border opacity, sizing resolution, Gaussian blur, and brightness contrast (glow) filters.
 *   **⚡ Premium Drag-Out Export**: Skip the file dialog entirely! Clicking and dragging the floating **hand icon** in the bottom-right corner of the canvas lets you drag the compiled PNG token straight onto your desktop, system folder, or directly into a chat window (like Discord).
 *   **🎨 Advanced PSD Overlay Decoder**: Drag and drop any custom Photoshop `.psd` file frame. The client parses layers on the fly (Layer 0 = transparency mask, Layer 1 = border overlay frame) to support premium transparency clipping.
-*   **📖 Native PDF Graphic Extractor**: Crawls PDF campaign manuals or adventure modules page-by-page to extract high-resolution character graphics, maps, forms, and button annotations, and lets you drag them straight onto your canvas.
+*   **📖 Native PDF Graphic Extractor**: Crawls PDF campaign manuals or adventure modules page-by-page to extract high-resolution character graphics, maps, forms, and button annotations. You can drag them straight onto your canvas, save individual images to disk, or check multiple graphics using an elegant, **cross-page selection cache** to bulk-export them into a system folder.
 
 ---
 
