@@ -11,7 +11,7 @@ This codebase represents a modern, lightweight rewrite converting the classic Ja
 *   **🚫 Zero Java Dependencies**: Users do not need to install the Java Runtime Environment (JRE) or deal with classpath problems. The app compiles to a standalone, native executable.
 *   **🎭 Hardware-Accelerated Canvas**: Panning, rotating, zooming, and adjusting portraits inside your frames operates at 60 FPS using standard HTML5 Canvas 2D operations.
 *   **🖼️ Live Filter Adjustments**: Real-time adjustments for portrait opacity, border opacity, sizing resolution, Gaussian blur, and brightness contrast (glow) filters.
-*   **⚡ Premium Drag-Out Export**: Skip the file dialog entirely! Clicking and dragging the floating **hand icon** in the bottom-right corner of the canvas lets you drag the compiled PNG token straight onto your desktop, system folder, or directly into a chat window (like Discord).
+*   **⚡ Premium Drag-Out Export**: Skip the file dialog entirely! Clicking and dragging the floating **hand icon** in the bottom-right corner of the canvas lets you drag the compiled PNG token straight onto your desktop, system folder, or directly into a chat window (like Discord). This feature is powered by native operating system drag-and-drop mechanics (`tauri-plugin-drag` / `@crabnebula/tauri-plugin-drag`), which stages temporary files in the OS temp directory (`$TEMP/*`) and invokes the platform's native drag operations. This ensures robust cross-platform compatibility across Windows, Linux, and macOS (including Tahoe/WebKit, Finder, and system-level applications like Discord).
 *   **🎨 Advanced PSD Overlay Decoder**: Drag and drop any custom Photoshop `.psd` file frame. The client parses layers on the fly (Layer 0 = transparency mask, Layer 1 = border overlay frame) to support premium transparency clipping.
 *   **📖 Native PDF Graphic Extractor**: Crawls PDF campaign manuals or adventure modules page-by-page to extract high-resolution character graphics, maps, forms, and button annotations. You can drag them straight onto your canvas, save individual images to disk, or check multiple graphics using an elegant, **cross-page selection cache** to bulk-export them into a system folder.
 
@@ -94,13 +94,41 @@ Adding new frame shapes, cards, or borders is fully automated:
 
 ---
 
-## 🛡️ Bypassing Windows Smart App Control (SAC)
-Because compiled developer builds are unsigned, Windows **Smart App Control (SAC)** may flag them. 
+## 🛡️ Bypassing Windows Smart App Control (SAC) & WDAC / AppLocker
+Because compiled developer builds are unsigned, Windows **Smart App Control (SAC)** or corporate **Windows Defender Application Control (WDAC) / AppLocker** policies may flag or block execution.
 
+### 🛡️ Smart App Control (SAC)
 *   **During Development**: Add your project directory `C:\Users\matta\code\tokentool` to the Windows Security Exclusion list.
 *   **For Distribution**: 
     1.  Instruct users to right-click the downloaded `.exe`, select **Properties**, and check the **Unblock** box at the bottom.
     2.  Alternatively, publish the app through the **Microsoft Store**—Microsoft Store packages are automatically signed during verification, completely bypassing Smart App Control warnings for free!
+
+### 🛡️ Corporate WDAC / AppLocker Blocks on Node Native Bindings
+In locked-down environments, running Tauri through Node.js (`npm run dev` or `npx tauri build`) can fail with an error like `Cannot find native binding` or `An Application Control policy has blocked this file` because the Node CLI tries to load an unsigned `.node` binary from `node_modules/@tauri-apps/cli-win32-x64-msvc`.
+
+To bypass this and run/build the app using native Rust tooling:
+1.  Install the native **Tauri CLI** globally via Cargo (ensure Cargo/Rust is installed):
+    ```bash
+    cargo install tauri-cli --locked
+    ```
+2.  **To Run Live Developer Mode**:
+    *   Start the Vite frontend dev server in one terminal:
+        ```bash
+        npm run dev
+        ```
+    *   In a second terminal, run the native Rust CLI dev environment:
+        ```bash
+        cargo tauri dev
+        ```
+3.  **To Build the Standalone Installer**:
+    *   Compile the frontend assets:
+        ```bash
+        npm run build
+        ```
+    *   Compile and bundle the native installer:
+        ```bash
+        cargo tauri build
+        ```
 
 ---
 
