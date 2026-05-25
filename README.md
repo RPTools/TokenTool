@@ -1,4 +1,4 @@
-# 🪙 TokenTool Refactor Demo (v2.2.0)
+# 🪙 TokenTool Refactor Demo
 
 A next-generation, high-performance, and **dependency-free** desktop application to create custom character, monster, and object tokens for Virtual Tabletop (VTT) systems (e.g., Roll20, MapTool, Foundry VTT).
 
