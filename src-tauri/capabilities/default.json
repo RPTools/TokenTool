@@ -12,7 +12,14 @@
     "core:app:default",
     "dialog:default",
     "fs:default",
-    "fs:allow-read-file",
-    "fs:allow-write-file"
+    {
+      "identifier": "fs:allow-write-file",
+      "allow": [{ "path": "$TEMP/*" }]
+    },
+    {
+      "identifier": "fs:allow-read-file",
+      "allow": [{ "path": "$TEMP/*" }]
+    },
+    "drag:default"
   ]
 }

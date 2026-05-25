@@ -1,5 +1,8 @@
 <script lang="ts">
   import { onMount, createEventDispatcher } from 'svelte';
+  import { startDrag } from '@crabnebula/tauri-plugin-drag';
+  import { writeFile } from '@tauri-apps/plugin-fs';
+  import { tempDir, join } from '@tauri-apps/api/path';
 
   // Component Props
   export let portraitUrl: string | null = null;
@@ -289,8 +292,49 @@
     }
   }
 
-  // Support HTML5 Drag Out so finished token can be dragged straight to Discord / folders
-  function handleDragStart(e: DragEvent) {
+  let isTauri = typeof window !== 'undefined' && (window as any).__TAURI__ !== undefined;
+
+  // Support Native OS Drag Out for Tauri environment (fixes macOS Tahoe drag-out)
+  async function handleDragStartTauri(e: MouseEvent) {
+    if (!isTauri) return;
+    if (e.button !== 0) return; // Only drag with left mouse button
+    if (!screenCanvas) return;
+
+    e.preventDefault();
+
+    try {
+      const dataUrl = offscreenCanvas.toDataURL('image/png');
+      const parts = dataUrl.split(',');
+      if (parts.length < 2) {
+        console.error("Malformed canvas data URL");
+        return;
+      }
+      const base64Data = parts[1];
+      const binaryString = atob(base64Data);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      const tempPath = await tempDir();
+      const filename = 'tokentool-drag-token.png';
+      const absolutePath = await join(tempPath, filename);
+
+      await writeFile(absolutePath, bytes);
+
+      await startDrag({
+        item: [absolutePath],
+        icon: absolutePath
+      });
+    } catch (err) {
+      console.error('Failed to trigger native drag-out:', err);
+    }
+  }
+
+  // Support HTML5 Drag Out fallback for Browser environment (Chrome-only)
+  function handleDragStartBrowser(e: DragEvent) {
+    if (isTauri) return;
     if (!screenCanvas) return;
     
     const dataUrl = offscreenCanvas.toDataURL('image/png');
@@ -357,8 +401,9 @@
   {:else}
     <!-- Dedicated Premium Drag-Out Hand Handle in bottom-right corner -->
     <button 
-      draggable="true"
-      on:dragstart={handleDragStart}
+      draggable={!isTauri}
+      on:dragstart={handleDragStartBrowser}
+      on:mousedown={handleDragStartTauri}
       class="drag-handle-badge select-none"
       type="button"
       title="Drag this hand to export your completed token directly to desktop/Discord!"

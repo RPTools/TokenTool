@@ -43,6 +43,7 @@ fn main() {
         // Register plugins for native OS file selection and reading
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_drag::init())
         .invoke_handler(tauri::generate_handler![extract_pdf_images])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
