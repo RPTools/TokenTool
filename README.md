@@ -59,9 +59,9 @@ npm install
 ### 3. Running in Live Developer Mode
 To launch the hot-reload developer window (which syncs all Svelte and Rust modifications instantly):
 ```bash
-npm run dev
+npm run tauri dev
 ```
-*(This automatically triggers `generate-manifest.js`, boots the Vite localhost port at `1420`, and spawns the native Tauri window).*
+*(This automatically runs the `beforeDevCommand` to trigger `generate-manifest.js` and boot the Vite localhost server at port `1420`, then spawns the native Tauri developer window).*
 
 ---
 
