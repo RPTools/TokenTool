@@ -43,6 +43,19 @@ This codebase represents a modern, lightweight rewrite converting the classic Ja
 
 ---
 
+## 🌿 Branching Strategy
+
+This repository is a fork of [RPTools/TokenTool](https://github.com/RPTools/TokenTool). The branching strategy is designed to keep the original upstream code intact while developing the modern Tauri/Svelte rewrite separately.
+
+| Branch | Purpose |
+|--------|---------|
+| **`demo`** (default) | The active development branch containing the modern **Tauri + Svelte + Rust** rewrite. All new work happens here. |
+| **`main`** | Preserved as a clean mirror of the original upstream [RPTools/TokenTool](https://github.com/RPTools/TokenTool) fork (JavaFX codebase). **Do not commit directly to `main`.** |
+
+> **Note:** When cloning or forking this repo, you will land on the `demo` branch by default. If you are looking for the original Java/JavaFX TokenTool source, switch to the `main` branch.
+
+---
+
 ## 🛠️ Local Development & Maintenance
 
 ### 1. Prerequisites
