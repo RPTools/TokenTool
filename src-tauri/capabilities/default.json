@@ -20,6 +20,10 @@
       "identifier": "fs:allow-read-file",
       "allow": [{ "path": "$TEMP/*" }]
     },
+    {
+      "identifier": "fs:allow-remove",
+      "allow": [{ "path": "$TEMP/*" }]
+    },
     "drag:default"
   ]
 }

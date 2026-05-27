@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, createEventDispatcher } from 'svelte';
   import { startDrag } from '@crabnebula/tauri-plugin-drag';
-  import { writeFile } from '@tauri-apps/plugin-fs';
+  import { writeFile, remove } from '@tauri-apps/plugin-fs';
   import { tempDir, join } from '@tauri-apps/api/path';
 
   // Component Props
@@ -323,10 +323,19 @@
 
       await writeFile(absolutePath, bytes);
 
-      await startDrag({
-        item: [absolutePath],
-        icon: absolutePath
-      });
+      try {
+        await startDrag({
+          item: [absolutePath],
+          icon: absolutePath
+        });
+      } finally {
+        // Always clean up the temporary file after drag concludes
+        try {
+          await remove(absolutePath);
+        } catch (cleanupErr) {
+          console.warn('Failed to clean up temp drag file:', cleanupErr);
+        }
+      }
     } catch (err) {
       console.error('Failed to trigger native drag-out:', err);
     }

@@ -4,6 +4,15 @@ use lopdf::{Document, Object, Dictionary, Stream};
 use base64::prelude::*;
 use image::ImageEncoder;
 
+// Shadow standard println! to automatically gate all logging in this module behind debug assertions
+macro_rules! println {
+    ($($arg:tt)*) => {
+        if cfg!(debug_assertions) {
+            std::println!($($arg)*);
+        }
+    };
+}
+
 pub fn extract_images_from_pdf_page<P: AsRef<Path>>(
     pdf_path: P,
     page_number: usize,

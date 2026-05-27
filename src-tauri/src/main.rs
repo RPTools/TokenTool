@@ -14,7 +14,11 @@ struct PdfPageOutput {
 
 #[tauri::command]
 fn extract_pdf_images(pdf_path: String, page_number: usize) -> Result<PdfPageOutput, String> {
-    println!("Tauri invoking PDF extraction: {} (pg {})", pdf_path, page_number);
+    let file_name = std::path::Path::new(&pdf_path)
+        .file_name()
+        .and_then(|f| f.to_str())
+        .unwrap_or("Unknown PDF");
+    println!("Tauri invoking PDF extraction: {} (pg {})", file_name, page_number);
     
     // Perform path validation
     let path = std::path::Path::new(&pdf_path);

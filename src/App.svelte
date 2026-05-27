@@ -92,7 +92,7 @@
     try {
       const { open } = await import('@tauri-apps/plugin-dialog');
       const selected = await open({
-        filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp', 'svg'] }],
+        filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp'] }],
         multiple: false
       });
       
@@ -112,7 +112,7 @@
       // Browser fallback (mock or standard input click)
       const input = document.createElement('input');
       input.type = 'file';
-      input.accept = 'image/*';
+      input.accept = 'image/png,image/jpeg,image/webp';
       input.onchange = (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
         if (file) {

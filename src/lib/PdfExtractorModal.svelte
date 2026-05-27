@@ -79,7 +79,7 @@
       const isTauri = typeof window !== 'undefined' && (window as any).__TAURI_INTERNALS__ !== undefined;
       
       if (isTauri) {
-        statusMessage = `Extraction Error: ${e}`;
+        statusMessage = `Extraction Error: Could not read images from PDF.`;
         images = [];
       } else {
         // Fallback for rich mock data inside browser preview
@@ -204,7 +204,7 @@
       }
     } catch (e) {
       console.error('Failed to save image:', e);
-      statusMessage = `Save failed: ${e}`;
+      statusMessage = `Save failed: Could not write image file.`;
     }
   }
 
@@ -255,7 +255,7 @@
       }
     } catch (e) {
       console.error('Bulk save failed:', e);
-      statusMessage = `Bulk save failed: ${e}`;
+      statusMessage = `Bulk save failed: Could not write files to directory.`;
     } finally {
       loading = false;
     }
