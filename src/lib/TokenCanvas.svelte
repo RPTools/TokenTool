@@ -197,7 +197,8 @@
 
     // 2. Draw Masked Content (Background + Portrait)
     if (clipPortrait && maskImg && tempCanvas && tempCtx) {
-      // Clear the temporary composite canvas
+      // Reset composite operation to default before clearing and rendering
+      tempCtx.globalCompositeOperation = 'source-over';
       tempCtx.clearRect(0, 0, w, h);
 
       // a. Draw Background Fill
