@@ -6,6 +6,11 @@ export default defineConfig({
   test: {
     include: ['src/**/*.{test,spec}.{js,ts}'],
     environment: 'jsdom',
+    environmentOptions: {
+      jsdom: {
+        resources: 'usable'
+      }
+    },
     globals: true,
     setupFiles: ['./vitest-setup.ts']
   }
