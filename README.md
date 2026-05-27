@@ -8,12 +8,12 @@ This codebase represents a modern, lightweight rewrite converting the classic Ja
 
 ## ✨ Key Features
 
-*   **🚫 Zero Java Dependencies**: Users do not need to install the Java Runtime Environment (JRE) or deal with classpath problems. The app compiles to a standalone, native executable.
-*   **🎭 Hardware-Accelerated Canvas**: Panning, rotating, zooming, and adjusting portraits inside your frames operates at 60 FPS using standard HTML5 Canvas 2D operations.
-*   **🖼️ Live Filter Adjustments**: Real-time adjustments for portrait opacity, border opacity, sizing resolution, Gaussian blur, and brightness contrast (glow) filters.
-*   **⚡ Premium Drag-Out Export**: Skip the file dialog entirely! Clicking and dragging the floating **hand icon** in the bottom-right corner of the canvas lets you drag the compiled PNG token straight onto your desktop, system folder, or directly into a chat window (like Discord). This feature is powered by native operating system drag-and-drop mechanics (`tauri-plugin-drag` / `@crabnebula/tauri-plugin-drag`), which stages temporary files in the OS temp directory (`$TEMP/*`) and invokes the platform's native drag operations. This ensures robust cross-platform compatibility across Windows, Linux, and macOS (including Tahoe/WebKit, Finder, and system-level applications like Discord).
-*   **🎨 Advanced PSD Overlay Decoder**: Drag and drop any custom Photoshop `.psd` file frame. The client parses layers on the fly (Layer 0 = transparency mask, Layer 1 = border overlay frame) to support premium transparency clipping.
-*   **📖 Native PDF Graphic Extractor**: Crawls PDF campaign manuals or adventure modules page-by-page to extract high-resolution character graphics, maps, forms, and button annotations. You can drag them straight onto your canvas, save individual images to disk, or check multiple graphics using an elegant, **cross-page selection cache** to bulk-export them into a system folder.
+- **🚫 Zero Java Dependencies**: Users do not need to install the Java Runtime Environment (JRE) or deal with classpath problems. The app compiles to a standalone, native executable.
+- **🎭 Hardware-Accelerated Canvas**: Panning, rotating, zooming, and adjusting portraits inside your frames operates at 60 FPS using standard HTML5 Canvas 2D operations.
+- **🖼️ Live Filter Adjustments**: Real-time adjustments for portrait opacity, border opacity, sizing resolution, Gaussian blur, and brightness contrast (glow) filters.
+- **⚡ Premium Drag-Out Export**: Skip the file dialog entirely! Clicking and dragging the floating **hand icon** in the bottom-right corner of the canvas lets you drag the compiled PNG token straight onto your desktop, system folder, or directly into a chat window (like Discord). This feature is powered by native operating system drag-and-drop mechanics (`tauri-plugin-drag` / `@crabnebula/tauri-plugin-drag`), which stages temporary files in the OS temp directory (`$TEMP/*`) and invokes the platform's native drag operations. This ensures robust cross-platform compatibility across Windows, Linux, and macOS (including Tahoe/WebKit, Finder, and system-level applications like Discord).
+- **🎨 Advanced PSD Overlay Decoder**: Drag and drop any custom Photoshop `.psd` file frame. The client parses layers on the fly (Layer 0 = transparency mask, Layer 1 = border overlay frame) to support premium transparency clipping.
+- **📖 Native PDF Graphic Extractor**: Crawls PDF campaign manuals or adventure modules page-by-page to extract high-resolution character graphics, maps, forms, and button annotations. You can drag them straight onto your canvas, save individual images to disk, or check multiple graphics using an elegant, **cross-page selection cache** to bulk-export them into a system folder.
 
 ---
 
@@ -47,10 +47,10 @@ This codebase represents a modern, lightweight rewrite converting the classic Ja
 
 This repository is a fork of [RPTools/TokenTool](https://github.com/RPTools/TokenTool). The branching strategy is designed to keep the original upstream code intact while developing the modern Tauri/Svelte rewrite separately.
 
-| Branch | Purpose |
-|--------|---------|
-| **`demo`** (default) | The active development branch containing the modern **Tauri + Svelte + Rust** rewrite. All new work happens here. |
-| **`main`** | Preserved as a clean mirror of the original upstream [RPTools/TokenTool](https://github.com/RPTools/TokenTool) fork (JavaFX codebase). **Do not commit directly to `main`.** |
+| Branch               | Purpose                                                                                                                                                                      |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`demo`** (default) | The active development branch containing the modern **Tauri + Svelte + Rust** rewrite. All new work happens here.                                                            |
+| **`main`**           | Preserved as a clean mirror of the original upstream [RPTools/TokenTool](https://github.com/RPTools/TokenTool) fork (JavaFX codebase). **Do not commit directly to `main`.** |
 
 > **Note:** When cloning or forking this repo, you will land on the `demo` branch by default. If you are looking for the original Java/JavaFX TokenTool source, switch to the `main` branch.
 
@@ -59,22 +59,29 @@ This repository is a fork of [RPTools/TokenTool](https://github.com/RPTools/Toke
 ## 🛠️ Local Development & Maintenance
 
 ### 1. Prerequisites
+
 Ensure you have the following installed on your developer machine:
-*   [Node.js](https://nodejs.org/) (v18+)
-*   [Rust & Cargo](https://rustup.rs/) (Stable channel)
+
+- [Node.js](https://nodejs.org/) (v18+)
+- [Rust & Cargo](https://rustup.rs/) (Stable channel)
 
 ### 2. Bootstrapping the Environment
+
 Install npm dependencies:
+
 ```bash
 npm install
 ```
 
 ### 3. Running in Live Developer Mode
+
 To launch the hot-reload developer window (which syncs all Svelte and Rust modifications instantly):
+
 ```bash
 npm run tauri dev
 ```
-*(This automatically runs the `beforeDevCommand` to trigger `generate-manifest.js` and boot the Vite localhost server at port `1420`, then spawns the native Tauri developer window).*
+
+_(This automatically runs the `beforeDevCommand` to trigger `generate-manifest.js` and boot the Vite localhost server at port `1420`, then spawns the native Tauri developer window)._
 
 ---
 
@@ -89,59 +96,65 @@ npx tauri build
 
 This compiles a single, dependency-free portable binary and creates platform-native installers under the release directory:
 `src-tauri/target/release/bundle/`
-*   **Windows**: `.msi` (installer package) and `-setup.exe` (setup executable).
-*   **macOS**: `.dmg` (disk image).
-*   **Linux**: `.AppImage` (portable single-file executable) and `.deb`.
+
+- **Windows**: `.msi` (installer package) and `-setup.exe` (setup executable).
+- **macOS**: `.dmg` (disk image).
+- **Linux**: `.AppImage` (portable single-file executable) and `.deb`.
 
 ---
 
 ## 🎨 How to Maintain and Add Overlays
+
 Adding new frame shapes, cards, or borders is fully automated:
 
 1.  Navigate to the `/public/overlays/` directory.
 2.  Create or find a folder representing your category (e.g., `public/overlays/v2/Round/Smooth`).
 3.  Drop your custom files inside. They can be **PNGs**, **JPEGs**, or **PSDs**.
-    *   *PSD Requirement*: The `.psd` must have Layer 0 (the bottom layer) representing the grayscale transparency mask, and Layer 1 (the upper layer) representing the visual border overlay.
+    - _PSD Requirement_: The `.psd` must have Layer 0 (the bottom layer) representing the grayscale transparency mask, and Layer 1 (the upper layer) representing the visual border overlay.
 4.  Run a build (`npm run dev` or `npm run build`).
 5.  The script `generate-manifest.js` will automatically scan the folder tree, catalog all items, and build `src/lib/overlayManifest.json` on the fly. The new frames and categories will immediately appear in the app's dropdown menus!
 
 ---
 
 ## 🛡️ Bypassing Windows Smart App Control (SAC) & WDAC / AppLocker
+
 Because compiled developer builds are unsigned, Windows **Smart App Control (SAC)** or corporate **Windows Defender Application Control (WDAC) / AppLocker** policies may flag or block execution.
 
 ### 🛡️ Smart App Control (SAC)
-*   **During Development**: Add your project directory `C:\Users\matta\code\tokentool` to the Windows Security Exclusion list.
-*   **For Distribution**: 
-    1.  Instruct users to right-click the downloaded `.exe`, select **Properties**, and check the **Unblock** box at the bottom.
-    2.  Alternatively, publish the app through the **Microsoft Store**—Microsoft Store packages are automatically signed during verification, completely bypassing Smart App Control warnings for free!
+
+- **During Development**: Add your project directory `C:\Users\matta\code\tokentool` to the Windows Security Exclusion list.
+- **For Distribution**:
+  1.  Instruct users to right-click the downloaded `.exe`, select **Properties**, and check the **Unblock** box at the bottom.
+  2.  Alternatively, publish the app through the **Microsoft Store**—Microsoft Store packages are automatically signed during verification, completely bypassing Smart App Control warnings for free!
 
 ### 🛡️ Corporate WDAC / AppLocker Blocks on Node Native Bindings
+
 In locked-down environments, running Tauri through Node.js (`npm run dev` or `npx tauri build`) can fail with an error like `Cannot find native binding` or `An Application Control policy has blocked this file` because the Node CLI tries to load an unsigned `.node` binary from `node_modules/@tauri-apps/cli-win32-x64-msvc`.
 
 To bypass this and run/build the app using native Rust tooling:
+
 1.  Install the native **Tauri CLI** globally via Cargo (ensure Cargo/Rust is installed):
     ```bash
     cargo install tauri-cli --locked
     ```
 2.  **To Run Live Developer Mode**:
-    *   Start the Vite frontend dev server in one terminal:
-        ```bash
-        npm run dev
-        ```
-    *   In a second terminal, run the native Rust CLI dev environment:
-        ```bash
-        cargo tauri dev
-        ```
+    - Start the Vite frontend dev server in one terminal:
+      ```bash
+      npm run dev
+      ```
+    - In a second terminal, run the native Rust CLI dev environment:
+      ```bash
+      cargo tauri dev
+      ```
 3.  **To Build the Standalone Installer**:
-    *   Compile the frontend assets:
-        ```bash
-        npm run build
-        ```
-    *   Compile and bundle the native installer:
-        ```bash
-        cargo tauri build
-        ```
+    - Compile the frontend assets:
+      ```bash
+      npm run build
+      ```
+    - Compile and bundle the native installer:
+      ```bash
+      cargo tauri build
+      ```
 
 ---
 
@@ -152,17 +165,17 @@ This project is a modern, high-performance desktop refactor and tribute to the o
 We want to give **full credit** and express our deepest gratitude to the original creators, developers, designers, and maintainers who have dedicated years of volunteer effort to supporting the Virtual Tabletop (VTT) gaming community. Without their visionary work, this modernized version would not exist.
 
 ### Key Contributors & Maintainers of the Original TokenTool Ecosystem:
-*   **[JamzTheMan (Jamz)](https://github.com/JamzTheMan)**: For driving massive updates, major releases, and the JavaFX port of classic TokenTool.
-*   **[Phergus](https://github.com/Phergus)**: For core development, design guidance, and extensive community support.
-*   **[Craig Wisniewski](https://github.com/cwisniewski)**: For key architectural work across the RPTools suite.
-*   **[Azhrei](https://github.com/Azhrei)**, **[RPTroll](https://github.com/RPTroll)**, **[Jagged](https://github.com/Jagged)**, **[kayila](https://github.com/kayila)**: For their stewardship of the RPTools ecosystem and their work in keeping the suite alive and vibrant.
-*   **Trevor Croft**: The original founder of RPTools whose early work laid the foundation for the entire ecosystem.
-*   The numerous open-source translators, artists who designed default overlay frames, and community members who provided bug reports, testing, and feature ideas over the decades.
+
+- **[JamzTheMan (Jamz)](https://github.com/JamzTheMan)**: For driving massive updates, major releases, and the JavaFX port of classic TokenTool.
+- **[Phergus](https://github.com/Phergus)**: For core development, design guidance, and extensive community support.
+- **[Craig Wisniewski](https://github.com/cwisniewski)**: For key architectural work across the RPTools suite.
+- **[Azhrei](https://github.com/Azhrei)**, **[RPTroll](https://github.com/RPTroll)**, **[Jagged](https://github.com/Jagged)**, **[kayila](https://github.com/kayila)**: For their stewardship of the RPTools ecosystem and their work in keeping the suite alive and vibrant.
+- **Trevor Croft**: The original founder of RPTools whose early work laid the foundation for the entire ecosystem.
+- The numerous open-source translators, artists who designed default overlay frames, and community members who provided bug reports, testing, and feature ideas over the decades.
 
 ### Licensing & Open Source Spirit:
-*   The original **TokenTool** is published under the open-source **GNU General Public License (GPL)**.
-*   This refactored version is built as a lightweight, modern web-and-Rust-native tribute. It is intended as an independent, modernized demonstration proof-of-concept to carry their outstanding legacy forward into a fast, native, JRE-free desktop era. All original overlay graphics, design concepts, and credits remain the property of the RPTools community.
 
-*Thank you, RPTools team, for keeping our tabletop sessions alive and inspiring developers to build!*
+- The original **TokenTool** is published under the open-source **GNU General Public License (GPL)**.
+- This refactored version is built as a lightweight, modern web-and-Rust-native tribute. It is intended as an independent, modernized demonstration proof-of-concept to carry their outstanding legacy forward into a fast, native, JRE-free desktop era. All original overlay graphics, design concepts, and credits remain the property of the RPTools community.
 
-
+_Thank you, RPTools team, for keeping our tabletop sessions alive and inspiring developers to build!_

@@ -4,49 +4,52 @@ use lopdf::{Document, Object, Dictionary, Stream};
 use base64::prelude::*;
 use image::ImageEncoder;
 
-// Shadow standard println! to automatically gate all logging in this module behind debug assertions
-macro_rules! println {
-    ($($arg:tt)*) => {
-        if cfg!(debug_assertions) {
-            std::println!($($arg)*);
-        }
-    };
-}
-
+/// Extracts embedded images and graphics from a specific page of a PDF document.
+///
+/// # Arguments
+/// * `pdf_path` - The absolute filesystem path to the PDF document.
+/// * `page_number` - The 1-based page index to extract from.
+///
+/// # Returns
+/// * `Result<(Vec<String>, usize, usize), String>` - On success, returns a tuple containing:
+///   1. A vector of base64-encoded PNG image data URLs.
+///   2. The total page count of the document.
+///   3. The total image count of all objects in the PDF document.
+///   Or an error string.
 pub fn extract_images_from_pdf_page<P: AsRef<Path>>(
     pdf_path: P,
     page_number: usize,
 ) -> Result<(Vec<String>, usize, usize), String> {
     let pdf_path_ref = pdf_path.as_ref();
-    println!("Rust reading file bytes for path: {:?}", pdf_path_ref);
+    log::info!("Rust reading file bytes for path: {:?}", pdf_path_ref);
 
     // Read the file bytes ourselves using standard Rust filesystem API
     let file_bytes = std::fs::read(pdf_path_ref)
         .map_err(|e| format!("IO Error reading PDF file '{:?}': {}", pdf_path_ref, e))?;
     
-    println!("Read PDF file bytes successfully. File size: {} bytes", file_bytes.len());
+    log::info!("Read PDF file bytes successfully. File size: {} bytes", file_bytes.len());
 
     // Parse the PDF from memory to bypass any file handle encoding/locking quirks in lopdf
     let mut doc = Document::load_mem(&file_bytes)
         .map_err(|e| format!("PDF parsing error: {}", e))?;
 
-    println!("PDF parse successful. Total objects parsed: {}", doc.objects.len());
-    println!("PDF encrypted: {}", doc.is_encrypted());
+    log::info!("PDF parse successful. Total objects parsed: {}", doc.objects.len());
+    log::info!("PDF encrypted: {}", doc.is_encrypted());
 
     // Attempt to decrypt with empty/default password if the PDF is encrypted
     if doc.is_encrypted() {
         match doc.decrypt(b"") {
-            Ok(_) => println!("PDF successfully decrypted with default/empty password."),
-            Err(e) => println!("PDF decryption failed: {:?}", e),
+            Ok(_) => log::info!("PDF successfully decrypted with default/empty password."),
+            Err(e) => log::warn!("PDF decryption failed: {:?}", e),
         }
     }
 
     let mut pages = doc.get_pages();
-    println!("lopdf doc.get_pages() returned {} pages.", pages.len());
+    log::info!("lopdf doc.get_pages() returned {} pages.", pages.len());
     
     // Fallback: If pages map is empty, perform a flat scan of all PDF objects
     if pages.is_empty() {
-        println!("Performing flat scan of all PDF objects to locate candidate Page dictionaries...");
+        log::info!("Performing flat scan of all PDF objects to locate candidate Page dictionaries...");
         let mut page_ids = Vec::new();
         for (id, object) in &doc.objects {
             if let Ok(dict) = object.as_dict() {
@@ -58,7 +61,7 @@ pub fn extract_images_from_pdf_page<P: AsRef<Path>>(
                 // Pages tree nodes have Kids and Parent/Type Pages, individual pages have Parent & MediaBox
                 if has_type_page || (has_mediabox && has_parent && !has_kids) {
                     page_ids.push(*id);
-                    println!("Found candidate page object {:?}: has_type_page={}, has_mediabox={}, has_parent={}", 
+                    log::info!("Found candidate page object {:?}: has_type_page={}, has_mediabox={}, has_parent={}", 
                              id, has_type_page, has_mediabox, has_parent);
                 }
             }
@@ -68,7 +71,7 @@ pub fn extract_images_from_pdf_page<P: AsRef<Path>>(
         for (i, page_id) in page_ids.into_iter().enumerate() {
             pages.insert((i + 1) as u32, page_id);
         }
-        println!("Flat scan found {} candidate page objects.", pages.len());
+        log::info!("Flat scan found {} candidate page objects.", pages.len());
     }
 
     let total_pages = pages.len();
@@ -115,18 +118,33 @@ pub fn extract_images_from_pdf_page<P: AsRef<Path>>(
     Ok((extracted_images, total_pages, total_images))
 }
 
-// Find Resources dictionary, resolving Page tree inheritance if not present on page_dict itself
+/// Resolves a PDF Object that may be either an inline Dictionary or an indirect Reference to
+/// a Dictionary. Returns a borrowed reference to the Dictionary, or None if resolution fails.
+/// This eliminates M-15: the same two-branch resolution pattern was copy-pasted 3+ times.
+fn resolve_to_dict<'a>(doc: &'a Document, obj: &'a Object) -> Option<&'a Dictionary> {
+    if let Ok(ref_id) = obj.as_reference() {
+        doc.get_object(ref_id).ok()?.as_dict().ok()
+    } else {
+        obj.as_dict().ok()
+    }
+}
+
+/// Resolves the Resources key in a dictionary, which may itself be an indirect Reference or an
+/// inline Dictionary. Returns None if the key is absent or cannot be resolved.
+fn resolve_resources<'a>(doc: &'a Document, dict: &'a Dictionary) -> Option<&'a Dictionary> {
+    let resources = dict.get(b"Resources").ok()?;
+    resolve_to_dict(doc, resources)
+}
+
+/// Locates the Resources dictionary for a PDF page, walking up the Pages tree
+/// if the page dictionary does not contain an inline Resources entry.
+///
+/// PDF pages can inherit Resources from ancestor nodes in the page tree (per
+/// the PDF spec §7.7.3.4). This function checks the page itself first, then
+/// traverses the `Parent` chain until a Resources dictionary is found.
 fn find_resources<'a>(doc: &'a Document, page_dict: &'a Dictionary) -> Option<&'a Dictionary> {
-    if let Ok(resources) = page_dict.get(b"Resources") {
-        if let Ok(res_id) = resources.as_reference() {
-            if let Ok(res_obj) = doc.get_object(res_id) {
-                if let Ok(res_dict) = res_obj.as_dict() {
-                    return Some(res_dict);
-                }
-            }
-        } else if let Ok(res_dict) = resources.as_dict() {
-            return Some(res_dict);
-        }
+    if let Some(res_dict) = resolve_resources(doc, page_dict) {
+        return Some(res_dict);
     }
 
     // Traverse parent Pages chain to look for inherited Resources dictionary
@@ -134,16 +152,8 @@ fn find_resources<'a>(doc: &'a Document, page_dict: &'a Dictionary) -> Option<&'
     while let Ok(parent_ref) = current_dict.get(b"Parent").and_then(|p| p.as_reference()) {
         if let Ok(parent_obj) = doc.get_object(parent_ref) {
             if let Ok(parent_dict) = parent_obj.as_dict() {
-                if let Ok(resources) = parent_dict.get(b"Resources") {
-                    if let Ok(res_id) = resources.as_reference() {
-                        if let Ok(res_obj) = doc.get_object(res_id) {
-                            if let Ok(res_dict) = res_obj.as_dict() {
-                                return Some(res_dict);
-                            }
-                        }
-                    } else if let Ok(res_dict) = resources.as_dict() {
-                        return Some(res_dict);
-                    }
+                if let Some(res_dict) = resolve_resources(doc, parent_dict) {
+                    return Some(res_dict);
                 }
                 current_dict = parent_dict;
             } else {
@@ -157,6 +167,11 @@ fn find_resources<'a>(doc: &'a Document, page_dict: &'a Dictionary) -> Option<&'
     None
 }
 
+/// Iterates XObject entries within a Resources dictionary, extracting Image
+/// streams as base64-encoded PNGs and recursively descending into Form XObjects.
+///
+/// Tracks already-processed object IDs via `processed` to avoid duplicating
+/// images that are referenced by multiple resource dictionaries.
 fn extract_from_resources(
     doc: &Document,
     resources: &Dictionary,
@@ -164,13 +179,7 @@ fn extract_from_resources(
     processed: &mut HashSet<lopdf::ObjectId>,
 ) {
     if let Ok(xobjects) = resources.get(b"XObject") {
-        let xobj_dict: Option<&Dictionary> = if let Ok(xobj_id) = xobjects.as_reference() {
-            doc.get_object(xobj_id).ok().and_then(|o| o.as_dict().ok())
-        } else {
-            xobjects.as_dict().ok()
-        };
-
-        if let Some(dict) = xobj_dict {
+        if let Some(dict) = resolve_to_dict(doc, xobjects) {
             for (_, val) in dict.iter() {
                 if let Ok(ref_id) = val.as_reference() {
                     if processed.contains(&ref_id) {
@@ -202,6 +211,11 @@ fn extract_from_resources(
     }
 }
 
+/// Extracts images from a page annotation's Appearance dictionary (`/AP`).
+///
+/// Annotations (form fields, buttons, stamps) can reference Form XObjects in
+/// their Normal (`/N`), Rollover (`/R`), and Down (`/D`) appearance states.
+/// Each appearance stream may contain its own nested Resources with images.
 fn extract_from_annotation(
     doc: &Document,
     annot: &Dictionary,
@@ -209,11 +223,7 @@ fn extract_from_annotation(
     processed: &mut HashSet<lopdf::ObjectId>,
 ) {
     if let Ok(ap) = annot.get(b"AP") {
-        let ap_dict: Option<&Dictionary> = if let Ok(ap_id) = ap.as_reference() {
-            doc.get_object(ap_id).ok().and_then(|o| o.as_dict().ok())
-        } else {
-            ap.as_dict().ok()
-        };
+        let ap_dict = resolve_to_dict(doc, ap);
 
         if let Some(dict) = ap_dict {
             for state_key in &[b"N" as &[u8], b"R" as &[u8], b"D" as &[u8]] {
@@ -245,6 +255,11 @@ fn extract_from_annotation(
     }
 }
 
+/// Implements the Paeth predictor function from the PNG specification (RFC 2083 §6.6).
+///
+/// Given three neighboring pixel bytes (`a` = left, `b` = above, `c` = upper-left),
+/// returns the one closest to the linear predictor `p = a + b - c`. Used by
+/// [`decode_png_predictor`] for filter type 4.
 fn paeth_predictor(a: u8, b: u8, c: u8) -> u8 {
     let a_i = a as i16;
     let b_i = b as i16;
@@ -264,6 +279,21 @@ fn paeth_predictor(a: u8, b: u8, c: u8) -> u8 {
     }
 }
 
+/// Decodes raw image data that uses PNG-style row filters (predictor values 10–14).
+///
+/// PDF streams with `/Predictor` ≥ 10 in their `/DecodeParms` embed per-row filter
+/// bytes identical to those in the PNG format. This function reverses the filtering
+/// to recover the original pixel data.
+///
+/// # Arguments
+/// * `columns` - Number of pixel columns (image width).
+/// * `colors` - Number of color components per pixel (1 for gray, 3 for RGB, 4 for CMYK).
+/// * `bits_per_component` - Bit depth per component (typically 8).
+/// * `data` - The filtered byte stream, where each row is prefixed by a 1-byte filter type.
+///
+/// # Returns
+/// `Some(Vec<u8>)` containing the unfiltered pixel data, or `None` if the input
+/// length is invalid or a row slice is out of bounds.
 fn decode_png_predictor(
     columns: usize,
     colors: usize,
@@ -343,6 +373,15 @@ fn decode_png_predictor(
     Some(decompressed)
 }
 
+/// Decodes a single PDF image XObject stream into a base64-encoded PNG string.
+///
+/// Handles three major image encodings:
+/// - **JPEG** (`DCTDecode`): passed through as raw bytes and base64-encoded directly.
+/// - **Raw / Flate-decoded**: decompressed, PNG-predictor-decoded if needed, then
+///   re-encoded as a PNG. Supports DeviceGray (including 1-bit), DeviceRGB, and
+///   DeviceCMYK (converted to RGB).
+///
+/// Returns `None` if the stream cannot be decoded or the dimensions are invalid.
 fn process_image_stream(stream: &Stream) -> Option<String> {
     let filter = stream.dict.get(b"Filter").ok();
 
@@ -395,11 +434,13 @@ fn process_image_stream(stream: &Stream) -> Option<String> {
 
         let color_space_slice = color_space_name.as_deref();
 
-        let colors = match color_space_slice {
-            Some(b"DeviceRGB") => 3,
-            Some(b"DeviceGray") => 1,
-            Some(b"DeviceCMYK") => 4,
-            _ => 3
+        // M-16: Consolidate color space matching into a single source of truth.
+        // Previously, color_space_slice was matched twice separately to get `colors`
+        // and then `color_type`. Now both are derived together.
+        let (colors, color_type) = match color_space_slice {
+            Some(b"DeviceGray") => (1usize, image::ColorType::L8),
+            Some(b"DeviceCMYK") => (4usize, image::ColorType::Rgb8), // CMYK is converted to RGB on encode
+            _ => (3usize, image::ColorType::Rgb8),                    // DeviceRGB and unknown default to RGB
         };
 
         // Parse PNG Predictor from DecodeParms
@@ -423,13 +464,6 @@ fn process_image_stream(stream: &Stream) -> Option<String> {
                 }
             } else {
                 decompressed
-            };
-
-            let color_type = match color_space_slice {
-                Some(b"DeviceRGB") => image::ColorType::Rgb8,
-                Some(b"DeviceGray") => image::ColorType::L8,
-                Some(b"DeviceCMYK") => image::ColorType::Rgb8,
-                _ => image::ColorType::Rgb8
             };
 
             // Convert colors or upscale bit-depth to screen RGB/Luminance bytes
@@ -494,22 +528,77 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_paeth_predictor() {
+        assert_eq!(paeth_predictor(0, 0, 0), 0);
+        assert_eq!(paeth_predictor(10, 20, 30), 10); // p=0, pa=10, pb=20, pc=30 -> a
+        assert_eq!(paeth_predictor(50, 150, 100), 100); // p=100, pa=50, pb=50, pc=0 -> c
+        assert_eq!(paeth_predictor(200, 10, 50), 200);
+    }
+
+    #[test]
+    fn test_decode_png_predictor_none() {
+        // filter=0, data=[10, 20, 30]
+        // row_len = 3 (3 cols, 1 color, 8 bit)
+        let data = vec![0, 10, 20, 30];
+        let decoded = decode_png_predictor(3, 1, 8, &data).unwrap();
+        assert_eq!(decoded, vec![10, 20, 30]);
+    }
+
+    #[test]
+    fn test_decode_png_predictor_sub() {
+        // filter=1, data=[10, 20, 30]
+        // bytes_per_pixel = 1.
+        // decoded should be: 10, 10+20=30, 30+30=60
+        let data = vec![1, 10, 20, 30];
+        let decoded = decode_png_predictor(3, 1, 8, &data).unwrap();
+        assert_eq!(decoded, vec![10, 30, 60]);
+    }
+
+    #[test]
+    fn test_decode_png_predictor_up() {
+        // 2 rows, filter=2 (Up) for second row
+        // Row 1: filter=0, [10, 20]
+        // Row 2: filter=2, [5, 15]
+        // decoded row 2: [10+5=15, 20+15=35]
+        let data = vec![
+            0, 10, 20,
+            2, 5, 15
+        ];
+        let decoded = decode_png_predictor(2, 1, 8, &data).unwrap();
+        assert_eq!(decoded, vec![10, 20, 15, 35]);
+    }
+
+    #[test]
+    fn test_decode_png_predictor_invalid_length() {
+        let data = vec![0, 10]; // Missing bytes for row
+        assert_eq!(decode_png_predictor(2, 1, 8, &data), None);
+    }
+
+    #[test]
     #[ignore]
     fn test_parse_pdf() {
-        let pdf_path = "C:\\Users\\matta\\Downloads\\Wave-Echo-Cave.pdf";
+        let pdf_path = std::env::var("TEST_PDF_PATH")
+            .unwrap_or_else(|_| "C:\\Users\\matta\\Downloads\\Wave-Echo-Cave.pdf".to_string());
+        
+        if !std::path::Path::new(&pdf_path).exists() {
+            println!("Skipping test: File does not exist at '{}'. Set TEST_PDF_PATH environment variable to run this test with a real PDF.", pdf_path);
+            return;
+        }
+
         println!("Testing PDF extraction for: {}", pdf_path);
         
-        if let Ok(file_bytes) = std::fs::read(pdf_path) {
+        if let Ok(file_bytes) = std::fs::read(&pdf_path) {
             let first_bytes = &file_bytes[..std::cmp::min(100, file_bytes.len())];
             println!("First 100 bytes of PDF: {:?}", String::from_utf8_lossy(first_bytes));
         }
 
-        match extract_images_from_pdf_page(pdf_path, 1) {
+        match extract_images_from_pdf_page(&pdf_path, 1) {
             Ok((images, pages, total_images)) => {
                 println!("SUCCESS! Extracted {} images, total pages: {}, total images: {}", images.len(), pages, total_images);
             }
             Err(e) => {
                 println!("FAILED: {}", e);
+                panic!("PDF extraction failed: {}", e);
             }
         }
     }

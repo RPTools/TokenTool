@@ -1,5 +1,5 @@
 {
-  "productName": "TokenTool Refactor Demo",
+  "productName": "TokenTool",
   "version": "2.2.0",
   "identifier": "net.rptools.tokentool",
   "build": {
@@ -11,7 +11,7 @@
   "app": {
     "windows": [
       {
-        "title": "TokenTool Refactor Demo",
+        "title": "TokenTool",
         "width": 950,
         "height": 850,
         "minWidth": 750,

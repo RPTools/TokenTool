@@ -18,13 +18,13 @@ function walk(dir, currentCategory) {
   for (const file of files) {
     const fullPath = path.join(dir, file);
     const stat = fs.statSync(fullPath);
-    
+
     if (stat.isDirectory()) {
       const newCategory = currentCategory ? `${currentCategory}/${file}` : file;
       walk(fullPath, newCategory);
     } else {
       const ext = path.extname(file).toLowerCase();
-      
+
       // Skip our generated thumbnails so they don't become duplicate presets
       if (file.endsWith('_thumb.png')) {
         continue;
@@ -34,7 +34,7 @@ function walk(dir, currentCategory) {
         if (!categories[currentCategory]) {
           categories[currentCategory] = [];
         }
-        
+
         // Normalize slashes for web URLs
         let relativePath = `/overlays/${currentCategory}/${file}`.replace(/\\/g, '/');
         // If currentCategory is empty (files in root of overlays/)
@@ -53,19 +53,20 @@ function walk(dir, currentCategory) {
               const buf = fs.readFileSync(fullPath);
               // Read without skipping layer data so we can extract the ring
               const psd = readPsd(buf, { skipThumbnail: true });
-              
+
               // We want to extract the overlay ring (children[1] or fallback to canvas)
-              const overlaySource = (psd.children && psd.children.length > 1 && psd.children[1].canvas) 
-                ? psd.children[1].canvas 
-                : psd.canvas;
-              
+              const overlaySource =
+                psd.children && psd.children.length > 1 && psd.children[1].canvas
+                  ? psd.children[1].canvas
+                  : psd.canvas;
+
               if (overlaySource) {
                 // Resize thumbnail to max 128x128 for performance
                 const MAX = 128;
                 let w = overlaySource.width || psd.width;
                 let h = overlaySource.height || psd.height;
                 if (w > MAX || h > MAX) {
-                  const scale = Math.min(MAX/w, MAX/h);
+                  const scale = Math.min(MAX / w, MAX / h);
                   w = Math.floor(w * scale);
                   h = Math.floor(h * scale);
                 }
@@ -94,7 +95,9 @@ function walk(dir, currentCategory) {
 if (fs.existsSync(overlaysDir)) {
   walk(overlaysDir, '');
   fs.writeFileSync(manifestPath, JSON.stringify({ categories }, null, 2));
-  console.log(`Manifest generated at ${manifestPath} with ${Object.keys(categories).length} categories.`);
+  console.log(
+    `Manifest generated at ${manifestPath} with ${Object.keys(categories).length} categories.`
+  );
 } else {
   console.log('No public/overlays directory found. Manifest not generated.');
 }

@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { onMount, createEventDispatcher } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { startDrag } from '@crabnebula/tauri-plugin-drag';
   import { writeFile, remove } from '@tauri-apps/plugin-fs';
   import { tempDir, join } from '@tauri-apps/api/path';
+  import { isTauri, dataUrlToUint8Array } from './utils';
 
   // Component Props
   export let portraitUrl: string | null = null;
@@ -18,8 +19,6 @@
   export let overlayOpacity: number = 1.0;
   export let clipPortrait: boolean = true;
 
-  const dispatch = createEventDispatcher();
-
   // Canvas Refs
   let screenCanvas: HTMLCanvasElement;
   let screenCtx: CanvasRenderingContext2D | null = null;
@@ -27,6 +26,10 @@
   // Offscreen canvas for absolute composite compilation
   let offscreenCanvas: HTMLCanvasElement;
   let offscreenCtx: CanvasRenderingContext2D | null = null;
+
+  // Reusable temporary canvas for clipping composites
+  let tempCanvas: HTMLCanvasElement;
+  let tempCtx: CanvasRenderingContext2D | null = null;
 
   // Render images
   let portraitImg: HTMLImageElement | null = null;
@@ -43,26 +46,53 @@
   // Pre-load default overlays/masks on mount
   onMount(() => {
     screenCtx = screenCanvas.getContext('2d');
-    
+
     offscreenCanvas = document.createElement('canvas');
     offscreenCtx = offscreenCanvas.getContext('2d');
-    
+
+    tempCanvas = document.createElement('canvas');
+    tempCtx = tempCanvas.getContext('2d');
+
     updateCanvasSize();
     redraw();
   });
 
+  onDestroy(() => {
+    // Nullify canvas context references to prevent garbage collection leaks
+    screenCtx = null;
+    offscreenCtx = null;
+    tempCtx = null;
+  });
+
   // Reactive updates
-  $: if (size) {
+  $: if (size > 0) {
     updateCanvasSize();
   }
 
+  // Reload images if URLs change
   $: if (
-    portraitUrl || maskUrl || overlayUrl ||
-    size || bgColor || zoom || rotation || 
-    transparency || blur || glow || overlayOpacity || clipPortrait ||
-    panX || panY
+    portraitUrl ||
+    maskUrl ||
+    overlayUrl
   ) {
     loadAndRedraw();
+  }
+
+  // Redraw when rendering parameters or pan/zoom change
+  $: if (
+    size ||
+    bgColor ||
+    zoom ||
+    rotation ||
+    transparency ||
+    blur ||
+    glow ||
+    overlayOpacity ||
+    clipPortrait ||
+    panX ||
+    panY
+  ) {
+    redraw();
   }
 
   function updateCanvasSize() {
@@ -71,6 +101,10 @@
       screenCanvas.height = size;
       offscreenCanvas.width = size;
       offscreenCanvas.height = size;
+      if (tempCanvas) {
+        tempCanvas.width = size;
+        tempCanvas.height = size;
+      }
       redraw();
     }
   }
@@ -92,7 +126,7 @@
   async function loadAndRedraw() {
     if (loading) return;
     loading = true;
-    
+
     try {
       // Re-load images only if URLs changed
       if (portraitUrl && (!portraitImg || portraitImg.src !== portraitUrl)) {
@@ -115,13 +149,40 @@
       } else if (!overlayUrl) {
         overlayImg = null;
       }
-      
+
       redraw();
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e);
     } finally {
       loading = false;
     }
+  }
+
+  // Helper to draw the portrait onto a given 2D context using current transforms and filters
+  function drawPortrait(targetCtx: CanvasRenderingContext2D, w: number, h: number) {
+    if (!portraitImg) return;
+
+    targetCtx.save();
+    targetCtx.translate(w / 2 + panX, h / 2 + panY);
+    targetCtx.rotate((rotation * Math.PI) / 180);
+
+    const aspect = portraitImg.width / portraitImg.height;
+    let drawW = w * zoom;
+    let drawH = h * zoom;
+    if (aspect > 1) {
+      drawW = drawH * aspect;
+    } else {
+      drawH = drawW / aspect;
+    }
+
+    let filters: string[] = [];
+    if (blur > 0) filters.push(`blur(${blur}px)`);
+    if (glow > 0) filters.push(`brightness(${1 + glow / 10}) contrast(${1 + glow / 20})`);
+    if (filters.length > 0) targetCtx.filter = filters.join(' ');
+
+    targetCtx.globalAlpha = transparency;
+    targetCtx.drawImage(portraitImg, -drawW / 2, -drawH / 2, drawW, drawH);
+    targetCtx.restore();
   }
 
   function redraw() {
@@ -135,41 +196,16 @@
     ctx.clearRect(0, 0, w, h);
 
     // 2. Draw Masked Content (Background + Portrait)
-    if (clipPortrait && maskImg) {
-      // Create a temporary canvas to composite the portrait and background, then clip it
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = w;
-      tempCanvas.height = h;
-      const tempCtx = tempCanvas.getContext('2d')!;
+    if (clipPortrait && maskImg && tempCanvas && tempCtx) {
+      // Clear the temporary composite canvas
+      tempCtx.clearRect(0, 0, w, h);
 
       // a. Draw Background Fill
       tempCtx.fillStyle = bgColor;
       tempCtx.fillRect(0, 0, w, h);
 
       // b. Draw Portrait with transforms
-      if (portraitImg) {
-        tempCtx.save();
-        tempCtx.translate(w / 2 + panX, h / 2 + panY);
-        tempCtx.rotate((rotation * Math.PI) / 180);
-
-        const aspect = portraitImg.width / portraitImg.height;
-        let drawW = w * zoom;
-        let drawH = h * zoom;
-        if (aspect > 1) {
-          drawW = drawH * aspect;
-        } else {
-          drawH = drawW / aspect;
-        }
-
-        let filters: string[] = [];
-        if (blur > 0) filters.push(`blur(${blur}px)`);
-        if (glow > 0) filters.push(`brightness(${1 + glow / 10}) contrast(${1 + glow / 20})`);
-        if (filters.length > 0) tempCtx.filter = filters.join(' ');
-
-        tempCtx.globalAlpha = transparency;
-        tempCtx.drawImage(portraitImg, -drawW / 2, -drawH / 2, drawW, drawH);
-        tempCtx.restore();
-      }
+      drawPortrait(tempCtx, w, h);
 
       // c. Clip everything using destination-out
       // (The mask layer is opaque on the OUTSIDE. destination-out erases the background/portrait where the mask is opaque)
@@ -178,35 +214,12 @@
 
       // d. Draw the perfectly masked result onto the main canvas
       ctx.drawImage(tempCanvas, 0, 0);
-      
     } else {
       // No mask — draw background and portrait directly
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, w, h);
 
-      if (portraitImg) {
-        ctx.save();
-        ctx.translate(w / 2 + panX, h / 2 + panY);
-        ctx.rotate((rotation * Math.PI) / 180);
-
-        const aspect = portraitImg.width / portraitImg.height;
-        let drawW = w * zoom;
-        let drawH = h * zoom;
-        if (aspect > 1) {
-          drawW = drawH * aspect;
-        } else {
-          drawH = drawW / aspect;
-        }
-
-        let filters: string[] = [];
-        if (blur > 0) filters.push(`blur(${blur}px)`);
-        if (glow > 0) filters.push(`brightness(${1 + glow / 10}) contrast(${1 + glow / 20})`);
-        if (filters.length > 0) ctx.filter = filters.join(' ');
-
-        ctx.globalAlpha = transparency;
-        ctx.drawImage(portraitImg, -drawW / 2, -drawH / 2, drawW, drawH);
-        ctx.restore();
-      }
+      drawPortrait(ctx, w, h);
     }
 
     // 4. Draw Overlay Frame
@@ -235,13 +248,13 @@
     if (!isDragging || !portraitImg) return;
     const deltaX = e.clientX - startDragX;
     const deltaY = e.clientY - startDragY;
-    
+
     panX += deltaX;
     panY += deltaY;
-    
+
     startDragX = e.clientX;
     startDragY = e.clientY;
-    
+
     redraw();
   }
 
@@ -263,7 +276,6 @@
       // Zoom out
       zoom = Math.max(zoom - zoomStep, 0.1);
     }
-    dispatch('zoomChange', { zoom });
   }
 
   // Handle Drag-and-Drop Files directly into Canvas
@@ -285,14 +297,11 @@
         const reader = new FileReader();
         reader.onload = () => {
           portraitUrl = reader.result as string;
-          dispatch('portraitLoaded', { url: portraitUrl });
         };
         reader.readAsDataURL(file);
       }
     }
   }
-
-  let isTauri = typeof window !== 'undefined' && (window as any).__TAURI__ !== undefined;
 
   // Support Native OS Drag Out for Tauri environment (fixes macOS Tahoe drag-out)
   async function handleDragStartTauri(e: MouseEvent) {
@@ -304,18 +313,8 @@
 
     try {
       const dataUrl = offscreenCanvas.toDataURL('image/png');
-      const parts = dataUrl.split(',');
-      if (parts.length < 2) {
-        console.error("Malformed canvas data URL");
-        return;
-      }
-      const base64Data = parts[1];
-      const binaryString = atob(base64Data);
-      const len = binaryString.length;
-      const bytes = new Uint8Array(len);
-      for (let i = 0; i < len; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
+      const bytes = dataUrlToUint8Array(dataUrl);
+      if (!bytes) return;
 
       const tempPath = await tempDir();
       const filename = 'tokentool-drag-token.png';
@@ -332,11 +331,11 @@
         // Always clean up the temporary file after drag concludes
         try {
           await remove(absolutePath);
-        } catch (cleanupErr) {
+        } catch (cleanupErr: unknown) {
           console.warn('Failed to clean up temp drag file:', cleanupErr);
         }
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to trigger native drag-out:', err);
     }
   }
@@ -345,15 +344,15 @@
   function handleDragStartBrowser(e: DragEvent) {
     if (isTauri) return;
     if (!screenCanvas) return;
-    
+
     const dataUrl = offscreenCanvas.toDataURL('image/png');
     const filename = 'tokentool-token.png';
     const downloadData = `image/png:${filename}:${dataUrl}`;
-    
+
     if (e.dataTransfer) {
       e.dataTransfer.setData('DownloadURL', downloadData);
       e.dataTransfer.effectAllowed = 'copy';
-      
+
       // Visual drag cue
       const dragIcon = document.createElement('img');
       dragIcon.src = dataUrl;
@@ -362,7 +361,7 @@
       dragIcon.style.borderRadius = '50%';
       document.body.appendChild(dragIcon);
       e.dataTransfer.setDragImage(dragIcon, 32, 32);
-      
+
       // Cleanup drag icon
       setTimeout(() => {
         document.body.removeChild(dragIcon);
@@ -398,18 +397,31 @@
     class="interactive-canvas shadow-2xl transition-all duration-300"
     style="width: {size}px; height: {size}px; cursor: {portraitImg ? 'grab' : 'default'}"
   ></canvas>
-  
+
   {#if !portraitUrl}
-    <div class="canvas-overlay pointer-events-none absolute flex flex-col items-center justify-center text-center p-6 text-gray-500 font-medium">
-      <svg class="w-8 h-8 mb-2 text-violet-500 opacity-60 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+    <div
+      class="canvas-overlay pointer-events-none absolute flex flex-col items-center justify-center text-center p-6 text-gray-500 font-medium"
+    >
+      <svg
+        class="w-8 h-8 mb-2 text-violet-500 opacity-60 animate-bounce"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+        ></path>
       </svg>
       <p class="text-sm font-semibold text-slate-300">Drag & Drop Portrait Here</p>
       <p class="text-xs text-slate-500 mt-1">Supports PNG, JPG, WebP</p>
     </div>
   {:else}
     <!-- Dedicated Premium Drag-Out Hand Handle in bottom-right corner -->
-    <button 
+    <button
       draggable={!isTauri}
       on:dragstart={handleDragStartBrowser}
       on:mousedown={handleDragStartTauri}
@@ -417,8 +429,19 @@
       type="button"
       title="Drag this hand to export your completed token directly to desktop/Discord!"
     >
-      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0V12m0-6.5v-1a1.5 1.5 0 113 0V12m0-7.5v-1a1.5 1.5 0 113 0V12m0-8.5a1.5 1.5 0 113 0v11.5a5.5 5.5 0 01-11 0V12a1.5 1.5 0 113 0"></path>
+      <svg
+        class="w-4 h-4 text-white"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0V12m0-6.5v-1a1.5 1.5 0 113 0V12m0-7.5v-1a1.5 1.5 0 113 0V12m0-8.5a1.5 1.5 0 113 0v11.5a5.5 5.5 0 01-11 0V12a1.5 1.5 0 113 0"
+        ></path>
       </svg>
     </button>
   {/if}

@@ -1,6 +1,25 @@
-*.java   text diff=java
-*.html   text diff=html
-*.css    text
-*.js     text
-*.txt    text
-*.md     text
+# Handle line endings automatically for files detected as text
+# and force LF (Unix-style) line endings to prevent cross-platform CRLF drift
+* text=auto eol=lf
+
+# Explicitly define text file types to be normalized as LF
+*.svelte text eol=lf
+*.ts     text eol=lf
+*.tsx    text eol=lf
+*.rs     text eol=lf
+*.js     text eol=lf
+*.json   text eol=lf
+*.css    text eol=lf
+*.html   text eol=lf
+*.md     text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+
+# Binary files that should not be touched
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.webp   binary
+*.psd    binary
+*.ico    binary
+*.pdf    binary
