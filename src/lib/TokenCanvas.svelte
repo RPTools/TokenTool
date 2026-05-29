@@ -69,13 +69,11 @@
     updateCanvasSize();
   }
 
-  // Reload images if URLs change
-  $: if (
-    portraitUrl ||
-    maskUrl ||
-    overlayUrl
-  ) {
-    loadAndRedraw();
+  // Reload images if URLs change (runs on any prop updates, including null resets)
+  $: {
+    if (portraitUrl !== undefined || maskUrl !== undefined || overlayUrl !== undefined) {
+      loadAndRedraw();
+    }
   }
 
   // Redraw when rendering parameters or pan/zoom change
@@ -122,32 +120,48 @@
     });
   }
 
+  // Track last successfully loaded URL strings to prevent relative URL expansion quirks (N-6)
+  let lastLoadedPortraitUrl: string | null = null;
+  let lastLoadedMaskUrl: string | null = null;
+  let lastLoadedOverlayUrl: string | null = null;
+
   let loading = false;
   async function loadAndRedraw() {
     if (loading) return;
     loading = true;
 
+    // Capture target URL values at the start of the loading transaction (N-6)
+    const targetPortraitUrl = portraitUrl;
+    const targetMaskUrl = maskUrl;
+    const targetOverlayUrl = overlayUrl;
+
     try {
-      // Re-load images only if URLs changed
-      if (portraitUrl && (!portraitImg || portraitImg.src !== portraitUrl)) {
-        portraitImg = await loadImg(portraitUrl);
+      // Re-load images only if URLs changed compared to our tracked session values (N-6)
+      if (targetPortraitUrl !== lastLoadedPortraitUrl) {
+        portraitImg = await loadImg(targetPortraitUrl);
+        lastLoadedPortraitUrl = targetPortraitUrl;
         // Reset pan on loading new portrait
         panX = 0;
         panY = 0;
-      } else if (!portraitUrl) {
+      } else if (!targetPortraitUrl) {
         portraitImg = null;
+        lastLoadedPortraitUrl = null;
       }
 
-      if (maskUrl && (!maskImg || maskImg.src !== maskUrl)) {
-        maskImg = await loadImg(maskUrl);
-      } else if (!maskUrl) {
+      if (targetMaskUrl !== lastLoadedMaskUrl) {
+        maskImg = await loadImg(targetMaskUrl);
+        lastLoadedMaskUrl = targetMaskUrl;
+      } else if (!targetMaskUrl) {
         maskImg = null;
+        lastLoadedMaskUrl = null;
       }
 
-      if (overlayUrl && (!overlayImg || overlayImg.src !== overlayUrl)) {
-        overlayImg = await loadImg(overlayUrl);
-      } else if (!overlayUrl) {
+      if (targetOverlayUrl !== lastLoadedOverlayUrl) {
+        overlayImg = await loadImg(targetOverlayUrl);
+        lastLoadedOverlayUrl = targetOverlayUrl;
+      } else if (!targetOverlayUrl) {
         overlayImg = null;
+        lastLoadedOverlayUrl = null;
       }
 
       redraw();
@@ -155,6 +169,14 @@
       console.error(e);
     } finally {
       loading = false;
+      // If URLs changed while we were loading, trigger another load to catch up (N-6)
+      if (
+        portraitUrl !== lastLoadedPortraitUrl ||
+        maskUrl !== lastLoadedMaskUrl ||
+        overlayUrl !== lastLoadedOverlayUrl
+      ) {
+        loadAndRedraw();
+      }
     }
   }
 

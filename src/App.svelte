@@ -169,6 +169,33 @@
 
   // Helper to commit a custom overlay to the state and select it
   function commitCustomOverlay(name: string, mask: string | null, overlay: string) {
+    // Check for duplicates and clean them up immediately to prevent leaks (N-4)
+    const existingIndex = customOverlays.findIndex(c => c.name === name);
+    if (existingIndex !== -1) {
+      const removed = customOverlays[existingIndex];
+      if (removed.overlay && removed.overlay.startsWith('blob:')) {
+        URL.revokeObjectURL(removed.overlay);
+      }
+      if (removed.mask && removed.mask.startsWith('blob:')) {
+        URL.revokeObjectURL(removed.mask);
+      }
+      customOverlays.splice(existingIndex, 1);
+    }
+
+    // Limit list to a maximum of 10 items to prevent unbounded session memory growth (N-4)
+    const MAX_CUSTOM_OVERLAYS = 10;
+    if (customOverlays.length >= MAX_CUSTOM_OVERLAYS) {
+      const oldest = customOverlays.pop();
+      if (oldest) {
+        if (oldest.overlay && oldest.overlay.startsWith('blob:')) {
+          URL.revokeObjectURL(oldest.overlay);
+        }
+        if (oldest.mask && oldest.mask.startsWith('blob:')) {
+          URL.revokeObjectURL(oldest.mask);
+        }
+      }
+    }
+
     customOverlays = [
       {
         name,
@@ -237,6 +264,10 @@
       if (file) {
         loadingPsd = true;
         const reader = new FileReader();
+        reader.onerror = () => {
+          errorMessage = 'Failed to read browser overlay file.';
+          loadingPsd = false;
+        };
         reader.onload = async () => {
           try {
             if (file.name.toLowerCase().endsWith('.psd')) {
@@ -359,6 +390,8 @@
     transparency = 1.0;
     blur = 0;
     glow = 0;
+    overlayOpacity = 1.0;
+    clipPortrait = true;
   }
 </script>
 

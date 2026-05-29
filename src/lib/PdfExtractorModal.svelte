@@ -104,6 +104,16 @@
     }
   }
 
+  function handlePageInputChange(e: Event) {
+    const val = parseInt((e.target as HTMLInputElement).value, 10);
+    if (isNaN(val)) {
+      currentPage = 1;
+    } else {
+      currentPage = Math.max(1, Math.min(totalPages, val));
+    }
+    loadPageImages();
+  }
+
   function nextPage() {
     if (currentPage < totalPages) {
       currentPage++;
@@ -344,7 +354,7 @@
               <input
                 type="number"
                 bind:value={currentPage}
-                on:change={loadPageImages}
+                on:change={handlePageInputChange}
                 min="1"
                 max={totalPages}
                 class="w-12 bg-transparent text-center focus:outline-none text-violet-400 font-bold text-xs"

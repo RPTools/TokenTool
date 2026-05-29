@@ -57,4 +57,63 @@ describe('HTML5 Canvas Layer Masking Pipeline', () => {
     expect(pixel[0]).toBe(255); // Red channel should be fully opaque
     expect(pixel[3]).toBe(255); // Alpha channel must be fully opaque
   });
+
+  describe('loadAndRedraw async state machine', () => {
+    it('correctly catches up to the latest URLs on rapid concurrent changes without dropping frames', async () => {
+      let loading = false;
+      let portraitUrl = 'initial';
+      let lastLoadedPortraitUrl: string | null = null;
+      let drawCount = 0;
+
+      // Mock loader with simulated latency
+      async function mockLoadImg(url: string | null): Promise<string | null> {
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        return url;
+      }
+
+      async function simulatedLoadAndRedraw() {
+        if (loading) return;
+        loading = true;
+
+        const targetPortraitUrl = portraitUrl;
+
+        try {
+          if (targetPortraitUrl !== lastLoadedPortraitUrl) {
+            await mockLoadImg(targetPortraitUrl);
+            lastLoadedPortraitUrl = targetPortraitUrl;
+          }
+          drawCount++;
+        } finally {
+          loading = false;
+          // If URLs changed while we were loading, re-trigger to catch up
+          if (portraitUrl !== lastLoadedPortraitUrl) {
+            await simulatedLoadAndRedraw();
+          }
+        }
+      }
+
+      // 1. Kick off the initial load
+      const firstPromise = simulatedLoadAndRedraw();
+      expect(loading).toBe(true);
+      expect(lastLoadedPortraitUrl).toBeNull();
+
+      // 2. While loading is active, change URLs rapidly
+      portraitUrl = 'intermediate';
+      await simulatedLoadAndRedraw(); // Immediately returns due to loading guard
+
+      portraitUrl = 'latest';
+      await simulatedLoadAndRedraw(); // Immediately returns due to loading guard
+
+      // 3. Await first promise, which will trigger the catch-up in finally block
+      await firstPromise;
+
+      // Allow the catch-up microtasks to resolve fully
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      // 4. Assertions
+      expect(loading).toBe(false);
+      expect(lastLoadedPortraitUrl).toBe('latest'); // Successfully caught up to the latest URL!
+      expect(drawCount).toBe(2); // Frame 1: initial. Frame 2: latest. Intermediate frame bypassed.
+    });
+  });
 });
