@@ -107,34 +107,44 @@ pub(crate) fn extract_from_annotation(
     extracted: &mut Vec<String>,
     processed: &mut HashSet<lopdf::ObjectId>,
 ) {
-    if let Ok(ap) = annot.get(b"AP") {
-        let ap_dict = resolve_to_dict(doc, ap);
+    let ap_dict = annot.get(b"AP")
+        .ok()
+        .and_then(|ap| resolve_to_dict(doc, ap));
 
-        if let Some(dict) = ap_dict {
-            for state_key in &[b"N" as &[u8], b"R" as &[u8], b"D" as &[u8]] {
-                if let Ok(state_obj) = dict.get(state_key) {
-                    if let Ok(state_id) = state_obj.as_reference() {
-                        if let Ok(stream_obj) = doc.get_object(state_id) {
-                            if let Ok(stream) = stream_obj.as_stream() {
-                                if let Some(form_res_dict) = find_resources(doc, &stream.dict) {
-                                    extract_from_resources(doc, form_res_dict, extracted, processed);
-                                }
-                            }
-                        }
-                    } else if let Ok(state_dict) = state_obj.as_dict() {
-                        for (_, val) in state_dict.iter() {
-                            if let Ok(sub_id) = val.as_reference() {
-                                if let Ok(stream_obj) = doc.get_object(sub_id) {
-                                    if let Ok(stream) = stream_obj.as_stream() {
-                                        if let Some(form_res_dict) = find_resources(doc, &stream.dict) {
-                                            extract_from_resources(doc, form_res_dict, extracted, processed);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+    let dict = match ap_dict {
+        Some(d) => d,
+        None => return,
+    };
+
+    for state_key in &[b"N" as &[u8], b"R" as &[u8], b"D" as &[u8]] {
+        let state_obj = match dict.get(state_key) {
+            Ok(obj) => obj,
+            Err(_) => continue,
+        };
+
+        if let Ok(state_id) = state_obj.as_reference() {
+            process_stream_ref(doc, state_id, extracted, processed);
+        } else if let Ok(state_dict) = state_obj.as_dict() {
+            for (_, val) in state_dict.iter() {
+                if let Ok(sub_id) = val.as_reference() {
+                    process_stream_ref(doc, sub_id, extracted, processed);
                 }
+            }
+        }
+    }
+}
+
+#[inline]
+fn process_stream_ref(
+    doc: &Document,
+    ref_id: lopdf::ObjectId,
+    extracted: &mut Vec<String>,
+    processed: &mut HashSet<lopdf::ObjectId>,
+) {
+    if let Ok(stream_obj) = doc.get_object(ref_id) {
+        if let Ok(stream) = stream_obj.as_stream() {
+            if let Some(form_res_dict) = find_resources(doc, &stream.dict) {
+                extract_from_resources(doc, form_res_dict, extracted, processed);
             }
         }
     }

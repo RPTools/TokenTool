@@ -31,8 +31,9 @@ function walk(dir, currentCategory) {
       }
 
       if (['.png', '.jpg', '.jpeg', '.webp', '.psd'].includes(ext)) {
-        if (!categories[currentCategory]) {
-          categories[currentCategory] = [];
+        const categoryKey = currentCategory || 'General';
+        if (!categories[categoryKey]) {
+          categories[categoryKey] = [];
         }
 
         // Normalize slashes for web URLs
@@ -81,7 +82,7 @@ function walk(dir, currentCategory) {
           }
         }
 
-        categories[currentCategory].push({
+        categories[categoryKey].push({
           name: path.basename(file, path.extname(file)),
           path: relativePath,
           thumbPath: thumbPath,

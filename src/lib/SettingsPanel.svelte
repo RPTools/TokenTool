@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type TokenCanvas from './TokenCanvas.svelte';
-  import { dataUrlToUint8Array } from './utils';
+  import { dataUrlToUint8Array, logError } from './utils';
 
   const dispatch = createEventDispatcher<{
     resetAll: void;
@@ -60,7 +60,7 @@
 
         const bytes = dataUrlToUint8Array(dataUrl);
         if (!bytes) {
-          console.error('Failed to decode token image data');
+          logError('Failed to decode token image data');
           return;
         }
 
@@ -189,7 +189,7 @@
           type="range"
           bind:value={zoom}
           min="0.1"
-          max="3"
+          max="5"
           step="0.01"
           class="w-full accent-violet-500 bg-[#171a22] rounded-lg appearance-none h-1"
         />
@@ -225,6 +225,7 @@
         <button
           on:click={() => (bgColor = pc.hex)}
           title={pc.name}
+          aria-label="Set background to {pc.name}"
           class="aspect-square rounded-lg border border-[#2d3440] hover:border-violet-500 shadow transition-all relative overflow-hidden flex items-center justify-center"
           style="background-color: {pc.hex}"
         >

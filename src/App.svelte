@@ -4,6 +4,7 @@
   import OverlayPanel from './lib/OverlayPanel.svelte';
   import SettingsPanel from './lib/SettingsPanel.svelte';
   import PdfExtractorModal from './lib/PdfExtractorModal.svelte';
+  import { logError } from './lib/utils';
 
   // State binds
   let portraitUrl: string | null = null;
@@ -45,7 +46,7 @@
         useFileNumbering = parsed.useFileNumbering ?? true;
         fileSuffix = parsed.fileSuffix || 1;
       } catch (e: unknown) {
-        console.error('Failed to parse cached settings', e);
+        logError('Failed to parse cached settings', e);
       }
     }
 
@@ -169,7 +170,7 @@
         <h1 class="text-lg font-bold tracking-wide font-outfit flex items-center gap-2">
           TokenTool <span
             class="text-[10px] bg-violet-600/30 border border-violet-500/30 text-violet-400 px-2 py-0.5 rounded-full font-mono font-medium"
-            >v2.2.0</span
+            >Demo</span
           >
         </h1>
         <p class="text-xs text-slate-500 font-medium">Next-gen desktop token framing editor</p>
@@ -245,6 +246,7 @@
           {clipPortrait}
           bind:zoom
           bind:rotation
+          on:portraitDrop={(e) => portraitUrl = e.detail.url}
         />
 
         <!-- Live Drag-Out Export cue helper -->

@@ -43,11 +43,11 @@ pub(crate) fn decode_png_predictor(
     bits_per_component: usize,
     data: &[u8],
 ) -> Option<Vec<u8>> {
-    let bytes_per_pixel = (colors * bits_per_component + 7) / 8;
-    let row_len = (columns * colors * bits_per_component + 7) / 8;
+    let bytes_per_pixel = (colors * bits_per_component).div_ceil(8);
+    let row_len = (columns * colors * bits_per_component).div_ceil(8);
     let predictor_row_len = row_len + 1;
 
-    if data.is_empty() || data.len() % predictor_row_len != 0 {
+    if data.is_empty() || !data.len().is_multiple_of(predictor_row_len) {
         return None;
     }
 

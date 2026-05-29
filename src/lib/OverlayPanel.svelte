@@ -2,7 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import manifest from './overlayManifest.json';
   import { parseTokenPsd } from './psdParser';
-  import { getBasename } from './utils';
+  import { getBasename, logError } from './utils';
 
   interface OverlayPreset {
     name: string;
@@ -120,7 +120,7 @@
           commitCustomOverlay(name, null, dataUrl);
         }
       } catch (err: unknown) {
-        console.error('Failed to load custom overlay:', err);
+        logError('Failed to load custom overlay:', err);
         errorMessage =
           err instanceof Error ? err.message : 'Failed to read or parse the overlay file.';
       } finally {
@@ -189,7 +189,7 @@
         }
       } catch (err: unknown) {
         errorMessage = `Failed to parse built-in PSD: ${err instanceof Error ? err.message : String(err)}`;
-        console.error(err);
+        logError(err);
       } finally {
         loadingPsd = false;
       }
@@ -271,6 +271,7 @@
           {#each customOverlays as custom, index (custom.overlay)}
             <button
               on:click={() => handleSelectCustom(custom, index)}
+              aria-label="Select custom overlay {custom.name}"
               class="overlay-thumb-card group aspect-square bg-[#1a1e27] border rounded-xl p-2 flex flex-col items-center justify-center
                 {activeOverlayId === `custom-${index}`
                 ? 'border-violet-500 bg-violet-950/10 shadow-lg shadow-violet-900/10'
@@ -307,6 +308,7 @@
         {#each currentCategoryOverlays as preset (preset.path)}
           <button
             on:click={() => handleSelectPreset(preset)}
+            aria-label="Select preset overlay {preset.name}"
             class="overlay-thumb-card group aspect-square bg-[#1a1e27] border rounded-xl p-2 flex flex-col items-center justify-center
               {activeOverlayId === preset.path
               ? 'border-violet-500 bg-violet-950/10 shadow-lg shadow-violet-900/10'

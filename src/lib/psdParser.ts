@@ -1,4 +1,5 @@
 import { readPsd, initializeCanvas } from 'ag-psd';
+import { logError } from './utils';
 
 // Initialize canvas factory for ag-psd to decode layer pixels in the browser
 initializeCanvas((width, height) => {
@@ -67,7 +68,7 @@ export async function parseTokenPsd(fileBuffer: ArrayBuffer): Promise<PsdLayers>
       height
     };
   } catch (error: unknown) {
-    console.error('Failed to parse PSD file:', error);
+    logError('Failed to parse PSD file:', error);
     throw new Error(
       'Could not parse PSD format. Ensure it has Layer 1 (Mask) and Layer 2 (Overlay).',
       { cause: error }

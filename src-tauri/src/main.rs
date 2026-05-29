@@ -53,7 +53,8 @@ fn extract_pdf_images(pdf_path: String, page_number: usize) -> Result<PdfPageOut
         return Err("File not found or is not a valid file.".to_string());
     }
 
-    let (images, total_pages, total_images) = extract_images_from_pdf_page(pdf_path, page_number)?;
+    let (images, total_pages, total_images) = extract_images_from_pdf_page(pdf_path, page_number)
+        .map_err(|e| e.to_string())?;
     Ok(PdfPageOutput { images, total_pages, total_images })
 }
 

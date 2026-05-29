@@ -1,9 +1,13 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import { startDrag } from '@crabnebula/tauri-plugin-drag';
   import { writeFile, remove } from '@tauri-apps/plugin-fs';
   import { tempDir, join } from '@tauri-apps/api/path';
-  import { isTauri, dataUrlToUint8Array } from './utils';
+  import { isTauri, dataUrlToUint8Array, logError, logWarn } from './utils';
+
+  const dispatch = createEventDispatcher<{
+    portraitDrop: { url: string };
+  }>();
 
   // Component Props
   export let portraitUrl: string | null = null;
@@ -76,19 +80,18 @@
     }
   }
 
-  // Redraw when rendering parameters or pan/zoom change
+  // Redraw when rendering parameters or pan/zoom change (excluding size to avoid double-redraw)
   $: if (
-    size ||
-    bgColor ||
-    zoom ||
-    rotation ||
-    transparency ||
-    blur ||
-    glow ||
-    overlayOpacity ||
-    clipPortrait ||
-    panX ||
-    panY
+    bgColor !== undefined ||
+    zoom !== undefined ||
+    rotation !== undefined ||
+    transparency !== undefined ||
+    blur !== undefined ||
+    glow !== undefined ||
+    overlayOpacity !== undefined ||
+    clipPortrait !== undefined ||
+    panX !== undefined ||
+    panY !== undefined
   ) {
     redraw();
   }
@@ -166,7 +169,7 @@
 
       redraw();
     } catch (e: unknown) {
-      console.error(e);
+      logError(e);
     } finally {
       loading = false;
       // If URLs changed while we were loading, trigger another load to catch up (N-6)
@@ -319,7 +322,7 @@
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
-          portraitUrl = reader.result as string;
+          dispatch('portraitDrop', { url: reader.result as string });
         };
         reader.readAsDataURL(file);
       }
@@ -355,11 +358,11 @@
         try {
           await remove(absolutePath);
         } catch (cleanupErr: unknown) {
-          console.warn('Failed to clean up temp drag file:', cleanupErr);
+          logWarn('Failed to clean up temp drag file:', cleanupErr);
         }
       }
     } catch (err: unknown) {
-      console.error('Failed to trigger native drag-out:', err);
+      logError('Failed to trigger native drag-out:', err);
     }
   }
 

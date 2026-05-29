@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { base64ToUint8Array, getBasename, isTauri } from './utils';
+  import { base64ToUint8Array, getBasename, isTauri, logError } from './utils';
   import PdfImageCard from './PdfImageCard.svelte';
 
   export let show: boolean = false;
@@ -40,7 +40,7 @@
         loadPageImages();
       }
     } catch (e: unknown) {
-      console.error(e);
+      logError(e);
       statusMessage = 'Tauri bridge unavailable. Using sample extractor.';
       mockPdfLoad();
     }
@@ -82,20 +82,20 @@
         statusMessage = `Extracted ${images.length} images from page ${currentPage} of ${totalPages}`;
       }
     } catch (e: unknown) {
-      console.error('Rust PDF extraction failed:', e);
+      logError('Rust PDF extraction failed:', e);
       if (isTauri) {
         statusMessage = `Extraction Error: Could not read images from PDF.`;
         images = [];
       } else {
-        // Fallback for rich mock data inside browser preview
+        // Fallback for rich CSP-compliant mock data inside browser preview (N-13)
         setTimeout(() => {
           images = [
-            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-            'https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-            'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-            'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-            'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%231e1b4b"/><circle cx="50" cy="35" r="20" fill="%23818cf8"/><path d="M20 80c0-15 15-20 30-20s30 5 30 20" fill="%23818cf8"/></svg>',
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23064e3b"/><circle cx="50" cy="35" r="20" fill="%2334d399"/><path d="M20 80c0-15 15-20 30-20s30 5 30 20" fill="%2334d399"/></svg>',
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23450a0a"/><circle cx="50" cy="35" r="20" fill="%23f87171"/><path d="M20 80c0-15 15-20 30-20s30 5 30 20" fill="%23f87171"/></svg>',
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%2378350f"/><circle cx="50" cy="35" r="20" fill="%23fbbf24"/><path d="M20 80c0-15 15-20 30-20s30 5 30 20" fill="%23fbbf24"/></svg>',
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%231e3a8a"/><circle cx="50" cy="35" r="20" fill="%2360a5fa"/><path d="M20 80c0-15 15-20 30-20s30 5 30 20" fill="%2360a5fa"/></svg>',
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%234c0519"/><circle cx="50" cy="35" r="20" fill="%23f472b6"/><path d="M20 80c0-15 15-20 30-20s30 5 30 20" fill="%23f472b6"/></svg>'
           ];
           statusMessage = `Fallback Mode: Extracted ${images.length} mockup portraits.`;
         }, 800);
@@ -193,7 +193,7 @@
         // Extract raw base64 data bytes with split guard (L-2)
         const parts = imgDataUrl.split(',');
         if (parts.length < 2) {
-          console.error('Malformed image data URL');
+          logError('Malformed image data URL');
           return;
         }
         const base64Data = parts[1];
@@ -202,7 +202,7 @@
         statusMessage = `Successfully saved image to: ${getBasename(selectedPath)}`;
       }
     } catch (e: unknown) {
-      console.error('Failed to save image:', e);
+      logError('Failed to save image:', e);
       statusMessage = `Save failed: Could not write image file.`;
     }
   }
@@ -228,18 +228,19 @@
         const rawPdfName = getBasename(pdfPath).replace('.pdf', '') || 'extracted';
         // Sanitize pdfName to prevent traversal and illegal characters (H-3 / L-6)
         const pdfName = rawPdfName.replace(/[\\/:*?"<>|]/g, '_').trim() || 'extracted';
-        const separator = selectedDir.includes('\\') ? '\\' : '/';
+        
+        const { join } = await import('@tauri-apps/api/path');
 
         let savedCount = 0;
         for (const key of Object.keys(selections)) {
           const item = selections[key];
           const filename = `${pdfName}_pg${item.page}_img${item.index + 1}.png`;
-          const filePath = `${selectedDir}${separator}${filename}`;
+          const filePath = await join(selectedDir, filename);
 
           // Extract raw base64 data bytes with split guard (L-2)
           const parts = item.dataUrl.split(',');
           if (parts.length < 2) {
-            console.error(`Malformed image data URL for key: ${key}`);
+            logError(`Malformed image data URL for key: ${key}`);
             continue;
           }
           const base64Data = parts[1];
@@ -253,7 +254,7 @@
         statusMessage = `Successfully saved ${savedCount} images to folder!`;
       }
     } catch (e: unknown) {
-      console.error('Bulk save failed:', e);
+      logError('Bulk save failed:', e);
       statusMessage = `Bulk save failed: Could not write files to directory.`;
     } finally {
       loading = false;
@@ -268,10 +269,9 @@
     on:keydown={(e) => {
       if (e.key === 'Escape') show = false;
     }}
-    role="button"
-    tabindex="-1"
+    role="presentation"
   >
-    <div class="modal-container animate-modal-enter">
+    <div class="modal-container animate-modal-enter" role="dialog" aria-modal="true" aria-labelledby="pdf-modal-title">
       <!-- Top Header -->
       <div
         class="flex justify-between items-center px-6 py-4 border-b border-[#2e3440] bg-[#15181f]"
@@ -292,7 +292,7 @@
             ></path>
           </svg>
           <div>
-            <h2 class="text-lg font-bold text-slate-100 font-outfit">PDF Image Extractor</h2>
+            <h2 id="pdf-modal-title" class="text-lg font-bold text-slate-100 font-outfit">PDF Image Extractor</h2>
             <p class="text-xs text-slate-500">
               Extract maps & character portraits directly from campaign booklets
             </p>

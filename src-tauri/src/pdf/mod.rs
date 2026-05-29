@@ -5,8 +5,30 @@ mod resources;
 use std::collections::HashSet;
 use std::path::Path;
 use lopdf::Document;
+use thiserror::Error;
 
 use resources::{find_resources, extract_from_resources, extract_from_annotation};
+
+#[derive(Error, Debug)]
+pub enum PdfError {
+    #[error("IO error reading PDF file '{path}': {source}")]
+    Io {
+        path: String,
+        #[source]
+        source: std::io::Error,
+    },
+    #[error("PDF parsing error: {0}")]
+    Parse(String),
+    #[error("PDF decryption failed: {0}")]
+    DecryptionFailed(String),
+    #[error("Page {requested} not found in PDF (Total pages: {total})")]
+    PageNotFound {
+        requested: usize,
+        total: usize,
+    },
+    #[error("PDF object error: {0}")]
+    ObjectError(String),
+}
 
 /// Extracts embedded images and graphics from a specific page of a PDF document.
 ///
@@ -15,27 +37,30 @@ use resources::{find_resources, extract_from_resources, extract_from_annotation}
 /// * `page_number` - The 1-based page index to extract from.
 ///
 /// # Returns
-/// * `Result<(Vec<String>, usize, usize), String>` - On success, returns a tuple containing:
+/// * `Result<(Vec<String>, usize, usize), PdfError>` - On success, returns a tuple containing:
 ///   1. A vector of base64-encoded PNG image data URLs.
 ///   2. The total page count of the document.
 ///   3. The total image count of all objects in the PDF document.
-///   Or an error string.
+///      Or a `PdfError`.
 pub fn extract_images_from_pdf_page<P: AsRef<Path>>(
     pdf_path: P,
     page_number: usize,
-) -> Result<(Vec<String>, usize, usize), String> {
+) -> Result<(Vec<String>, usize, usize), PdfError> {
     let pdf_path_ref = pdf_path.as_ref();
     log::info!("Rust reading file bytes for path: {:?}", pdf_path_ref);
 
     // Read the file bytes ourselves using standard Rust filesystem API
     let file_bytes = std::fs::read(pdf_path_ref)
-        .map_err(|e| format!("IO Error reading PDF file '{:?}': {}", pdf_path_ref, e))?;
+        .map_err(|e| PdfError::Io {
+            path: pdf_path_ref.to_string_lossy().into_owned(),
+            source: e,
+        })?;
     
     log::info!("Read PDF file bytes successfully. File size: {} bytes", file_bytes.len());
 
     // Parse the PDF from memory to bypass any file handle encoding/locking quirks in lopdf
     let mut doc = Document::load_mem(&file_bytes)
-        .map_err(|e| format!("PDF parsing error: {}", e))?;
+        .map_err(|e| PdfError::Parse(e.to_string()))?;
 
     log::info!("PDF parse successful. Total objects parsed: {}", doc.objects.len());
     log::info!("PDF encrypted: {}", doc.is_encrypted());
@@ -44,7 +69,7 @@ pub fn extract_images_from_pdf_page<P: AsRef<Path>>(
     if doc.is_encrypted() {
         match doc.decrypt(b"") {
             Ok(_) => log::info!("PDF successfully decrypted with default/empty password."),
-            Err(e) => log::warn!("PDF decryption failed: {:?}", e),
+            Err(e) => return Err(PdfError::DecryptionFailed(e.to_string())),
         }
     }
 
@@ -57,7 +82,7 @@ pub fn extract_images_from_pdf_page<P: AsRef<Path>>(
         let mut page_ids = Vec::new();
         for (id, object) in &doc.objects {
             if let Ok(dict) = object.as_dict() {
-                let has_type_page = dict.get(b"Type").and_then(|o| o.as_name()).map_or(false, |t| t == b"Page");
+                let has_type_page = dict.get(b"Type").and_then(|o| o.as_name()).is_ok_and(|t| t == b"Page");
                 let has_mediabox = dict.get(b"MediaBox").is_ok();
                 let has_parent = dict.get(b"Parent").is_ok();
                 let has_kids = dict.get(b"Kids").is_ok();
@@ -81,10 +106,13 @@ pub fn extract_images_from_pdf_page<P: AsRef<Path>>(
     let total_pages = pages.len();
     
     let page_id = pages.get(&(page_number as u32))
-        .ok_or_else(|| format!("Page {} not found in PDF (Total pages: {})", page_number, total_pages))?;
+        .ok_or(PdfError::PageNotFound {
+            requested: page_number,
+            total: total_pages,
+        })?;
 
-    let page_obj = doc.get_object(*page_id).map_err(|e| e.to_string())?;
-    let page_dict = page_obj.as_dict().map_err(|_| "Page is not a dictionary".to_string())?;
+    let page_obj = doc.get_object(*page_id).map_err(|e| PdfError::ObjectError(e.to_string()))?;
+    let page_dict = page_obj.as_dict().map_err(|_| PdfError::ObjectError("Page is not a dictionary".to_string()))?;
 
     let mut extracted_images = Vec::new();
     let mut processed_streams: HashSet<lopdf::ObjectId> = HashSet::new();
@@ -111,9 +139,9 @@ pub fn extract_images_from_pdf_page<P: AsRef<Path>>(
 
     let total_images = doc.objects.iter().filter(|(_, object)| {
         if let Ok(dict) = object.as_dict() {
-            dict.get(b"Subtype").and_then(|o| o.as_name()).map_or(false, |s| s == b"Image")
+            dict.get(b"Subtype").and_then(|o| o.as_name()).is_ok_and(|s| s == b"Image")
         } else if let Ok(stream) = object.as_stream() {
-            stream.dict.get(b"Subtype").and_then(|o| o.as_name()).map_or(false, |s| s == b"Image")
+            stream.dict.get(b"Subtype").and_then(|o| o.as_name()).is_ok_and(|s| s == b"Image")
         } else {
             false
         }

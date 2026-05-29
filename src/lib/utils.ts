@@ -35,3 +35,21 @@ export function dataUrlToUint8Array(dataUrl: string): Uint8Array | null {
 export function getBasename(path: string): string {
   return path.split('\\').pop()?.split('/').pop() || '';
 }
+
+/**
+ * Safe console error logger that only executes in development mode
+ */
+export function logError(...args: unknown[]): void {
+  if (import.meta.env.DEV) {
+    console.error(...args);
+  }
+}
+
+/**
+ * Safe console warning logger that only executes in development mode
+ */
+export function logWarn(...args: unknown[]): void {
+  if (import.meta.env.DEV) {
+    console.warn(...args);
+  }
+}

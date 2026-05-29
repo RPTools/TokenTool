@@ -4237,6 +4237,7 @@ dependencies = [
  "tauri-plugin-dialog",
  "tauri-plugin-drag",
  "tauri-plugin-fs",
+ "thiserror 2.0.18",
 ]
 
 [[package]]
