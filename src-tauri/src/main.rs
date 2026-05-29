@@ -1,9 +1,9 @@
 // Prevents additional console window on Windows in release
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod pdf_extractor;
+mod pdf;
 
-use pdf_extractor::extract_images_from_pdf_page;
+use pdf::extract_images_from_pdf_page;
 
 /// Serializable response payload returned by the `extract_pdf_images` Tauri command.
 ///
