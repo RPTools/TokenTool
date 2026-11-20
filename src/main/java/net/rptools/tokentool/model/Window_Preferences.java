@@ -15,6 +15,7 @@
 package net.rptools.tokentool.model;
 
 import com.google.gson.Gson;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,8 +42,13 @@ public class Window_Preferences {
   }
 
   public void setWindow(Stage stage) {
-    stage.setX(windowX);
-    stage.setY(windowY);
+    for (Screen screen : Screen.getScreens()) {
+      if (screen.getBounds().contains(windowX, windowY)) {
+        stage.setX(windowX);
+        stage.setY(windowY);
+        break;
+      }
+    }
     if (windowWidth > 10) stage.setWidth(windowWidth);
     if (windowHeight > 10) stage.setHeight(windowHeight);
   }
