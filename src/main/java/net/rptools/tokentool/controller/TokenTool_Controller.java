@@ -567,8 +567,10 @@ public class TokenTool_Controller {
     File lastBackgroundImageFile =
         new File(AppPreferences.getPreference(AppPreferences.LAST_BACKGROUND_IMAGE_FILE, ""));
 
-    if (lastBackgroundImageFile.exists()) fileChooser.setInitialDirectory(lastBackgroundImageFile);
-    else if (lastBackgroundImageFile.getParentFile() != null)
+    if (lastBackgroundImageFile.isDirectory())
+      fileChooser.setInitialDirectory(lastBackgroundImageFile);
+    else if (lastBackgroundImageFile.getParentFile() != null
+        && lastBackgroundImageFile.getParentFile().isDirectory())
       fileChooser.setInitialDirectory(lastBackgroundImageFile.getParentFile());
 
     File selectedImageFile =
@@ -605,8 +607,9 @@ public class TokenTool_Controller {
     File lastPortraitImageFile =
         new File(AppPreferences.getPreference(AppPreferences.LAST_PORTRAIT_IMAGE_FILE, ""));
 
-    if (lastPortraitImageFile.exists()) fileChooser.setInitialDirectory(lastPortraitImageFile);
-    else if (lastPortraitImageFile.getParentFile() != null)
+    if (lastPortraitImageFile.isDirectory()) fileChooser.setInitialDirectory(lastPortraitImageFile);
+    else if (lastPortraitImageFile.getParentFile() != null
+        && lastPortraitImageFile.getParentFile().isDirectory())
       fileChooser.setInitialDirectory(lastPortraitImageFile.getParentFile());
 
     File selectedImageFile =
@@ -642,8 +645,8 @@ public class TokenTool_Controller {
 
     File lastPdfFile = new File(AppPreferences.getPreference(AppPreferences.LAST_PDF_FILE, ""));
 
-    if (lastPdfFile.exists()) fileChooser.setInitialDirectory(lastPdfFile);
-    else if (lastPdfFile.getParentFile() != null)
+    if (lastPdfFile.isDirectory()) fileChooser.setInitialDirectory(lastPdfFile);
+    else if (lastPdfFile.getParentFile() != null && lastPdfFile.getParentFile().isDirectory())
       fileChooser.setInitialDirectory(lastPdfFile.getParentFile());
 
     File selectedPDF = fileChooser.showOpenDialog((Stage) compositeGroup.getScene().getWindow());
